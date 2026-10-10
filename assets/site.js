@@ -1,190 +1,371 @@
-const navItems = [
-  {label:'Accueil', href:'index.html'},
-  {label:'Le club', href:'club.html'},
-  {label:'Événements', href:'evenements.html'},
-  {label:'Le jeu', href:'jeu.html'},
-  {label:'Le bureau', href:'bureau.html'},
-  {label:'Partenaires', href:'partenaires.html'},
-  {label:'Merch', href:'merch.html'},
-  {label:'Rejoindre', href:'rejoindre.html'}
-];
-const boardMembers = [
-  {role:'Présidence', name:'Lucas Denis', bio:'Président · pilote les décisions et la relation avec les partenaires.'},
-  {role:'Vice-présidence', name:'Yasmine Martin', bio:'Coordonne les missions de l’équipe et les suivis internes.'},
-  {role:'Événements', name:'Noah Girard', bio:'Programme les Comptoirs, les Sorties Terrain et les Meet and Talk.'},
-  {role:'Partenariats', name:'Marie Chardon', bio:'Développe les relations avec les structures et les intervenants.'},
-  {role:'Trésorerie', name:'Léo Moreau', bio:'Gère les financements, les cotisations et les remboursements.'},
-  {role:'Communication', name:'Inès Dupont', bio:'Met en valeur le club sur les réseaux et dans les supports.'}
-];
-const partnersList = [
-  'Nantes Métropole','Audencia','Auberge de Jeunesse','Mairie de Nantes','Caisse d’Épargne','Bureau des Clubs'
-];
-const eventsList = [
-  {type:'Comptoir', title:'Le droit dans la vie de tous les jours', date:'Mercredi 9 octobre', place:'Maison des étudiants', desc:'Un débat sur le droit des contrats, l’entreprise et la vie de tous les jours.'},
-  {type:'Meet and Talk', title:'Rencontre avec une dirigeante', date:'Jeudi 17 octobre', place:'City Campus', desc:'Une séance de questions-réponses avec une dirigeante de PME.'},
-  {type:'Sortie Terrain', title:'Tribunal de commerce', date:'Samedi 26 octobre', place:'Nantes', desc:'Visite du tribunal et échanges sur les métiers juridiques.'},
-  {type:'Conférence', title:'Marketing et influence', date:'Mercredi 13 novembre', place:'Audencia', desc:'Le marketing de marque dans les universités et les réseaux.'},
-  {type:'Comptoir', title:'Négociation et prise de parole', date:'Mercredi 20 novembre', place:'Café partenaire', desc:'S’entraîner à la négociation en anglais et en français.'}
-];
-const merchList = [
-  {name:'La veste du Comptoir', tag:'Vêtement', price:'À venir', desc:'Veste universitaire bleu marine et logo du club.'},
-  {name:'Le sweat à capuche', tag:'Textile', price:'À venir', desc:'Le classique du club, chaud et confortable.'},
-  {name:'La bouteille isotherme', tag:'Accessoire', price:'À venir', desc:'Pour les trajets et les journées longues.'},
-  {name:'Le sac à dos', tag:'Utilitaire', price:'À venir', desc:'Un compagnon de cours, de stage et de sorties.'}
-];
-const topics = [
-  'Quel sujet vous ferait voir le public d’un débat ?','Comment convaincre sans imposer ?','Que faut-il retenir d’un contrat ?','Comment défendre une idée à voix haute ?','Quelle décision prend un chef ?'
-];
+/* Le Comptoir — affichage du site. Les contenus se modifient dans le tableau de bord Wix (CMS), pas ici. */
+(function () {
+  'use strict';
+  var CID = 'bcb9b46d-59ad-415e-aa12-0fdb9af4ab6c', API = 'https://www.wixapis.com', D = document;
 
-function createHeader() {
-  const header = document.getElementById('hd');
-  if (!header) return;
-  const nav = navItems.map(item => `<a href="${item.href}">${item.label}</a>`).join('');
-  header.innerHTML = `
-    <div class="wrap">
-      <a class="brand" href="index.html"><span class="brand-mark">LC</span><span>Le Comptoir</span></a>
-      <nav>${nav}</nav>
-      <button class="lang" type="button" data-lang-toggle>FR / EN</button>
-    </div>
-  `;
-  const btn = header.querySelector('[data-lang-toggle]');
-  btn.addEventListener('click', () => {
-    const current = localStorage.getItem('lc_lang') || 'fr';
-    const next = current === 'fr' ? 'en' : 'fr';
-    localStorage.setItem('lc_lang', next);
-    applyLanguage();
-  });
-}
+  function get(k) { try { return localStorage.getItem('lc_' + k); } catch (e) { return null; } }
+  function put(k, v) { try { localStorage.setItem('lc_' + k, v); } catch (e) {} }
+  var L = get('lang') === 'en' ? 'en' : 'fr';
+  function t(fr, en) { return L === 'en' && en ? en : fr; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function $(s, r) { return (r || D).querySelector(s); }
+  function $$(s, r) { return Array.prototype.slice.call((r || D).querySelectorAll(s)); }
+  var here = (location.pathname.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
 
-function createFooter() {
-  const footer = document.getElementById('ft');
-  if (!footer) return;
-  footer.innerHTML = `
-    <div class="wrap" style="padding:26px 0 42px; color:var(--muted); display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;">
-      <div>© Le Comptoir · Club étudiant d’Audencia</div>
-      <div style="display:flex;gap:18px;flex-wrap:wrap;">
-        <a href="mentions.html">Mentions légales</a>
-        <a href="confidentialite.html">Confidentialité</a>
-        <a href="conditions.html">Conditions</a>
-      </div>
-    </div>
-  `;
-}
+  /* Le sceau du club, dessiné une fois et réutilisé (en-tête, ouverture, pied de page) */
+  var n = 0;
+  function seal() {
+    n++;
+    var a = 'sa' + n, b = 'sb' + n, star = 'M0 -9 L2.6 -2.6 L9 0 L2.6 2.6 L0 9 L-2.6 2.6 L-9 0 L-2.6 -2.6Z';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" role="img" aria-label="Le Comptoir, club étudiant. Fortes fortuna adiuvat.">' +
+      '<defs><path id="' + a + '" d="M 80 250 A 170 170 0 0 1 420 250"/><path id="' + b + '" d="M 72 250 A 178 178 0 0 0 428 250"/></defs>' +
+      '<circle cx="250" cy="250" r="238" fill="#0B1F4D"/><circle cx="250" cy="250" r="226" fill="none" stroke="#D9A441" stroke-width="5"/><circle cx="250" cy="250" r="214" fill="none" stroke="#D9A441" stroke-width="1.5"/>' +
+      '<text font-family="Lora, Georgia, serif" font-weight="700" font-size="46" letter-spacing="2" fill="#F5F1E6" text-anchor="middle"><textPath href="#' + a + '" startOffset="50%">LE COMPTOIR</textPath></text>' +
+      '<g fill="#D9A441"><path transform="translate(62 250)" d="' + star + '"/><path transform="translate(438 250)" d="' + star + '"/></g>' +
+      '<line x1="190" y1="352" x2="310" y2="352" stroke="#D9A441" stroke-width="1.2" opacity=".7"/>' +
+      '<g transform="translate(250 205)"><path class="steam" d="M -14 -52 q -10 -12 0 -24 q 10 -12 0 -24" fill="none" stroke="#D9A441" stroke-width="4" stroke-linecap="round"/><path class="steam" d="M 10 -52 q -10 -12 0 -24 q 10 -12 0 -24" fill="none" stroke="#D9A441" stroke-width="4" stroke-linecap="round"/>' +
+      '<path d="M -38 -36 h 76 v 30 a 38 38 0 0 1 -76 0 z" fill="#F5F1E6"/><path d="M 38 -26 h 10 a 14 14 0 0 1 0 28 h -12" fill="none" stroke="#F5F1E6" stroke-width="7"/><rect x="-52" y="26" width="104" height="7" rx="3.5" fill="#D9A441"/></g>' +
+      '<g transform="translate(250 300)"><path d="M 0 -40 C -30 -58 -80 -58 -118 -44 L -118 20 C -80 6 -30 6 0 24 Z" fill="#F5F1E6"/><path d="M 0 -40 C 30 -58 80 -58 118 -44 L 118 20 C 80 6 30 6 0 24 Z" fill="#EDE4D0"/>' +
+      '<g stroke="#0B1F4D" stroke-width="2.2" opacity=".35" fill="none"><path d="M -20 -30 C -45 -40 -80 -40 -100 -32"/><path d="M -20 -16 C -45 -26 -80 -26 -100 -18"/><path d="M -20 -2 C -45 -12 -80 -12 -100 -4"/><path d="M 20 -30 C 45 -40 80 -40 100 -32"/><path d="M 20 -16 C 45 -26 80 -26 100 -18"/><path d="M 20 -2 C 45 -12 80 -12 100 -4"/></g>' +
+      '<path d="M -130 24 C -80 12 -30 14 0 34 C 30 14 80 12 130 24" fill="none" stroke="#D9A441" stroke-width="6" stroke-linecap="round"/></g>' +
+      '<text font-family="Lato, Carlito, sans-serif" font-weight="700" font-size="20" letter-spacing="3" fill="#E8B04B" text-anchor="middle"><textPath href="#' + b + '" startOffset="50%">FORTES FORTUNA ADIUVAT</textPath></text>' +
+      '<text x="250" y="376" font-family="Lato, Carlito, sans-serif" font-size="14" letter-spacing="3" fill="#F5F1E6" text-anchor="middle">' + t('CLUB ÉTUDIANT', 'STUDENT CLUB') + '</text></svg>';
+  }
 
-function renderBoard() {
-  const el = document.getElementById('board');
-  if (!el) return;
-  el.innerHTML = boardMembers.map(member => `
-    <article class="board-card">
-      <div class="role">${member.role}</div>
-      <h4>${member.name}</h4>
-      <p class="bio">${member.bio}</p>
-    </article>
-  `).join('');
-}
+  /* Langue : le texte anglais est porté par l'attribut data-en de chaque élément */
+  function translate() {
+    D.documentElement.lang = L;
+    if (L !== 'en') return;
+    $$('[data-en]').forEach(function (e) { e.innerHTML = e.getAttribute('data-en'); });
+    $$('[data-en-ph]').forEach(function (e) { e.placeholder = e.getAttribute('data-en-ph'); });
+    var te = D.documentElement.getAttribute('data-title-en');
+    if (te) D.title = te;
+  }
 
-function renderRoster() {
-  const el = document.getElementById('roster');
-  if (!el) return;
-  el.innerHTML = boardMembers.slice(0,4).map(member => `<li><b>${member.name}</b><span>${member.role}</span></li>`).join('');
-}
+  /* Navigation : l'ordre suit le parcours d'un visiteur (découvrir, venir, acheter, s'associer) */
+  var NAV = [['club', 'Le club', 'The club'], ['evenements', 'Événements', 'Events'], ['jeu', 'Le jeu', 'The game'], ['bureau', 'Le bureau', 'The board'], ['merch', 'Merch', 'Merch'], ['partenaires', 'Partenaires', 'Partners']];
+  /* Action principale de chaque page, reprise par la barre mobile */
+  var DOCK = {
+    merch: [['#precommande', 'Réserver un article', 'Reserve an item']],
+    partenaires: [['#contact', 'Prendre rendez-vous', 'Book a call']],
+    rejoindre: [],
+    jeu: [['#kit', 'Imprimer le jeu', 'Print the game'], ['rejoindre.html', 'Venir à un Comptoir', 'Come to a Comptoir']]
+  };
+  function link(h, fr, en, cls) { return '<a' + (cls ? ' class="' + cls + '"' : '') + ' href="' + h + '"' + (here + '.html' === h ? ' aria-current="page"' : '') + '>' + t(fr, en) + '</a>'; }
+  function chrome() {
+    var main = $('main');
+    if (main && !main.id) main.id = 'main';
+    D.body.insertAdjacentHTML('afterbegin', '<a class="skip" href="#main">' + t('Aller au contenu', 'Skip to content') + '</a>');
+    $('#hd').innerHTML = '<div class="wrap bar"><a class="brand" href="index.html" aria-label="Le Comptoir, ' + t('accueil', 'home') + '">' + seal() + '<span>Le Comptoir</span></a>' +
+      '<button class="burger" aria-controls="menu" aria-expanded="false"><i aria-hidden="true"></i>' + t('Menu', 'Menu') + '</button>' +
+      '<nav class="menu" id="menu" aria-label="' + t('Navigation principale', 'Main navigation') + '"><div class="links">' +
+      NAV.map(function (v) { return link(v[0] + '.html', v[1], v[2]); }).join('') + '</div>' +
+      '<a class="btn" href="rejoindre.html">' + t('Venir à un Comptoir', 'Come to a Comptoir') + '</a>' +
+      '<p class="hint">' + t('Chaque mercredi · ouvert à tous les étudiants du City Campus', 'Every Wednesday · open to all City Campus students') + '</p>' +
+      '<button class="lang" aria-label="' + t('Switch to English', 'Passer en français') + '">' + t('EN', 'FR') + '</button></nav></div>';
+    $('#ft').innerHTML = '<div class="wrap"><div class="foot"><div class="about">' + seal() + '<p><b>Le Comptoir</b></p>' +
+      '<p class="soft">' + t('Club étudiant du Bachelor in Management, incubé au Bureau des Clubs d’Audencia · City Campus, Nantes', 'Bachelor in Management student club, incubated by Audencia’s Bureau des Clubs · City Campus, Nantes') + '</p>' +
+      '<p class="motto"><b>FORTES FORTUNA ADIUVAT</b><br>' + t('« La fortune sourit aux audacieux », Térence', '“Fortune favours the bold”, Terence') + '</p>' +
+      '<p>Contact : <a data-set-mail href="mailto:jblucas.denis@audencia.com">jblucas.denis@audencia.com</a></p></div>' +
+      '<nav aria-label="' + t('Découvrir', 'Discover') + '"><h2>' + t('Découvrir', 'Discover') + '</h2><ul>' +
+      '<li>' + link('club.html', 'Le club', 'The club') + '</li><li>' + link('evenements.html', 'Événements', 'Events') + '</li><li>' + link('jeu.html', 'Le jeu', 'The game') + '</li><li>' + link('bureau.html', 'Le bureau', 'The board') + '</li></ul></nav>' +
+      '<nav aria-label="' + t('Agir', 'Get involved') + '"><h2>' + t('Agir', 'Get involved') + '</h2><ul>' +
+      '<li>' + link('rejoindre.html', 'Venir à un Comptoir', 'Come to a Comptoir') + '</li><li>' + link('merch.html', 'Réserver le merch', 'Reserve merch') + '</li><li>' + link('partenaires.html', 'Devenir partenaire', 'Become a partner') + '</li><li>' + link('partenaires.html#contact', 'Prendre rendez-vous', 'Book a call') + '</li></ul></nav>' +
+      '<nav aria-label="' + t('Suivre', 'Follow') + '"><h2>' + t('Suivre', 'Follow') + '</h2><ul>' +
+      '<li><a href="https://www.audencia.com" target="_blank" rel="noopener">Audencia ↗</a></li>' +
+      '<li><a data-set-href="instagram" target="_blank" rel="noopener" hidden>Instagram ↗</a></li><li><a data-set-href="linkedin" target="_blank" rel="noopener" hidden>LinkedIn ↗</a></li><li><a data-set-href="youtube" target="_blank" rel="noopener" hidden>YouTube ↗</a></li>' +
+      '<li data-nosocial class="soft">' + t('Instagram et YouTube : bientôt en ligne.', 'Instagram and YouTube: coming soon.') + '</li>' +
+      '<li><a href="https://www.linkedin.com/in/lucas-denis-jb" target="_blank" rel="noopener">' + t('LinkedIn du président ↗', 'The president on LinkedIn ↗') + '</a></li></ul></nav></div>' +
+      '<div class="legal"><span>© ' + new Date().getFullYear() + ' Le Comptoir</span><span style="display:flex;gap:18px;flex-wrap:wrap"><a href="mentions.html">' + t('Mentions légales', 'Legal notice') + '</a><a href="confidentialite.html">' + t('Confidentialité et cookies', 'Privacy and cookies') + '</a><a href="conditions.html">' + t('Conditions de précommande', 'Pre-order terms') + '</a></span></div></div>';
+    $$('[data-seal]').forEach(function (e) { e.innerHTML = seal(); });
+    var burger = $('.burger'), menu = $('.menu');
+    function setMenu(o) { menu.classList.toggle('open', o); burger.setAttribute('aria-expanded', o); D.body.classList.toggle('locked', o); }
+    burger.addEventListener('click', function () { setMenu(!menu.classList.contains('open')); });
+    menu.addEventListener('click', function (e) { if (e.target.closest('a')) setMenu(false); });
+    D.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.classList.contains('open')) { setMenu(false); burger.focus(); } });
+    $('.lang').addEventListener('click', function () { put('lang', L === 'en' ? 'fr' : 'en'); location.reload(); });
+    dock();
+  }
 
-function renderPartners() {
-  const el = document.getElementById('partners');
-  if (!el) return;
-  el.innerHTML = '<div class="board">'+partnersList.map(p => `<article class="partner-card board-card"><h4>${p}</h4><p class="bio">Partenaire du club pour les Comptoirs, les Meet and Talk et les sorties terrain.</p></article>`).join('')+'</div>';
-}
-
-function renderProducts() {
-  const el = document.getElementById('products');
-  if (!el) return;
-  el.innerHTML = merchList.map(product => `
-    <article class="product-card">
-      <span class="tag">${product.tag}</span>
-      <h4>${product.name}</h4>
-      <p>${product.desc}</p>
-      <strong>${product.price}</strong>
-    </article>
-  `).join('');
-}
-
-function renderEvents() {
-  const el = document.getElementById('events');
-  if (!el) return;
-  const limit = Number(el.dataset.limit || 0);
-  const data = limit ? eventsList.slice(0, limit) : eventsList;
-  el.innerHTML = data.map(event => `
-    <article class="ticket-card">
-      <div class="meta"><span>${event.type}</span><span>${event.date}</span></div>
-      <h4>${event.title}</h4>
-      <div class="soft">${event.place}</div>
-      <p>${event.desc}</p>
-    </article>
-  `).join('');
-
-  const filters = document.getElementById('filters');
-  if (!filters) return;
-  const types = ['Tous', ...new Set(eventsList.map(e => e.type))];
-  filters.innerHTML = types.map((type, idx) => `<button class="chip ${idx===0?'active':''}" type="button" data-filter="${type}">${type}</button>`).join('');
-  filters.querySelectorAll('.chip').forEach(chip => chip.addEventListener('click', () => {
-    const type = chip.dataset.filter;
-    filters.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === chip));
-    const visible = type === 'Tous' ? eventsList : eventsList.filter(e => e.type === type);
-    el.innerHTML = visible.map(event => `
-      <article class="ticket-card">
-        <div class="meta"><span>${event.type}</span><span>${event.date}</span></div>
-        <h4>${event.title}</h4>
-        <div class="soft">${event.place}</div>
-        <p>${event.desc}</p>
-      </article>
-    `).join('');
-  }));
-}
-
-function hookForms() {
-  document.querySelectorAll('form[data-form]').forEach(form => {
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const msg = form.querySelector('.msg');
-      if (msg) msg.textContent = 'Merci, votre message a bien été pris en compte.';
-      form.reset();
-    });
-  });
-}
-
-function applyLanguage() {
-  const lang = localStorage.getItem('lc_lang') || 'fr';
-  document.documentElement.lang = lang === 'en' ? 'en' : 'fr';
-  document.querySelectorAll('[data-en]').forEach(node => {
-    const text = node.getAttribute('data-en');
-    if (lang === 'en' && text) {
-      if (node.tagName === 'Q') node.textContent = text;
-      else if (node.tagName === 'A' || node.tagName === 'SPAN' || node.tagName === 'BUTTON' || node.tagName === 'LI' || node.tagName === 'P' || node.tagName === 'H1' || node.tagName === 'H2' || node.tagName === 'H3' || node.tagName === 'B') node.textContent = text;
+  /* Barre d'action mobile : l'action principale reste à portée de pouce après l'ouverture de la page */
+  function dock() {
+    var acts = DOCK.hasOwnProperty(here) ? DOCK[here] : [['rejoindre.html', 'Venir à un Comptoir', 'Come to a Comptoir']];
+    if (!acts.length || /^(mentions|confidentialite|conditions)$/.test(here)) return;
+    var d = D.createElement('div');
+    d.className = 'dock';
+    d.innerHTML = acts.map(function (a, i) { return '<a class="btn' + (i ? ' ghost' : '') + '" href="' + a[0] + '">' + t(a[1], a[2]) + '</a>'; }).join('');
+    D.body.appendChild(d);
+    D.body.classList.add('has-dock');
+    var ft = $('#ft'), ticking = false;
+    function upd() {
+      ticking = false;
+      var past = window.scrollY > window.innerHeight * .6;
+      var atFoot = ft && ft.getBoundingClientRect().top < window.innerHeight;
+      var target = acts[0][0].charAt(0) === '#' ? $(acts[0][0]) : null;
+      var atTarget = target && target.getBoundingClientRect().top < window.innerHeight * .8 && target.getBoundingClientRect().bottom > 0;
+      var st = $('#story'), inStory = st && st.getBoundingClientRect().bottom > window.innerHeight * .5;
+      d.classList.toggle('show', past && !atFoot && !atTarget && !inStory);
     }
-  });
-}
+    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(upd); } }, { passive: true });
+    upd();
+  }
 
-function drawTopic() {
-  const el = document.getElementById('topic');
-  if (!el) return;
-  if (!document.getElementById('draw')) return;
-  const q = el.querySelector('q');
-  const btn = document.getElementById('draw');
-  btn.addEventListener('click', () => {
-    const item = topics[Math.floor(Math.random() * topics.length)];
-    q.textContent = item;
-  });
-}
+  /* Ouverture de l'accueil : la position de défilement fait tourner le sceau et change de chapitre */
+  function story() {
+    var s = $('#story');
+    if (!s) return;
+    var orb = $('[data-orb]', s);
+    if (orb) orb.insertAdjacentHTML('afterbegin', seal());
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches, ticking = false;
+    function upd() {
+      ticking = false;
+      var r = s.getBoundingClientRect(), span = r.height - window.innerHeight;
+      var p = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+      s.style.setProperty('--p', p.toFixed(3));
+      s.setAttribute('data-ch', p < .34 ? '1' : p < .68 ? '2' : '3');
+    }
+    if (reduce) { s.setAttribute('data-ch', '1'); return; }
+    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(upd); } }, { passive: true });
+    window.addEventListener('resize', upd);
+    upd();
+  }
 
-document.addEventListener('DOMContentLoaded', () => {
-  createHeader();
-  createFooter();
-  renderBoard();
-  renderRoster();
-  renderPartners();
-  renderProducts();
-  renderEvents();
-  hookForms();
-  drawTopic();
-  applyLanguage();
-});
+  /* Lecture des contenus dans le CMS Wix, avec copie locale pour un affichage immédiat */
+  var tok;
+  function token() {
+    if (tok) return tok;
+    var c = null;
+    try { c = JSON.parse(sessionStorage.getItem('lc_tok') || 'null'); } catch (e) {}
+    if (c && c.x > Date.now()) return (tok = Promise.resolve(c.t));
+    tok = fetch(API + '/oauth2/token', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId: CID, grantType: 'anonymous' }) })
+      .then(function (r) { if (!r.ok) throw new Error('token'); return r.json(); })
+      .then(function (j) { try { sessionStorage.setItem('lc_tok', JSON.stringify({ t: j.access_token, x: Date.now() + (j.expires_in - 300) * 1000 })); } catch (e) {} return j.access_token; });
+    return tok;
+  }
+  function call(path, body) {
+    return token().then(function (tk) {
+      return fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: tk }, body: JSON.stringify(body) });
+    }).then(function (r) {
+      if (!r.ok) { if (r.status === 401 || r.status === 403) { try { sessionStorage.removeItem('lc_tok'); } catch (e) {} } throw new Error('api'); }
+      return r.json();
+    });
+  }
+  function load(coll, cb) {
+    var raw = get(coll), had = false;
+    if (raw) { try { cb(JSON.parse(raw)); had = true; } catch (e) {} }
+    call('/wix-data/v2/items/query', { dataCollectionId: coll, query: { paging: { limit: 100 } } }).then(function (j) {
+      var rows = (j.dataItems || []).map(function (i) { return i.data; });
+      rows.sort(function (x, y) { return (x.ordre || 999) - (y.ordre || 999); });
+      var s = JSON.stringify(rows);
+      if (s !== raw) { put(coll, s); cb(rows); }
+    }).catch(function () { if (!had) cb(null); });
+  }
+  function img(v) {
+    if (!v) return '';
+    if (typeof v === 'object') v = v.url || v.src || '';
+    var m = /^wix:image:\/\/v1\/([^\/]+)\//.exec(v);
+    return m ? 'https://static.wixstatic.com/media/' + m[1] : v;
+  }
+  function fail() { return '<p class="empty">' + t('Ce contenu ne se charge pas pour le moment. Rechargez la page, ou écrivez-nous : ', 'This content is not loading right now. Reload the page, or email us: ') + '<a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a></p>'; }
+
+  /* Réglages : liens des réseaux, contact, tarifs, prochain rendez-vous */
+  var S = { email: 'jblucas.denis@audencia.com' };
+  function settings(rows) {
+    if (!rows) return;
+    rows.forEach(function (r) { var v = t(r.valeur, r.valeurEn); if (v || r.title !== 'email') S[r.title] = v || ''; });
+    $$('[data-set]').forEach(function (e) { var v = S[e.getAttribute('data-set')]; if (v) e.textContent = v; });
+    $$('[data-set-href]').forEach(function (e) { var v = S[e.getAttribute('data-set-href')], li = e.parentNode.tagName === 'LI' ? e.parentNode : null; if (v && /^https?:\/\//.test(v)) { e.href = v; e.hidden = false; if (li) li.hidden = false; } else { e.hidden = true; if (li) li.hidden = true; } });
+    $$('[data-set-mail]').forEach(function (e) { e.href = 'mailto:' + S.email; e.textContent = S.email; });
+    var any = S.instagram || S.linkedin || S.youtube;
+    $$('[data-nosocial]').forEach(function (e) { e.hidden = !!any; });
+  }
+
+  /* Fenêtre de détail */
+  var dg;
+  function show(html) {
+    if (!dg) {
+      dg = D.createElement('dialog');
+      D.body.appendChild(dg);
+      dg.addEventListener('click', function (e) { if (e.target === dg || e.target.className === 'x') dg.close(); });
+    }
+    dg.innerHTML = '<div class="dlg"><button class="x" aria-label="' + t('Fermer', 'Close') + '">×</button>' + html + '</div>';
+    dg.showModal();
+  }
+
+  /* Événements : un même billet sert l'agenda et l'archive */
+  var TYPES = { 'Comptoir': 'Comptoir', 'Meet and Talk': 'Meet and Talk', 'Sortie Terrain': 'Field trip', 'Conférence': 'Conference' };
+  var DT = { 'Date à confirmer': 'Date to be confirmed', 'Chaque mercredi': 'Every Wednesday' };
+  var E = [], P = [], F = '';
+  function time(d) { if (!d) return null; var x = new Date(d.$date || d).getTime(); return isNaN(x) ? null : x; }
+  function day(r) {
+    var x = time(r.date);
+    if (x !== null) return new Date(x).toLocaleDateString(L === 'en' ? 'en-GB' : 'fr-FR', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
+    return t(r.dateTexte, DT[r.dateTexte]) || '';
+  }
+  function events(rows) {
+    var box = $('#events');
+    if (!rows) { box.innerHTML = fail(); return; }
+    var now = Date.now() - 864e5;
+    E = rows.filter(function (r) { return r.afficher !== false; }).map(function (r, i) { var d = time(r.date); return { r: r, d: d, past: d !== null && d < now, no: i + 1 }; });
+    E.sort(function (x, y) {
+      if (x.past !== y.past) return x.past ? 1 : -1;
+      if (x.past) return y.d - x.d;
+      if (x.d && y.d) return x.d - y.d;
+      if (x.d || y.d) return x.d ? -1 : 1;
+      return x.no - y.no;
+    });
+    var chips = $('#filters');
+    if (chips) {
+      var seen = [];
+      E.forEach(function (e) { if (e.r.type && seen.indexOf(e.r.type) < 0) seen.push(e.r.type); });
+      chips.innerHTML = [''].concat(seen).map(function (k) { return '<button class="chip" data-f="' + esc(k) + '" aria-pressed="' + (k === F) + '">' + esc(k ? t(k, TYPES[k]) : t('Tout', 'All')) + '</button>'; }).join('');
+    }
+    drawEvents();
+  }
+  function drawEvents() {
+    var box = $('#events'), lim = +box.getAttribute('data-limit') || 99;
+    var list = E.filter(function (e) { return (!F || e.r.type === F) && (lim === 99 || !e.past); }).slice(0, lim);
+    box.innerHTML = list.length ? list.map(function (e) {
+      var r = e.r;
+      return '<button class="ticket' + (e.past ? ' past' : '') + '" data-ev="' + E.indexOf(e) + '"><span class="stub"><span class="no">N° ' + ('00' + e.no).slice(-3) + '</span><span class="date">' + esc(day(r)) + '</span></span>' +
+        '<span class="tbody"><span class="kind">' + esc(t(r.type, TYPES[r.type])) + '</span><span class="h">' + esc(t(r.title, r.titleEn)) + '</span><span class="p">' + esc(t(r.resume, r.resumeEn)) + '</span></span></button>';
+    }).join('') : '<p class="empty">' + t('Rien dans cette catégorie pour le moment.', 'Nothing in this category for now.') + '</p>';
+  }
+  function eventDetail(e) {
+    var r = e.r, rows = [[t('Quand', 'When'), day(r)], [t('Où', 'Where'), r.lieu], [t('Avec', 'With'), r.intervenant], [t('Cours mis en pratique', 'Course put into practice'), r.cours]];
+    var pics = P.filter(function (p) { return p.autorisation === true && p.evenement === r.title && img(p.image); });
+    var main = r.autorisationPhoto === true ? img(r.photo) : '';
+    show('<p class="over">' + esc(t(r.type, TYPES[r.type])) + '</p><h2>' + esc(t(r.title, r.titleEn)) + '</h2><p>' + esc(t(r.resume, r.resumeEn)) + '</p>' +
+      '<ul class="checks">' + rows.filter(function (x) { return x[1]; }).map(function (x) { return '<li><b>' + x[0] + ' :</b> ' + esc(x[1]) + '</li>'; }).join('') + '</ul>' +
+      (r.video ? '<p style="margin-top:1em"><a class="more" href="' + esc(r.video) + '" target="_blank" rel="noopener">' + t('Voir la vidéo ↗', 'Watch the video ↗') + '</a></p>' : '') +
+      (main || pics.length ? '<div class="shots">' + (main ? '<a href="' + esc(main) + '" target="_blank" rel="noopener"><img src="' + esc(main) + '" alt="' + esc(r.title) + '"></a>' : '') + pics.map(function (p) { var u = esc(img(p.image)); return '<a href="' + u + '" target="_blank" rel="noopener"><img src="' + u + '" alt="' + esc(p.title || r.title) + '" loading="lazy"></a>'; }).join('') + '</div>' : '') +
+      '<p class="actions"><a class="btn" href="rejoindre.html">' + t('Venir avec le club', 'Come with the club') + '</a></p>');
+  }
+
+  /* Bureau */
+  var B = [];
+  function open(name) { return name === 'Poste à pourvoir'; }
+  function face(r) {
+    var u = r.autorisationPhoto === true ? img(r.photo) : '';
+    if (u) return '<img class="face" src="' + esc(u) + '" alt="' + esc(r.title) + '" loading="lazy">';
+    var w = String(r.title || '').split(/\s+/);
+    return '<span class="face" aria-hidden="true">' + (open(r.title) ? '?' : esc((w[0] || '').charAt(0) + (w.length > 1 ? w[w.length - 1].charAt(0) : ''))) + '</span>';
+  }
+  function who(r) { return open(r.title) ? t('Poste à pourvoir', 'Open position') : r.title; }
+  function board(rows) {
+    var box = $('#board'), ro = $('#roster'), fc = $('#faces');
+    if (!rows) { if (box || ro) (box || ro).innerHTML = fail(); return; }
+    B = rows;
+    if (ro) ro.innerHTML = rows.map(function (r) { return '<li><b>' + esc(who(r)) + '</b><br>' + esc(t(r.role, r.roleEn)) + '</li>'; }).join('');
+    if (box) box.innerHTML = rows.map(function (r, i) {
+      return '<button class="member" data-mb="' + i + '">' + face(r) + '<span class="role">' + esc(t(r.role, r.roleEn)) + '</span><span class="h">' + esc(who(r)) + '</span><span class="see">' + t('Voir la fiche', 'See profile') + '</span></button>';
+    }).join('');
+    if (fc) {
+      var people = rows.filter(function (r) { return !open(r.title); });
+      var pics = people.filter(function (r) { return r.autorisationPhoto === true && img(r.photo); }).slice(0, 6);
+      fc.innerHTML = '<span class="stack">' + pics.map(function (r) { return '<img src="' + esc(img(r.photo)) + '" alt="" loading="lazy">'; }).join('') + '</span>' +
+        '<span><b>' + t(people.length + ' étudiants tiennent le comptoir', people.length + ' students run the club') + '</b><small>' + t('Rencontrer le bureau', 'Meet the board') + '</small></span>';
+    }
+  }
+  function lines(v) { return String(v == null ? '' : v).split(/\n+/).map(function (s) { return s.trim(); }).filter(Boolean); }
+  function block(title, v, list) {
+    var l = lines(v);
+    if (!l.length) return '';
+    return '<h3 style="margin-top:1.3em">' + title + '</h3>' + (list || l.length > 1
+      ? '<ul class="checks">' + l.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>'
+      : '<p>' + esc(l[0]) + '</p>');
+  }
+  function memberDetail(r) {
+    var vacant = open(r.title), links = [];
+    if (r.linkedin) links.push('<a class="more" href="' + esc(r.linkedin) + '" target="_blank" rel="noopener">LinkedIn ↗</a>');
+    if (r.mail) links.push('<a class="more" href="mailto:' + esc(r.mail) + '">' + esc(r.mail) + '</a>');
+    show(face(r) + '<p class="over">' + esc(t(r.role, r.roleEn)) + '</p><h2>' + esc(who(r)) + '</h2>' +
+      (!vacant && r.surnom ? '<p class="when">' + t('Surnom : ', 'Nickname: ') + '« ' + esc(r.surnom) + ' »</p>' : '') +
+      (!vacant && r.accroche ? '<p class="lead">' + esc(r.accroche) + '</p>' : '') +
+      (vacant ? '<p>' + t('Le club cherche la personne qui tiendra ce poste. ', 'The club is looking for someone to take on this role. ') + '<a class="more" href="rejoindre.html">' + t('Proposer sa candidature', 'Apply') + '</a></p>'
+        : '<p>' + (r.presentation ? esc(r.presentation) : '<span class="soft">' + t('Présentation à venir.', 'Introduction coming soon.') + '</span>') + '</p>') +
+      block(t('Sa mission au Comptoir', 'Role at Le Comptoir'), t(r.missions, r.missionsEn)) +
+      (vacant ? '' : block(t('Parcours', 'Background'), r.parcours, true) + block(t('Faits marquants', 'Highlights'), r.faits, true)) +
+      (!vacant && r.expertises ? '<h3 style="margin-top:1.3em">' + t('Expertises', 'Skills') + '</h3><p>' + lines(r.expertises).map(esc).join(' · ') + '</p>' : '') +
+      (r.citation ? '<blockquote>' + esc(r.citation) + '</blockquote>' : '') +
+      (links.length ? '<p style="display:flex;gap:18px;flex-wrap:wrap">' + links.join('') + '</p>' : ''));
+  }
+  /* Partenaires, merch, sujets de débat */
+  function partners(rows) {
+    var box = $('#partners');
+    if (!rows) { box.innerHTML = fail(); return; }
+    rows = rows.filter(function (r) { return r.afficher !== false; });
+    box.innerHTML = rows.length ? '<div class="logos">' + rows.map(function (r) {
+      var u = img(r.logo);
+      return '<div class="partner">' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy">' : '') + '<h3>' + esc(r.title) + '</h3>' + (r.categorie ? '<p class="when">' + esc(r.categorie) + '</p>' : '') +
+        (r.description ? '<p>' + esc(r.description) + '</p>' : '') + (r.site ? '<a class="more" href="' + esc(r.site) + '" target="_blank" rel="noopener">' + t('Voir le site ↗', 'Visit website ↗') + '</a>' : '') + '</div>';
+    }).join('') + '</div>' : '<p class="empty">' + t('Les premiers partenaires du club seront présentés ici. Et si c’était vous ? ', 'The club’s first partners will be shown here. Why not you? ') + '<a class="more" href="#contact">' + t('Prendre rendez-vous', 'Book a call') + '</a></p>';
+  }
+  function products(rows) {
+    var box = $('#products'), sel = $('#article');
+    if (!rows) { box.innerHTML = fail(); return; }
+    rows = rows.filter(function (r) { return r.afficher !== false; });
+    box.innerHTML = rows.map(function (r, i) {
+      var u = img(r.photo), price = [];
+      if (r.prixMembre) price.push(t('Membre : ', 'Member: ') + r.prixMembre);
+      if (r.prixPublic) price.push(t('Public : ', 'Non-member: ') + r.prixPublic);
+      return '<div class="good"><div class="pic">' + (u ? '<img src="' + esc(u) + '" alt="' + esc(r.title) + '" loading="lazy">' : seal()) + '</div><div class="txt"><h3>' + esc(t(r.title, r.titleEn)) + '</h3><p>' + esc(t(r.description, r.descriptionEn)) + '</p>' +
+        '<p class="price">' + esc(price.join(' · ') || t('Prix à venir', 'Price to be announced')) + '</p>' + (r.tailles ? '<p class="soft">' + t('Tailles : ', 'Sizes: ') + esc(r.tailles) + '</p>' : '') +
+        '<a class="btn small ghost" href="#precommande" data-pick="' + i + '">' + t('Réserver cet article', 'Reserve this item') + '</a></div></div>';
+    }).join('');
+    if (sel) sel.innerHTML = rows.map(function (r) { return '<option>' + esc(t(r.title, r.titleEn)) + '</option>'; }).join('');
+  }
+  var T = [], last = -1;
+  function draw() {
+    if (!T.length) return;
+    var i;
+    do { i = Math.floor(Math.random() * T.length); } while (T.length > 1 && i === last);
+    last = i;
+    var box = $('#topic'), r = T[i];
+    $('q', box).textContent = t(r.title, r.titleEn);
+    $('.when', box).textContent = t(r.cours, r.coursEn) || '';
+    box.classList.remove('flip'); void box.offsetWidth; box.classList.add('flip');
+  }
+
+  /* Formulaires : chaque message arrive dans la collection « Messages reçus », avec un statut de suivi */
+  var DONE = { 'Partenariat': ['Merci ! Un membre du bureau vous écrit pour fixer l’échange de 15 minutes.', 'Thank you! A board member will email you to set up the 15-minute call.'], 'Précommande': ['Réservation enregistrée. Le bureau vous écrit pour confirmer l’article, la taille et le retrait.', 'Reservation recorded. The board will email you to confirm the item, size and collection.'] };
+  function forms() {
+    $$('form[data-form]').forEach(function (f) {
+      f.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var fd = new FormData(f), det = [], b = $('button[type=submit]', f), m = $('.msg', f), kind = f.getAttribute('data-form');
+        if (fd.get('website')) return;
+        fd.forEach(function (v, k) { if (['nom', 'email', 'message', 'website', 'ok'].indexOf(k) < 0 && v) det.push(k + ' : ' + v); });
+        b.disabled = true;
+        call('/wix-data/v2/items', { dataCollectionId: 'Messages', dataItem: { data: { title: fd.get('nom'), type: kind, email: fd.get('email'), message: fd.get('message') || '', details: det.join(' | '), consentement: true, statut: 'Nouveau' } } })
+          .then(function () { f.reset(); m.className = 'msg'; m.textContent = DONE[kind] ? t(DONE[kind][0], DONE[kind][1]) : t('Message envoyé. Le bureau vous répond rapidement.', 'Message sent. The board will get back to you soon.'); })
+          .catch(function () { m.className = 'msg err'; m.innerHTML = t('L’envoi n’a pas fonctionné. Écrivez-nous directement : ', 'Sending failed. Please email us directly: ') + '<a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a>'; })
+          .then(function () { b.disabled = false; });
+      });
+    });
+    /* Pré-remplit le formulaire quand on arrive avec ?demande=… ou depuis un bouton « Réserver cet article » */
+    var q = /[?&]demande=([^&]+)/.exec(location.search), sel = $('select[name=Demande]');
+    if (q && sel) { var want = decodeURIComponent(q[1]); $$('option', sel).forEach(function (o, i) { if (o.value === want || o.textContent === want) sel.selectedIndex = i; }); }
+  }
+
+  translate();
+  chrome();
+  story();
+  forms();
+  load('Reglages', settings);
+  if ($('#events')) { if (!$('#events').getAttribute('data-limit')) load('Photos', function (r) { P = r || []; }); load('Evenements', events); }
+  if ($('#board') || $('#roster') || $('#faces')) load('Bureau', board);
+  if ($('#partners')) load('Partenaires', partners);
+  if ($('#products')) load('Produits', products);
+  if ($('#topic')) load('Sujets', function (r) { T = r || []; });
+  D.addEventListener('click', function (e) {
+    var pick = e.target.closest ? e.target.closest('[data-pick]') : null;
+    if (pick) { var sel = $('#article'); if (sel) sel.selectedIndex = +pick.getAttribute('data-pick'); return; }
+    var el = e.target.closest ? e.target.closest('[data-ev],[data-mb],[data-f],#draw') : null;
+    if (!el) return;
+    if (el.id === 'draw') draw();
+    else if (el.hasAttribute('data-f')) { F = el.getAttribute('data-f'); $$('.chip').forEach(function (c) { c.setAttribute('aria-pressed', c === el); }); drawEvents(); }
+    else if (el.hasAttribute('data-ev')) eventDetail(E[+el.getAttribute('data-ev')]);
+    else memberDetail(B[+el.getAttribute('data-mb')]);
+  });
+})();

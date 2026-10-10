@@ -1,4 +1,216 @@
-html,body{height:100%}
-body.m{overflow-x:hidden}
-.m .story .ch, .m .item, .m .ticket-card, .m .board-card, .m .product-card, .m .card { transition: transform .4s ease, opacity .4s ease; }
-.m .item:hover, .m .ticket-card:hover, .m .board-card:hover, .m .product-card:hover { transform: translateY(-3px); }
+/* Le Comptoir — couche d'animation.
+   Tout est conditionné par la classe « m » posée sur <html> (jamais posée si le visiteur
+   a demandé moins d'animations). Sans cette classe, le site s'affiche comme avant.
+   Vocabulaire : le sceau qui tourne, les lignes qui se tracent, les billets qui sortent
+   de la machine, les cartes qu'on retourne. */
+
+:root{--ez:cubic-bezier(.2,.75,.15,1);--ez2:cubic-bezier(.65,0,.35,1)}
+
+/* ───────── Passage d'une page à l'autre ───────── */
+@media (prefers-reduced-motion:no-preference){
+  @view-transition{navigation:auto}
+  #hd{view-transition-name:lc-hd}
+  .menu .links a[aria-current]{view-transition-name:lc-pill}
+  ::view-transition-old(root){animation:lc-out .2s var(--ez2) both}
+  ::view-transition-new(root){animation:lc-in .55s var(--ez) both}
+  ::view-transition-group(lc-pill){animation-duration:.5s;animation-timing-function:var(--ez)}
+}
+@keyframes lc-out{to{opacity:0;transform:translateY(-10px)}}
+@keyframes lc-in{from{opacity:0;transform:translateY(20px)}}
+
+/* L'en-tête garde sa place avant d'être rempli : pas de saut à l'arrivée */
+#hd{min-height:calc(var(--hd) + 1px)}
+
+/* ───────── Avant que le script soit prêt : rien ne clignote ───────── */
+html.m:not(.mr) main,html.m:not(.mr) #ft{opacity:0}
+
+/* ───────── En-tête ───────── */
+html.m #hd{transition:box-shadow .4s}
+html.m #hd.scrolled{box-shadow:0 14px 30px -22px rgba(7,22,58,.55)}
+/* Fil de lecture : un trait laiton qui avance avec la page */
+html.m #hd::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--brass);transform-origin:0 50%;transform:scaleX(var(--sp,0));pointer-events:none}
+html.m .brand svg{transition:transform .6s var(--ez)}
+html.m .menu .links a{transition:background-color .25s,color .25s}
+html.m .lang,html.m .burger,html.m .chip{transition:border-color .25s,background-color .25s,color .25s}
+
+/* ───────── Boutons et liens ───────── */
+html.m .btn{position:relative;overflow:hidden;isolation:isolate;transition:background .2s,border-color .2s,color .2s,transform .4s var(--ez),box-shadow .4s var(--ez)}
+html.m .btn::after{content:"";position:absolute;inset:-2px;z-index:-1;background:linear-gradient(105deg,transparent 34%,rgba(255,255,255,.6) 50%,transparent 66%);transform:translateX(-130%);pointer-events:none}
+html.m .btn.ghost::after{background:linear-gradient(105deg,transparent 34%,rgba(217,164,65,.34) 50%,transparent 66%)}
+html.m .btn:active{transform:translateY(0) scale(.97)}
+html.m .more{transition:text-underline-offset .25s,text-decoration-thickness .25s}
+@media (hover:hover){
+  html.m .btn:hover{transform:translateY(-2px);box-shadow:0 14px 26px -14px rgba(138,100,24,.8)}
+  html.m .btn.ghost:hover{box-shadow:none}
+  html.m .btn:hover::after{transform:translateX(130%);transition:transform .75s var(--ez)}
+  html.m .btn:active{transform:translateY(0) scale(.97)}
+  html.m .more:hover{text-underline-offset:7px;text-decoration-thickness:3px}
+  html.m .brand:hover svg{transform:rotate(-10deg) scale(1.08)}
+  html.m .brand:hover .steam{stroke-dasharray:60;animation:steam 1.8s ease-in-out infinite}
+}
+
+/* ───────── Apparitions au défilement ─────────
+   Le script pose data-rv sur les blocs, puis « in » quand ils entrent à l'écran,
+   et retire le tout une fois l'animation finie. */
+html.m [data-rv]{transition:opacity .7s var(--ez),transform .9s var(--ez),clip-path 1s var(--ez);transition-delay:var(--d,0ms)}
+html.m [data-rv="up"]{opacity:0;transform:translateY(24px)}
+html.m [data-rv="scale"]{opacity:0;transform:scale(.9)}
+html.m [data-rv="up"].in,html.m [data-rv="scale"].in{opacity:1;transform:none}
+
+/* Titres : les mots montent un à un derrière un cache */
+html.m .w{display:inline-block;clip-path:inset(-.12em -.12em -.22em)}
+html.m .w>span{display:inline-block}
+html.m [data-rv="words"] .w>span{transform:translateY(125%);transition:transform .95s var(--ez);transition-delay:calc(var(--d,0ms) + var(--i,0) * 42ms)}
+html.m [data-rv="words"].in .w>span{transform:none}
+
+/* Lignes qui se tracent (colonnes, étapes), puis le contenu monte */
+html.m .item{--rc:var(--line)}
+html.m .navy .item{--rc:rgba(250,248,243,.22)}
+html.m .steps li{--rc:currentColor}
+html.m [data-rv="rule"]{border-top-color:transparent;background:linear-gradient(var(--rc),var(--rc)) 0 0/0% 1px no-repeat border-box;transition:background-size 1.1s var(--ez2);transition-delay:var(--d,0ms)}
+html.m [data-rv="rule"].in{background-size:100% 1px}
+html.m [data-rv="rule"]>*,html.m [data-rv="rule"]::before{opacity:0;transform:translateY(18px);transition:opacity .7s var(--ez),transform .9s var(--ez);transition-delay:calc(var(--d,0ms) + 140ms + var(--k,0) * 80ms)}
+html.m [data-rv="rule"]>:nth-child(2){--k:1}
+html.m [data-rv="rule"]>:nth-child(3){--k:2}
+html.m [data-rv="rule"]>:nth-child(4){--k:3}
+html.m [data-rv="rule"]>:nth-child(n+5){--k:4}
+html.m [data-rv="rule"].in>*,html.m [data-rv="rule"].in::before{opacity:1;transform:none}
+html.m hr[data-rv="line"]{transform:scaleX(0);transform-origin:0 50%;transition:transform 1.1s var(--ez2);transition-delay:var(--d,0ms)}
+html.m hr[data-rv="line"].in{transform:none}
+html.m .pagehead{border-bottom-color:transparent;background-image:linear-gradient(var(--line),var(--line));background-repeat:no-repeat;background-position:0 100%;background-size:0% 1px;background-origin:border-box}
+html.mr .pagehead{background-size:100% 1px;transition:background-size 1.5s var(--ez2) .35s}
+
+/* Listes à coches : la coche se pose */
+html.m [data-rv="check"]{opacity:0;transform:translateX(-14px)}
+html.m [data-rv="check"]::before{transform:rotate(-45deg) scale(0);transition:transform .55s var(--ez);transition-delay:calc(var(--d,0ms) + 220ms)}
+html.m [data-rv="check"].in{opacity:1;transform:none}
+html.m [data-rv="check"].in::before{transform:rotate(-45deg) scale(1)}
+
+/* Pictogrammes de la bande de confiance : le trait se dessine */
+html.m [data-rv="proof"]{opacity:0;transform:translateY(14px)}
+html.m [data-rv="proof"] svg *{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.2s var(--ez2);transition-delay:calc(var(--d,0ms) + 180ms)}
+html.m [data-rv="proof"].in{opacity:1;transform:none}
+html.m [data-rv="proof"].in svg *{stroke-dashoffset:0}
+
+/* Billets : ils sortent de la machine, du haut vers le bas */
+html.m [data-rv="ticket"]{opacity:0}
+html.m [data-rv="ticket"].in{opacity:1;animation:lc-print 1s var(--ez) var(--d,0ms) both}
+html.m .ticket.past[data-rv].in{opacity:.72}
+@keyframes lc-print{from{clip-path:inset(-40px -40px 100% -40px);transform:translateY(-18px)}to{clip-path:inset(-40px);transform:none}}
+html.m button.ticket{transition:transform .5s var(--ez),box-shadow .5s var(--ez)}
+@media (hover:hover){
+  html.m button.ticket:hover{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-5px);box-shadow:0 26px 40px -26px rgba(7,22,58,.6)}
+  html.m .navy button.ticket:hover{box-shadow:0 26px 40px -24px rgba(0,0,0,.7)}
+}
+html.m .ticket[data-rv]{transition:none}
+
+/* Le sceau des pages intérieures */
+html.m [data-rv="seal"]{opacity:0;transform:rotate(-24deg) scale(.82);transition-duration:.8s,1.3s,1s}
+html.m [data-rv="seal"].in{opacity:1;transform:none}
+html.m .hero .seal{rotate:calc(var(--py,0) * .05deg);animation:lc-float 7s ease-in-out infinite}
+@keyframes lc-float{50%{translate:0 -12px}}
+html.m .foot .about[data-rv] svg{transform:rotate(-50deg) scale(.8);transition:transform 1.3s var(--ez);transition-delay:var(--d,0ms)}
+html.m .foot .about[data-rv].in svg{transform:none}
+
+/* ───────── Bandes bleu nuit : elles s'ouvrent en arrivant, la lumière suit le curseur ───────── */
+html.m .band.navy{position:relative;isolation:isolate;clip-path:inset(0 calc((1 - var(--e,1)) * 3.5vw) round calc((1 - var(--e,1)) * 40px))}
+html.m .band.navy::before,html.m .hero.navy::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(540px circle at var(--mx,50%) var(--my,0%),rgba(232,176,75,.14),transparent 62%);opacity:0;transition:opacity .7s}
+html.m .hero.navy{position:relative;isolation:isolate}
+@media (hover:hover){
+  html.m .band.navy:hover::before,html.m .hero.navy:hover::before{opacity:1}
+}
+
+/* ───────── Ouverture de l'accueil ───────── */
+@property --lc-is{syntax:"<number>";inherits:false;initial-value:1}
+@property --lc-ir{syntax:"<angle>";inherits:false;initial-value:0deg}
+html.m .story{--ps:0;--ox:0;--tx:0;--ty:0;--oxk:1;background:radial-gradient(90% 70% at 50% 50%,#10296a 0%,var(--ink) 62%,var(--night) 100%)}
+html.m .orb{transform:translate(calc(-50% + var(--ox) * var(--oxk) * 1vw),-50%) perspective(900px) rotateX(calc(var(--ty) * -7deg)) rotateY(calc(var(--tx) * 9deg)) rotate(calc(var(--ps) * -34deg + var(--lc-ir))) scale(calc((1 - var(--ps) * .1) * var(--lc-is)));will-change:transform}
+html.m .orb .ring{opacity:min(1,calc(var(--ps) * 12))}
+html.m .orb .ring circle{stroke-dashoffset:calc(100 - var(--ps) * 100)}
+html.m .orb .lc-halo{position:absolute;inset:-46%;border-radius:50%;background:radial-gradient(closest-side,rgba(232,176,75,.24),rgba(232,176,75,.07) 46%,transparent 72%);opacity:calc(.3 + var(--ps) * .7);pointer-events:none}
+html.m .orb svg.lc-orbit{position:absolute;left:-17%;top:-17%;width:134%;height:134%;overflow:visible;transform:rotate(calc(var(--ps) * 170deg))}
+html.m .lc-orbit circle{fill:none;stroke:rgba(232,176,75,.4);stroke-width:.22;stroke-dasharray:.5 2.3}
+html.m .lc-orbit path{fill:var(--brass2);animation:lc-twinkle 3.2s ease-in-out infinite}
+html.m .lc-orbit g:nth-child(3) path{animation-delay:1s}
+html.m .lc-orbit g:nth-child(4) path{animation-delay:2s}
+@keyframes lc-twinkle{50%{opacity:.25}}
+html.mr .orb{animation:lc-orb-in 1.5s var(--ez) both}
+@keyframes lc-orb-in{from{opacity:0;--lc-is:.7;--lc-ir:-36deg}}
+
+html.m .ch{transition:opacity .45s ease,transform .8s var(--ez),filter .45s ease;filter:blur(7px)}
+html.m .ch .w>span{transform:translateY(125%);transition:transform 0s .45s}
+html.m .ch>p{opacity:0;transform:translateY(14px);transition:opacity .3s,transform 0s .45s}
+html.mr .story[data-ch="1"] .ch1,html.mr .story[data-ch="2"] .ch2,html.mr .story[data-ch="3"] .ch3{filter:none}
+html.mr .story[data-ch="1"] .ch1 .w>span,html.mr .story[data-ch="2"] .ch2 .w>span,html.mr .story[data-ch="3"] .ch3 .w>span{transform:none;transition:transform .9s var(--ez) calc(var(--i,0) * 45ms + 120ms)}
+html.mr .story[data-ch="1"] .ch1>p,html.mr .story[data-ch="2"] .ch2>p,html.mr .story[data-ch="3"] .ch3>p{opacity:1;transform:none;transition:opacity .7s var(--ez) .35s,transform .9s var(--ez) .35s}
+html.mr .story[data-ch="1"] .ch1>.over,html.mr .story[data-ch="2"] .ch2>.over,html.mr .story[data-ch="3"] .ch3>.over{transition-delay:.05s}
+html.mr .story[data-ch="3"] .ch3>.motto{transition-delay:.55s}
+html.m .stage-cta,html.m .chapters{opacity:0;transform:translateY(16px)}
+html.mr .stage-cta,html.mr .chapters{opacity:1;transform:none;transition:opacity .8s var(--ez) .75s,transform 1s var(--ez) .75s}
+html.m .chapters span{transition:background .4s,width .6s var(--ez)}
+html.m .chapters em::after{content:"";display:inline-block;width:1px;height:16px;margin-left:12px;vertical-align:middle;background:var(--brass2);transform-origin:50% 0;animation:lc-hint 1.8s var(--ez2) infinite}
+@keyframes lc-hint{0%{transform:scaleY(0)}45%{transform:scaleY(1)}100%{transform:scaleY(1) translateY(16px);opacity:0}}
+
+/* ───────── Cartes qu'on tire ───────── */
+html.m .topic{transform-origin:50% 0}
+html.m .topic.flip{animation:lc-deal .75s var(--ez) both}
+html.m .topic.flip q,html.m .topic.flip .when{animation:rise .55s .22s both}
+@keyframes lc-deal{0%{transform:perspective(1000px) rotateX(-84deg);opacity:.15}55%{opacity:1}100%{transform:perspective(1000px) rotateX(0)}}
+html.m .gcard.dealt{animation:lc-turn .7s var(--ez) both}
+@keyframes lc-turn{0%{transform:perspective(1000px) rotateY(-92deg) scale(.94)}100%{transform:perspective(1000px) rotateY(0)}}
+html.m .gcard .ans:not([hidden]){animation:rise .5s both}
+
+/* ───────── Fenêtre de détail, menu mobile, formulaires ───────── */
+html.m dialog[open]{animation:lc-dlg .5s var(--ez) both}
+html.m dialog[open]::backdrop{animation:lc-fade .35s both}
+html.m dialog[open] .dlg>*{animation:rise .55s var(--ez) both;animation-delay:calc(var(--n,0) * 45ms + 140ms)}
+html.m dialog[open] .dlg>.x{animation:lc-fade .4s .2s both}
+html.m .dlg>:nth-child(3){--n:1}
+html.m .dlg>:nth-child(4){--n:2}
+html.m .dlg>:nth-child(5){--n:3}
+html.m .dlg>:nth-child(6){--n:4}
+html.m .dlg>:nth-child(n+7){--n:5}
+@keyframes lc-dlg{from{opacity:0;transform:translateY(30px) scale(.97)}}
+@keyframes lc-fade{from{opacity:0}}
+html.m .x{transition:transform .4s var(--ez),background-color .2s}
+@media (hover:hover){html.m .x:hover{transform:rotate(90deg)}}
+
+@media (max-width:960px){
+  html.m .menu.open{animation:lc-menu .4s var(--ez) both}
+  html.m .menu.open .links a,html.m .menu.open>.btn,html.m .menu.open>.hint,html.m .menu.open>.lang{animation:lc-menu-in .6s var(--ez) both;animation-delay:calc(var(--n,0) * 50ms + 60ms)}
+  html.m .menu .links a:nth-child(2){--n:1}
+  html.m .menu .links a:nth-child(3){--n:2}
+  html.m .menu .links a:nth-child(4){--n:3}
+  html.m .menu .links a:nth-child(5){--n:4}
+  html.m .menu .links a:nth-child(6){--n:5}
+  html.m .menu>.btn{--n:6}
+  html.m .menu>.hint{--n:7}
+  html.m .menu>.lang{--n:8}
+  html.m .story{--oxk:0}
+  html.m .dock{transition:transform .5s var(--ez)}
+}
+@keyframes lc-menu{from{opacity:0;clip-path:inset(0 0 100% 0)}to{opacity:1;clip-path:inset(0)}}
+@keyframes lc-menu-in{from{opacity:0;transform:translateY(22px)}}
+
+html.m input,html.m select,html.m textarea{transition:border-color .2s,box-shadow .3s}
+html.m input:focus,html.m select:focus,html.m textarea:focus{box-shadow:0 0 0 5px rgba(217,164,65,.18)}
+html.m .msg:not(:empty){animation:rise .5s both}
+html.m details[open]>ol{animation:rise .5s both}
+
+/* ───────── Petites réponses au survol ───────── */
+html.m .member .face{transition:transform .6s var(--ez),box-shadow .6s var(--ez),filter .2s}
+html.m .good .pic img{transition:transform .9s var(--ez)}
+html.m .partner,html.m .subj,html.m .suspects li{transition:transform .5s var(--ez),box-shadow .5s var(--ez),border-color .3s}
+html.m .faces .stack>*{transition:margin-left .45s var(--ez)}
+@media (hover:hover){
+  html.m .member:hover .face{transform:translateY(-6px);box-shadow:0 24px 34px -24px rgba(7,22,58,.65)}
+  html.m .good:hover .pic img{transform:scale(1.05)}
+  html.m .partner:hover{transform:translateY(-4px);box-shadow:0 20px 32px -24px rgba(7,22,58,.5)}
+  html.m .subj:hover{transform:translateY(-5px) rotate(-1.2deg);box-shadow:0 18px 28px -18px rgba(7,22,58,.55)}
+  html.m .suspects li:hover{transform:translateY(-3px);border-color:var(--brass2)}
+  html.m .faces:hover .stack>*+*{margin-left:-5px}
+}
+
+@media print{
+  html.m [data-rv],html.m [data-rv]>*,html.m .w>span,html.m main,html.m #ft{opacity:1!important;transform:none!important;clip-path:none!important}
+}
