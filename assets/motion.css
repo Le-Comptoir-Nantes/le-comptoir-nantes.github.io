@@ -1,0 +1,4 @@
+html,body{height:100%}
+body.m{overflow-x:hidden}
+.m .story .ch, .m .item, .m .ticket-card, .m .board-card, .m .product-card, .m .card { transition: transform .4s ease, opacity .4s ease; }
+.m .item:hover, .m .ticket-card:hover, .m .board-card:hover, .m .product-card:hover { transform: translateY(-3px); }

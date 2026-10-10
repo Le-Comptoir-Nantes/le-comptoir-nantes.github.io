@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr" data-title-en="Merch · Le Comptoir">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Merch · Le Comptoir</title>
+<meta name="description" content="La collection du Comptoir : veste universitaire, sweats, pull, bouteille isotherme, sacs, mug et plus, en précommande auprès du bureau.">
+<link rel="canonical" href="https://le-comptoir-nantes.github.io/merch.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Le Comptoir">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Merch · Le Comptoir">
+<meta property="og:description" content="La collection du Comptoir : veste universitaire, sweats, pull, bouteille isotherme, sacs, mug et plus, en précommande auprès du bureau.">
+<meta property="og:url" content="https://le-comptoir-nantes.github.io/merch.html">
+<meta property="og:image" content="https://le-comptoir-nantes.github.io/assets/partage.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/motion.css">
+<script>!function(d,w){try{if(w.matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("m");w.setTimeout(function(){w.__lcMotion||d.classList.remove("m")},2500)}catch(e){}}(document.documentElement,window)</script>
+</head>
+<body>
+<header id="hd"></header>
+<main>
+
+<section class="pagehead navy">
+  <div class="wrap">
+    <p class="over">Merch</p>
+    <h1 data-en="The Comptoir collection.">La collection du Comptoir.</h1>
+    <p class="lead soft" data-en="Navy clothing and everyday items in the club’s colours. Everything is made to order, through pre-orders collected by the board. Prices will be announced when pre-orders open.">Des vêtements bleu marine et des objets du quotidien aux couleurs du club. Tout est fabriqué à la commande, sur précommande auprès du bureau. Les prix seront annoncés à l’ouverture des précommandes.</p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="pin" style="margin-bottom:36px"><p data-set="precommande" data-en="Pre-orders are not open yet. Leave your details and we will let you know when they open.">Les précommandes ne sont pas encore ouvertes. Laissez-nous vos coordonnées pour être prévenu de l’ouverture.</p></div>
+    <div class="goods" id="products"></div>
+  </div>
+</section>
+
+<section class="band navy">
+  <div class="wrap split">
+    <div>
+      <h2 data-en="Pre-order">Précommander</h2>
+      <ul class="checks">
+        <li data-en="No online payment: the board tells you how to pay and where to collect your order.">Aucun paiement en ligne : le bureau vous indique comment régler et où retirer votre commande.</li>
+        <li data-en="Your request is a reservation until the board confirms it.">Votre demande est une réservation, jusqu’à confirmation par le bureau.</li>
+        <li data-en="The money from merch only funds the club’s activities.">L’argent du merch finance uniquement les activités du club.</li>
+        <li data-en="All the rules: &lt;a href='conditions.html'&gt;pre-order terms&lt;/a&gt;.">Toutes les règles : <a href="conditions.html">conditions de précommande</a>.</li>
+      </ul>
+    </div>
+    <form class="card" data-form="Précommande" id="precommande">
+      <div class="row">
+        <label><span data-en="Your name">Votre nom</span><input name="nom" required autocomplete="name"></label>
+        <label><span data-en="E-mail">E-mail</span><input name="email" type="email" required autocomplete="email"></label>
+      </div>
+      <label><span data-en="Item">Article</span><select name="Article" id="article"><option data-en="The Comptoir jacket">La veste du Comptoir</option><option data-en="The hoodie">Le sweat à capuche</option><option data-en="The quarter-zip sweatshirt">Le sweat col zippé</option><option data-en="The crew-neck sweatshirt">Le pull col rond</option><option data-en="The insulated bottle">La bouteille isotherme</option><option data-en="The laptop sleeve">La pochette d'ordinateur</option><option data-en="The backpack">Le sac à dos</option><option data-en="The tote bag">Le cabas</option><option data-en="The mug">Le mug</option><option data-en="The M&amp;M's tin">La boîte de M&amp;M's</option></select></label>
+      <div class="row">
+        <label><span data-en="Size (clothing)">Taille (vêtements)</span><input name="Taille" placeholder="S, M, L, XL…"></label>
+        <label><span data-en="Quantity">Quantité</span><input name="Quantité" type="number" min="1" max="20" value="1"></label>
+      </div>
+      <label><span data-en="A note for the board (optional)">Un mot pour le bureau (facultatif)</span><textarea name="message"></textarea></label>
+      <label class="hp" aria-hidden="true">Site web<input name="website" tabindex="-1" autocomplete="off"></label>
+      <p class="soft" style="font-size:.86em;line-height:1.5;margin:4px 0 0" data-en="Your details are used only by the Comptoir board to record your pre-order and arrange collection. Name and e-mail are needed so we can reply; the other fields are optional. They are deleted at the end of the academic year. You can access, correct or delete them by writing to the club, and complain to the CNIL. &lt;a href='confidentialite.html'&gt;Privacy policy&lt;/a&gt;">Vos informations servent uniquement au bureau du Comptoir pour enregistrer votre précommande et organiser le retrait. Le nom et l’e-mail sont nécessaires pour vous répondre ; les autres champs sont facultatifs. Elles sont supprimées à la fin de l’année universitaire. Vous pouvez y accéder, les corriger ou les faire effacer en écrivant au club, et saisir la CNIL. <a href="confidentialite.html">Politique de confidentialité</a></p>
+      <button class="btn" type="submit" data-en="Send my pre-order">Envoyer ma précommande</button>
+      <p class="msg" role="status"></p>
+    </form>
+  </div>
+</section>
+
+</main>
+<footer id="ft"></footer>
+<script src="assets/site.js"></script>
+<script src="assets/motion.js"></script>
+</body>
+</html>

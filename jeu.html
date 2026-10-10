@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="fr" data-title-en="The game · Le Comptoir, student club at Audencia">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le jeu · Le Comptoir, club étudiant d’Audencia</title>
+<meta name="description" content="L’Affaire Ombreval, le jeu de société du Comptoir : réviser la négociation, le droit, la compta, le marketing et l’économie en jouant, entre Monopoly, La Bonne Paie et Cluedo.">
+<link rel="canonical" href="https://le-comptoir-nantes.github.io/jeu.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Le Comptoir">
+<meta property="og:title" content="L’Affaire Ombreval · le jeu du Comptoir">
+<meta property="og:description" content="Un jeu de société pour réviser les cinq matières de 1re année en jouant. 2 à 6 joueurs, 60 à 90 minutes.">
+<meta property="og:url" content="https://le-comptoir-nantes.github.io/jeu.html">
+<meta property="og:image" content="https://le-comptoir-nantes.github.io/assets/partage.png">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/motion.css">
+<script>!function(d,w){try{if(w.matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("m");w.setTimeout(function(){w.__lcMotion||d.classList.remove("m")},2500)}catch(e){}}(document.documentElement,window)</script>
+<style>
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin:1.4em 0 0}
+.facts li{border:1px solid rgba(232,176,75,.6);border-radius:99px;padding:5px 14px;font-size:.95rem;color:var(--gold2)}
+.subjects{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:32px}
+.subj{border-radius:6px;padding:18px;color:#fff;background:var(--c)}
+.subj b{display:block;font-family:var(--serif);font-size:1.3rem}
+.subj span{font-size:.92rem;opacity:.92}
+.play{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:40px;align-items:center}
+.gcard{width:100%;max-width:330px;aspect-ratio:63/88;border-radius:12px;background:var(--cream);color:var(--navy);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.35);margin:0 auto}
+.gcard .hd{background:var(--c,#8E2C3A);color:#fff;padding:12px 16px;font:700 .78rem/1.2 var(--sans);letter-spacing:.14em;text-transform:uppercase;display:flex;justify-content:space-between}
+.gcard .bd{padding:16px;display:flex;flex-direction:column;gap:10px;flex:1}
+.gcard .q{font-weight:700;font-size:1.02rem;line-height:1.4;margin:0}
+.gcard ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px;font-size:.95rem}
+.gcard .ans{margin-top:auto;border-top:2px dashed var(--c,#8E2C3A);padding-top:10px;font-size:.92rem}
+.gcard .ans b{display:block}
+.steps{counter-reset:s;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:28px}
+.steps li{background:#fff;border:1px solid var(--cream2);border-radius:6px;padding:18px 18px 18px 58px;position:relative}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:16px;top:16px;width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--navy);font-weight:700;display:grid;place-items:center}
+.suspects{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:28px}
+.suspects li{border:1px solid rgba(232,176,75,.45);border-radius:6px;padding:14px 16px}
+.suspects b{font-family:var(--serif);font-size:1.15rem;display:block}
+@media (max-width:820px){.play{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header id="hd"></header>
+<main>
+
+<section class="hero navy">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="over" data-en="The club’s board game">Le jeu de société du club</p>
+      <h1 data-en="The Ombreval Affair">L’Affaire Ombreval</h1>
+      <p class="lead soft" data-en="Three days before its new collection launches, the luxury house Ombreval is betrayed from the inside. Run your boutiques, pay your bills, take on challenges in negotiation, law, accounting, marketing and economics. Every right answer makes you richer and brings you closer to the culprit.">Trois jours avant le lancement de sa collection, la maison de luxe Ombreval est trahie de l’intérieur. Faites tourner vos boutiques, payez vos factures, relevez des défis de négociation, de droit, de compta, de marketing et d’économie. Chaque bonne réponse vous enrichit et vous rapproche du coupable.</p>
+      <p class="actions"><a class="btn" href="rejoindre.html" data-en="Play at a Comptoir">Jouer à un Comptoir</a><a class="btn ghost" href="#kit" data-en="Print the game">Imprimer le jeu</a></p>
+      <ul class="facts"><li data-en="2 to 6 players">2 à 6 joueurs</li><li>60–90 min</li><li data-en="282 cards">282 cartes</li><li data-en="180 challenges, 21 spoken">180 défis, dont 21 oraux</li><li data-en="216 possible solutions">216 solutions</li></ul>
+    </div>
+    <div class="seal" data-seal></div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <p class="over" data-en="Monopoly × La Bonne Paie × Cluedo">Monopoly × La Bonne Paie × Cluedo</p>
+    <h2 data-en="Learn without noticing.">Apprendre sans s’en rendre compte.</h2>
+    <div class="cols" style="margin-top:32px">
+      <div class="item"><p class="when" data-en="Revise">Révisez</p><h3 data-en="180 challenges from our courses">180 défis tirés de nos cours</h3><p data-en="Multiple choice, calculations, spotting an error in a balance sheet, a trap clause in a contract… and spoken challenges: negotiate, pitch, plead. The answer and its explanation are always read out loud.">QCM, calculs, anomalie dans un bilan, clause piège dans un contrat… et défis oraux : négocier, pitcher, plaider. La réponse et son explication sont toujours lues à voix haute.</p></div>
+      <div class="item"><p class="when" data-en="Invest">Investissez</p><h3 data-en="12 boutiques, 6 cities">12 boutiques, 6 villes</h3><p data-en="One lap of the board is one month: payday, then days 1 to 31. Buy boutiques from Nantes to Paris, borrow, open a Flagship. Nobody is ever eliminated.">Un tour de plateau, c’est un mois : le jour de paie, puis les jours 1 à 31. Achetez des boutiques de Nantes à Paris, empruntez, ouvrez un Flagship. Personne n’est jamais éliminé.</p></div>
+      <div class="item"><p class="when" data-en="Unmask">Démasquez</p><h3 data-en="6 suspects, 6 misdeeds, 6 rooms">6 suspects, 6 méfaits, 6 lieux</h3><p data-en="Every challenge you win lets you question the other players. A new investigation each game: the solution is drawn at random.">Chaque défi réussi permet d’interroger les autres joueurs. Une nouvelle enquête à chaque partie : la solution est tirée au hasard.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band navy">
+  <div class="wrap play">
+    <div>
+      <h2 data-en="Try a card.">Tirez une carte.</h2>
+      <p class="soft" data-en="Ten examples from the 180 challenge cards. In the game, the player on your left reads the question; you have about 30 seconds.">Dix exemples parmi les 180 cartes Défi. En jeu, c’est votre voisin de gauche qui lit la question ; vous avez une trentaine de secondes.</p>
+      <p class="actions"><button class="btn" id="gdraw" type="button" data-en="Draw a card">Tirer une carte</button><button class="btn ghost" id="gshow" type="button" data-en="Show the answer">Voir la réponse</button></p>
+    </div>
+    <div class="gcard" id="gcard" aria-live="polite"><div class="hd"><span id="gsub">Négociation</span><span id="glvl">★ · QCM</span></div><div class="bd"><p class="q" id="gq">La règle des 4x20, c’est…</p><ol type="A" id="go"><li>20 secondes, 20 mots, 20 gestes, 20 cm</li><li>20 minutes, 20 questions, 20 arguments, 20 % de remise</li><li>20 jours de délai, 20 relances, 20 devis, 20 clients</li></ol><div class="ans" id="ga" hidden><b id="gr"></b><span id="ge"></span></div></div></div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <h2 data-en="Five subjects, one game">Cinq matières, un seul jeu</h2>
+    <p data-en="36 cards per subject, each with its source in our first-year course materials.">36 cartes par matière, chacune avec sa source dans nos supports de 1re année.</p>
+    <div class="subjects">
+      <div class="subj" style="--c:#8E2C3A"><b data-en="Negotiation">Négociation</b><span data-en="4x20, QQPP, CVAC, CAP, objections, closing">4x20, QQPP, CVAC, CAP, objections, closing</span></div>
+      <div class="subj" style="--c:#1F6B4F"><b data-en="Law">Droit</b><span data-en="Sources of law, courts, evidence, contracts, sale">Sources, juridictions, preuve, contrats, vente</span></div>
+      <div class="subj" style="--c:#2C5F8A"><b data-en="Accounting">Comptabilité</b><span data-en="Entries, VAT, balance sheet, income statement">Écritures, TVA, bilan, compte de résultat</span></div>
+      <div class="subj" style="--c:#6A3A86"><b>Marketing</b><span data-en="SWOT, STP, positioning, media, greenwashing">SWOT, SCP, positionnement, médias, greenwashing</span></div>
+      <div class="subj" style="--c:#A65A24"><b data-en="Economics">Économie</b><span data-en="Supply and demand, GDP, inflation, ECB, exchange rates">Offre et demande, PIB, inflation, BCE, change</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <h2 data-en="A turn in four steps">Un tour en quatre temps</h2>
+    <ol class="steps">
+      <li data-en="<b>Roll</b> two dice and move forward through the days of the month."><b>Lancez</b> deux dés et avancez dans les jours du mois.</li>
+      <li data-en="<b>Resolve</b> the square: boutique, challenge, mail of the month, investigation…"><b>Appliquez</b> la case : boutique, défi, courrier du mois, enquête…</li>
+      <li data-en="<b>Manage</b> your business: borrow, build a Flagship, trade with the others."><b>Gérez</b> vos affaires : emprunt, Flagship, échanges avec les autres.</li>
+      <li data-en="<b>Accuse</b> if you think you know: right is +30 k€, wrong is −10 k€."><b>Accusez</b> si vous pensez savoir : juste, +30 k€ ; fausse, −10 k€.</li>
+    </ol>
+    <p style="margin-top:28px" data-en="The winner? The player with the biggest equity on their balance sheet: boutiques + cash − loans, plus their secret objective and the investigation bonus.">Qui gagne ? Celui qui finit avec les plus gros <b>capitaux propres</b> sur sa Fiche Bilan : boutiques + trésorerie − emprunts, plus son objectif secret et la prime d’enquête.</p>
+  </div>
+</section>
+
+<section class="band navy">
+  <div class="wrap">
+    <h2 data-en="Who betrayed the house?">Qui a trahi la Maison ?</h2>
+    <p class="soft" data-en="Six people had the keys. Fictional house and characters.">Six personnes avaient les clés. Maison et personnages fictifs.</p>
+    <ul class="suspects">
+      <li><b>Victoire Lambert-Roche</b><span class="soft" data-en="Creative director">Directrice de la création</span></li>
+      <li><b>Basile Ferrand</b><span class="soft" data-en="Head of the leather workshop">Chef d’atelier maroquinier</span></li>
+      <li><b>Odile Varenne</b><span class="soft" data-en="Long-serving accountant">Comptable historique</span></li>
+      <li><b>Gaspard Ombreval</b><span class="soft" data-en="Heir, on the board">Héritier, au conseil d’administration</span></li>
+      <li><b>Sacha Morel</b><span class="soft" data-en="Press and influence officer">Attachée de presse et influence</span></li>
+      <li><b>Théo Bastide</b><span class="soft" data-en="First-year bachelor intern">Stagiaire en 1re année de bachelor</span></li>
+    </ul>
+    <p style="margin-top:24px" class="soft" data-en="Misdeeds: leaked sketches, counterfeiting, embezzlement, greenwashing, supplier bribe, phantom stock. Each one leads back to a point of the course.">Méfaits : fuite des croquis, contrefaçon, détournement de fonds, greenwashing, pot-de-vin fournisseur, stock fantôme. Chacun renvoie à une notion du cours.</p>
+  </div>
+</section>
+
+<section class="band" id="kit">
+  <div class="wrap split">
+    <div>
+      <h2 data-en="Print it, play it">À imprimer, à jouer</h2>
+      <p data-en="The whole game prints on A4 at home: rules, a 38 × 38 cm board in four sheets, 282 cards nine per page, bills, pawns, score sheets.">Tout le jeu s’imprime en A4 à la maison : la règle, le plateau de 38 × 38 cm en quatre feuilles, les 282 cartes à neuf par page, les billets, les pions et les fiches.</p>
+      <p class="actions" id="kitdl"><a class="btn" href="rejoindre.html" data-en="Ask the board for the kit">Demander le kit au bureau</a></p>
+    </div>
+    <div>
+      <h3 data-en="In the box">Dans la boîte</h3>
+      <ul class="checks">
+        <li data-en="1 board, 6 pawns, 2 dice">1 plateau, 6 pions, 2 dés</li>
+        <li data-en="180 challenge cards, 18 clues, 24 mail cards">180 cartes Défi, 18 Indices, 24 Imprévus</li>
+        <li data-en="18 investigation cards, 6 roles, 12 secret objectives">18 cartes d’enquête, 6 Rôles, 12 Objectifs secrets</li>
+        <li data-en="12 deeds, 12 loans, 12 Flagships, 144 bills">12 titres, 12 emprunts, 12 Flagships, 144 billets</li>
+        <li data-en="Balance sheets, detective notebooks, player aids">Fiches Bilan, carnets d’enquêteur, aides de jeu</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer id="ft"></footer>
+<script src="assets/site.js"></script>
+<script>
+(function () {
+  var C = [
+    ['Négociation', '#8E2C3A', '★ · QCM', 'La règle des 4x20, c’est…', ['20 secondes, 20 mots, 20 gestes, 20 cm', '20 minutes, 20 questions, 20 arguments, 20 % de remise', '20 jours de délai, 20 relances, 20 devis, 20 clients'], 'A', 'La première impression (effet de halo). Les 20 cm, c’est le visage.'],
+    ['Négociation', '#8E2C3A', '★★ · QCM', 'Le client : « Votre concurrent est 10 % moins cher. » Votre première réaction ?', ['Baisser votre prix de 10 %', '« Qu’est-ce qui est compris dans leur offre ? »', 'Dire que ce concurrent fait de la mauvaise qualité'], 'B', 'On questionne, puis on valorise sans jamais critiquer un concurrent.'],
+    ['Droit', '#1F6B4F', '★ · QCM', 'Lequel n’est PAS un vice du consentement ?', ['Le dol', 'La violence', 'L’erreur sur la valeur'], 'C', 'Vices : erreur, dol, violence. L’erreur sur la valeur ne compte pas.'],
+    ['Droit', '#1F6B4F', '★★ · QCM', 'Clause piège ! Quelle clause de ces CGV en ligne est illégale ?', ['Prix affichés toutes taxes comprises', 'Droit de rétractation de 7 jours francs', 'Délai de livraison maximal de 60 jours ouvrés'], 'B', 'Le délai légal de rétractation à distance est de 14 jours.'],
+    ['Comptabilité', '#2C5F8A', '★ · QCM', 'Pour l’entreprise, la TVA est…', ['Une charge', 'Un produit', 'Ni l’un ni l’autre : des mouvements de trésorerie'], 'C', 'Elle la collecte pour l’État ; c’est le consommateur final qui la supporte.'],
+    ['Comptabilité', '#2C5F8A', '★ · QCM', 'Un ordinateur à 1 200 € HT utilisé 3 ans est…', ['Une charge', 'Une immobilisation', 'Un stock'], 'B', 'Plus de 500 € et utilisé plus d’un an : immobilisation.'],
+    ['Marketing', '#6A3A86', '★ · QCM', 'Une campagne qui vise à « faire agir » a un objectif…', ['Cognitif', 'Affectif', 'Conatif'], 'C', 'Cognitif : faire connaître. Affectif : faire aimer. Conatif : faire agir.'],
+    ['Marketing', '#6A3A86', '★ · QCM', 'Soutien sans contrepartie directe à une œuvre d’intérêt général : c’est…', ['Le mécénat', 'Le parrainage', 'La promotion des ventes'], 'A', 'Le parrainage, lui, vise un bénéfice direct.'],
+    ['Économie', '#A65A24', '★★ · QCM', 'L’effet Veblen, c’est quand…', ['La demande d’un bien de prestige augmente avec son prix', 'Le prix baisse quand l’offre augmente', 'Les salaires suivent l’inflation'], 'A', 'Consommation ostentatoire : un prix élevé signale le statut.'],
+    ['Économie', '#A65A24', '★★ · QCM', 'L’euro s’apprécie face au dollar. À New York, les sacs fabriqués en France deviennent…', ['Moins chers en dollars', 'Plus chers en dollars', 'Gratuits'], 'B', 'Un euro fort pénalise les exportations.']
+  ];
+  var i = 0, $ = function (id) { return document.getElementById(id); };
+  function show(k) {
+    var c = C[k];
+    $('gcard').style.setProperty('--c', c[1]);
+    $('gsub').textContent = c[0]; $('glvl').textContent = c[2]; $('gq').textContent = c[3];
+    $('go').innerHTML = c[4].map(function (o) { var li = document.createElement('li'); li.textContent = o; return li.outerHTML; }).join('');
+    $('gr').textContent = 'Réponse ' + c[5] + ' · ' + c[4]['ABC'.indexOf(c[5])];
+    $('ge').textContent = c[6]; $('ga').hidden = true;
+  }
+  $('gdraw').addEventListener('click', function () { var j; do { j = Math.floor(Math.random() * C.length); } while (j === i); i = j; show(i); });
+  $('gshow').addEventListener('click', function () { $('ga').hidden = false; });
+  show(0);
+})();
+</script>
+<script src="assets/motion.js"></script>
+</body>
+</html>
