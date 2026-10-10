@@ -1,7 +1,7 @@
-/* Le Comptoir — affichage du site. Les contenus se modifient dans le tableau de bord Wix (CMS), pas ici. */
+/* Le Comptoir — affichage du site. Les contenus se modifient dans le dossier « contenu » (fichiers .json), pas ici. */
 (function () {
   'use strict';
-  var CID = 'bcb9b46d-59ad-415e-aa12-0fdb9af4ab6c', API = 'https://www.wixapis.com', D = document;
+  var D = document;
 
   function get(k) { try { return localStorage.getItem('lc_' + k); } catch (e) { return null; } }
   function put(k, v) { try { localStorage.setItem('lc_' + k, v); } catch (e) {} }
@@ -130,41 +130,23 @@
     upd();
   }
 
-  /* Lecture des contenus dans le CMS Wix, avec copie locale pour un affichage immédiat */
-  var tok;
-  function token() {
-    if (tok) return tok;
-    var c = null;
-    try { c = JSON.parse(sessionStorage.getItem('lc_tok') || 'null'); } catch (e) {}
-    if (c && c.x > Date.now()) return (tok = Promise.resolve(c.t));
-    tok = fetch(API + '/oauth2/token', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId: CID, grantType: 'anonymous' }) })
-      .then(function (r) { if (!r.ok) throw new Error('token'); return r.json(); })
-      .then(function (j) { try { sessionStorage.setItem('lc_tok', JSON.stringify({ t: j.access_token, x: Date.now() + (j.expires_in - 300) * 1000 })); } catch (e) {} return j.access_token; });
-    return tok;
-  }
-  function call(path, body) {
-    return token().then(function (tk) {
-      return fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: tk }, body: JSON.stringify(body) });
-    }).then(function (r) {
-      if (!r.ok) { if (r.status === 401 || r.status === 403) { try { sessionStorage.removeItem('lc_tok'); } catch (e) {} } throw new Error('api'); }
-      return r.json();
-    });
-  }
+  /* Lecture des contenus : un fichier par rubrique dans le dossier « contenu » du site */
+  var FILES = { Reglages: 'reglages', Evenements: 'evenements', Photos: 'photos', Bureau: 'bureau', Partenaires: 'partenaires', Produits: 'merch', Sujets: 'sujets' };
   function load(coll, cb) {
-    var raw = get(coll), had = false;
-    if (raw) { try { cb(JSON.parse(raw)); had = true; } catch (e) {} }
-    call('/wix-data/v2/items/query', { dataCollectionId: coll, query: { paging: { limit: 100 } } }).then(function (j) {
-      var rows = (j.dataItems || []).map(function (i) { return i.data; });
-      rows.sort(function (x, y) { return (x.ordre || 999) - (y.ordre || 999); });
-      var s = JSON.stringify(rows);
-      if (s !== raw) { put(coll, s); cb(rows); }
-    }).catch(function () { if (!had) cb(null); });
+    fetch('contenu/' + FILES[coll] + '.json', { cache: 'no-cache' })
+      .then(function (r) { if (!r.ok) throw new Error('contenu'); return r.json(); })
+      .then(function (rows) {
+        if (!Array.isArray(rows)) throw new Error('contenu');
+        return rows.map(function (r, i) { return { r: r, i: i }; })
+          .sort(function (x, y) { return ((x.r.ordre || 999) - (y.r.ordre || 999)) || (x.i - y.i); })
+          .map(function (x) { return x.r; });
+      })
+      .then(cb, function () { cb(null); });
   }
   function img(v) {
     if (!v) return '';
     if (typeof v === 'object') v = v.url || v.src || '';
-    var m = /^wix:image:\/\/v1\/([^\/]+)\//.exec(v);
-    return m ? 'https://static.wixstatic.com/media/' + m[1] : v;
+    return String(v);
   }
   function fail() { return '<p class="empty">' + t('Ce contenu ne se charge pas pour le moment. Rechargez la page, ou écrivez-nous : ', 'This content is not loading right now. Reload the page, or email us: ') + '<a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a></p>'; }
 
@@ -327,26 +309,59 @@
     box.classList.remove('flip'); void box.offsetWidth; box.classList.add('flip');
   }
 
-  /* Formulaires : chaque message arrive dans la collection « Messages reçus », avec un statut de suivi */
-  var DONE = { 'Partenariat': ['Merci ! Un membre du bureau vous écrit pour fixer l’échange de 15 minutes.', 'Thank you! A board member will email you to set up the 15-minute call.'], 'Précommande': ['Réservation enregistrée. Le bureau vous écrit pour confirmer l’article, la taille et le retrait.', 'Reservation recorded. The board will email you to confirm the item, size and collection.'] };
+  /* Formulaires : le message est préparé dans la messagerie du visiteur, à l'adresse du club. Le site n'enregistre rien. */
+  function copy(text, btn) {
+    function done() { btn.textContent = t('Message copié', 'Message copied'); }
+    function old() {
+      var a = D.createElement('textarea');
+      a.value = text; a.setAttribute('readonly', ''); a.style.position = 'fixed'; a.style.opacity = '0';
+      D.body.appendChild(a); a.select();
+      try { if (D.execCommand('copy')) done(); } catch (e) {}
+      a.remove();
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, old); else old();
+  }
   function forms() {
     $$('form[data-form]').forEach(function (f) {
+      var text = '';
       f.addEventListener('submit', function (ev) {
         ev.preventDefault();
-        var fd = new FormData(f), det = [], b = $('button[type=submit]', f), m = $('.msg', f), kind = f.getAttribute('data-form');
+        var fd = new FormData(f), det = [], m = $('.msg', f), kind = f.getAttribute('data-form');
         if (fd.get('website')) return;
         fd.forEach(function (v, k) { if (['nom', 'email', 'message', 'website', 'ok'].indexOf(k) < 0 && v) det.push(k + ' : ' + v); });
-        b.disabled = true;
-        call('/wix-data/v2/items', { dataCollectionId: 'Messages', dataItem: { data: { title: fd.get('nom'), type: kind, email: fd.get('email'), message: fd.get('message') || '', details: det.join(' | '), consentement: true, statut: 'Nouveau' } } })
-          .then(function () { f.reset(); m.className = 'msg'; m.textContent = DONE[kind] ? t(DONE[kind][0], DONE[kind][1]) : t('Message envoyé. Le bureau vous répond rapidement.', 'Message sent. The board will get back to you soon.'); })
-          .catch(function () { m.className = 'msg err'; m.innerHTML = t('L’envoi n’a pas fonctionné. Écrivez-nous directement : ', 'Sending failed. Please email us directly: ') + '<a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a>'; })
-          .then(function () { b.disabled = false; });
+        var subject = 'Le Comptoir · ' + kind + ' · ' + fd.get('nom');
+        var head = [t('Nom', 'Name') + ' : ' + fd.get('nom'), 'E-mail : ' + fd.get('email')].concat(det).join('\n');
+        var body = head + '\n\n' + (fd.get('message') || '');
+        text = body;
+        /* Un lien de messagerie trop long est coupé par certains logiciels : au-delà, le texte passe par le bouton « Copier » */
+        if (encodeURIComponent(body).length > 1500) body = head + '\n\n' + t('(Collez ici votre message : utilisez le bouton « Copier le message » du site.)', '(Paste your message here: use the “Copy the message” button on the site.)');
+        m.className = 'msg';
+        m.innerHTML = t('Votre messagerie s’ouvre avec le message prêt à partir : il ne reste qu’à cliquer sur « Envoyer ». Si rien ne s’ouvre, copiez le message et envoyez-le à ', 'Your mail app opens with the message ready to go: just press “Send”. If nothing opens, copy the message and send it to ') +
+          '<a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a>.<br><button type="button" class="btn small ghost" data-copy style="margin-top:12px">' + t('Copier le message', 'Copy the message') + '</button>';
+        location.href = 'mailto:' + S.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      });
+      f.addEventListener('click', function (ev) {
+        var b = ev.target.closest ? ev.target.closest('[data-copy]') : null;
+        if (b) copy(text, b);
       });
     });
     /* Pré-remplit le formulaire quand on arrive avec ?demande=… ou depuis un bouton « Réserver cet article » */
     var q = /[?&]demande=([^&]+)/.exec(location.search), sel = $('select[name=Demande]');
     if (q && sel) { var want = decodeURIComponent(q[1]); $$('option', sel).forEach(function (o, i) { if (o.value === want || o.textContent === want) sel.selectedIndex = i; }); }
   }
+
+  /* Une image qui ne se charge pas laisse la place aux initiales, ou au sceau, plutôt qu'à une icône cassée */
+  D.addEventListener('error', function (e) {
+    var el = e.target, w, s;
+    if (!el || el.tagName !== 'IMG' || !el.closest) return;
+    if (el.classList.contains('face')) {
+      w = String(el.alt || '').split(/\s+/);
+      s = D.createElement('span'); s.className = 'face'; s.setAttribute('aria-hidden', 'true');
+      s.textContent = (w[0] || '').charAt(0) + (w.length > 1 ? w[w.length - 1].charAt(0) : '');
+      el.parentNode.replaceChild(s, el);
+    } else if (el.closest('.good .pic')) el.closest('.pic').innerHTML = seal();
+    else if (el.closest('.faces, .partner, .shots')) { s = el.closest('.shots a') || el; s.parentNode.removeChild(s); }
+  }, true);
 
   translate();
   chrome();

@@ -1,0 +1,57 @@
+[
+  {
+    "title": "email",
+    "valeur": "jblucas.denis@audencia.com",
+    "note": "Adresse de contact affichée sur le site. Les formulaires écrivent à cette adresse."
+  },
+  {
+    "title": "prochainRdv",
+    "valeur": "Chaque mercredi : un Comptoir.",
+    "valeurEn": "Every Wednesday: a Comptoir.",
+    "note": "Titre du billet « Prochain rendez-vous » en page d'accueil."
+  },
+  {
+    "title": "prochainRdvDetail",
+    "valeur": "Un sujet, un débat, tout le monde parle. Le lieu partenaire est annoncé à l'avance.",
+    "valeurEn": "One topic, one debate, everyone speaks. The partner venue is announced in advance.",
+    "note": "Détail du billet : date, heure, lieu, thème."
+  },
+  {
+    "title": "cotisation",
+    "valeur": "30 € pour l'année",
+    "valeurEn": "€30 for the year",
+    "note": "Montant de la cotisation affiché sur le site."
+  },
+  {
+    "title": "billet",
+    "valeur": "8 €",
+    "valeurEn": "€8",
+    "note": "Prix d'entrée des non-membres aux Meet and Talk et conférences."
+  },
+  {
+    "title": "precommande",
+    "valeur": "Les précommandes ne sont pas encore ouvertes. Laissez-nous vos coordonnées pour être prévenu de l'ouverture.",
+    "valeurEn": "Pre-orders are not open yet. Leave your details and we will let you know when they open.",
+    "note": "Message en haut de la page Merch : dates d'ouverture et de clôture, modalités de paiement et de retrait."
+  },
+  {
+    "title": "lienBilletterie",
+    "valeur": "",
+    "note": "Lien de la billetterie en ligne du Bureau des Clubs. Vide = bouton masqué."
+  },
+  {
+    "title": "instagram",
+    "valeur": "",
+    "note": "Lien complet du compte Instagram du club. Vide = icône masquée."
+  },
+  {
+    "title": "linkedin",
+    "valeur": "",
+    "note": "Lien complet de la page LinkedIn du club. Vide = icône masquée."
+  },
+  {
+    "title": "youtube",
+    "valeur": "",
+    "note": "Lien complet de la chaîne YouTube (vlog). Vide = icône masquée."
+  }
+]

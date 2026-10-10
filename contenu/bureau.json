@@ -1,0 +1,102 @@
+[
+  {
+    "ordre": 1,
+    "title": "Lucas Denis",
+    "role": "Président et fondateur",
+    "roleEn": "President and founder",
+    "surnom": "Pap's",
+    "photo": "assets/bureau/lucas-denis.webp",
+    "autorisationPhoto": true,
+    "accroche": "Il a appris sur le terrain. Il y emmène maintenant les autres.",
+    "presentation": "Avant Audencia, Lucas Denis a travaillé cinq ans dans l'artisanat. Il en garde deux réflexes : la rigueur de ce qui doit être juste chaque jour, et la vente en face à face. En 2026, il intègre le Bachelor in Management et fonde Le Comptoir, qu'il préside. Il y réunit un bureau de sept membres autour d'une idée simple : sortir les cours des salles pour les appliquer. Sa conviction : chacun peut faire quelque chose s'il s'en donne la peine, et la sympathie construit un réseau fort et solide.",
+    "missions": "Représente le club auprès d'Audencia et des partenaires, convoque et anime le bureau.",
+    "missionsEn": "Represents the club with Audencia and its partners, convenes and leads the board.",
+    "parcours": "2021 – 2025 · Artisanat : cinq ans en boulangerie-pâtisserie, dont un stage en Espagne fin 2022.\n2026 · Audencia : entre en Bachelor in Management à Nantes. Simulation d'entreprise Atlantis : analyse financière et devis commercial pour la marque Mistral One.\n2026 – aujourd'hui · Le Comptoir : fonde le club et le préside.",
+    "faits": "Fondateur du Comptoir : un bureau de 7 membres constitué dès sa première année à Audencia.\nSimulation d'entreprise Atlantis : rapport d'analyse financière sur 4 périodes et création de l'identité de la marque Mistral One.\n5 ans de terrain avant l'école de commerce.",
+    "expertises": "Leadership d'équipe\nVente et relation client\nNégociation\nAnalyse financière\nPrise de parole",
+    "citation": "« Le succès, c'est d'aller d'échec en échec sans perdre son enthousiasme. » (Winston Churchill)",
+    "linkedin": "https://www.linkedin.com/in/lucas-denis-jb",
+    "mail": "jblucas.denis@audencia.com"
+  },
+  {
+    "ordre": 2,
+    "title": "Romain Rabiller",
+    "role": "Vice-président",
+    "roleEn": "Vice-President",
+    "photo": "assets/bureau/romain-rabiller.webp",
+    "autorisationPhoto": true,
+    "accroche": "Formé en pâtisserie, il sait transmettre ce qu'il apprend.",
+    "presentation": "Romain Rabiller commence par la pâtisserie : trois ans d'apprentissage, du CAP à la mention complémentaire, dans deux entreprises de la région nantaise, où il encadre de plus jeunes apprentis. Il se tourne ensuite vers le commerce avec un bac pro Technicien Conseil Vente, mention très bien, et des stages en boulangerie, en fromagerie et dans une épicerie artisanale de Galway, en Irlande, avec Erasmus. En 2026, il entre en Bachelor in Management à Audencia et devient vice-président du Comptoir. Son cap : une grande entreprise de l'IT.",
+    "missions": "Seconde le président, le remplace en cas d'empêchement et suit les projets en cours.",
+    "missionsEn": "Supports the president, stands in when needed and follows ongoing projects.",
+    "parcours": "2021 – 2024 · Pâtisserie : CAP pâtissier puis mention complémentaire en apprentissage, à Bouguenais et à Bouaye, avec l'encadrement d'apprentis.\n2024 – 2026 · Lycée Saint-Martin, Machecoul : bac pro Technicien Conseil Vente, mention très bien. Stages de vente en boulangerie et en fromagerie à Bouguenais, puis stage Erasmus dans une épicerie artisanale de Galway (Irlande) en février 2026.\n2026 – aujourd'hui · Audencia et Le Comptoir : Bachelor in Management à Nantes, vice-président du club.",
+    "faits": "Bac pro Technicien Conseil Vente obtenu avec mention très bien.\n3 ans d'apprentissage en pâtisserie, avec l'encadrement d'apprentis de CAP et d'un stagiaire.\n3 stages en vente, dont un stage Erasmus à Galway, en Irlande (Mortons of Galway, épicerie artisanale).",
+    "expertises": "Vente et relation client\nTransmission et encadrement\nOrganisation et rigueur\nGestion des stocks\nAnglais (B2)",
+    "citation": "« Avec Le Comptoir, j'aimerais créer un lieu d'échange et d'entraide où chacun peut apprendre des autres, quel que soit son parcours. »",
+    "linkedin": "https://www.linkedin.com/in/romain-rabiller-494b343a9/"
+  },
+  {
+    "ordre": 3,
+    "title": "Félice Maire",
+    "role": "Responsable événements",
+    "roleEn": "Head of Events",
+    "photo": "assets/bureau/felice-maire.webp",
+    "autorisationPhoto": true,
+    "missions": "Organise les Sorties Terrain et les conférences, annoncées dix jours à l'avance, et tient les fiches intervenants.",
+    "missionsEn": "Organises field trips and conferences, announced ten days ahead, and keeps the speaker files."
+  },
+  {
+    "ordre": 4,
+    "title": "Zoé Podevin",
+    "role": "Responsable partenariats",
+    "roleEn": "Head of Partnerships",
+    "photo": "assets/bureau/zoe-podevin.webp",
+    "autorisationPhoto": true,
+    "missions": "Échange avec les lieux partenaires, les entreprises, les élus et les juridictions, et prépare les conventions de partenariat.",
+    "missionsEn": "Works with partner venues, companies, elected officials and courts, and prepares partnership agreements."
+  },
+  {
+    "ordre": 5,
+    "title": "Adil Moutmir",
+    "role": "Trésorier",
+    "roleEn": "Treasurer",
+    "photo": "assets/bureau/adil-moutmir.webp",
+    "autorisationPhoto": true,
+    "missions": "Tient les comptes, encaisse les recettes, délivre les reçus de cotisation et présente un point de trésorerie à chaque bureau.",
+    "missionsEn": "Keeps the accounts, collects income, issues membership receipts and reports on finances at every board meeting."
+  },
+  {
+    "ordre": 6,
+    "title": "Luc Grana",
+    "role": "Secrétaire",
+    "roleEn": "Secretary",
+    "surnom": "Le prof",
+    "photo": "assets/bureau/luc-grana.webp",
+    "autorisationPhoto": true,
+    "accroche": "Une année de droit dans le sac, il tient la plume du Comptoir.",
+    "presentation": "Avant Audencia, Luc Grana a validé une première année de licence de droit à l'Université de Bordeaux, après un bac général avec mention en section européenne espagnol. Au lycée, il coordonne l'équipe de 15 élèves qui réalise le yearbook : réunions, comptes rendus, relations avec les sponsors. Il a aussi fait deux saisons de vendanges dans le Bordelais. En 2026, il intègre le Bachelor in Management et devient secrétaire du Comptoir. Hors des cours : musique, création de contenu, couture, menuiserie, basket.",
+    "missions": "Rédige convocations et comptes rendus, tient la liste des membres et les feuilles de présence.",
+    "missionsEn": "Writes notices and minutes, keeps the member list and attendance sheets.",
+    "parcours": "2022 – 2025 · Lycée Sans Frontière, Pessac : bac général avec mention, section européenne espagnol, coordination du yearbook en terminale.\n2025 – 2026 · Université de Bordeaux : première année de licence de droit validée. Vendanges aux châteaux Grimont (2025) et Duplessy (2026).\n2026 – aujourd'hui · Audencia et Le Comptoir : Bachelor in Management à Nantes, secrétaire du club.",
+    "faits": "Coordinateur du yearbook de son lycée : une équipe de 15 élèves, des réunions suivies par compte rendu et des sponsors à démarcher.\nPremière année de licence de droit validée avant d'entrer à Audencia.\nBénévole : DJ pour la vie étudiante de son lycée, nettoyage de sites naturels, chantier viticole solidaire.",
+    "expertises": "Organisation de projet\nComptes rendus et suivi d'actions\nRelations partenaires\nRaisonnement juridique\nMontage vidéo",
+    "citation": "« Chacun est vecteur de changement, et le changement, c'est maintenant. »",
+    "linkedin": "https://www.linkedin.com/in/luc-grana-824488371/"
+  },
+  {
+    "ordre": 7,
+    "title": "Pauline Chaillou-L'Heveder",
+    "role": "Responsable communication",
+    "roleEn": "Head of Communications",
+    "missions": "Gère Instagram et le site, conçoit les affiches et l'identité visuelle, archive les autorisations de droit à l'image.",
+    "missionsEn": "Runs Instagram and the website, designs posters and the visual identity, and files image-rights consents."
+  },
+  {
+    "ordre": 8,
+    "title": "Poste à pourvoir",
+    "role": "Responsable pédagogique",
+    "roleEn": "Head of Academics",
+    "missions": "Établit le planning des thèmes du mercredi, annoncés une semaine à l'avance, et fait le lien avec les enseignants référents.",
+    "missionsEn": "Sets the schedule of Wednesday topics, announced a week ahead, and liaises with faculty."
+  }
+]

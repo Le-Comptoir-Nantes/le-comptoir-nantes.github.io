@@ -1,0 +1,89 @@
+[
+  {
+    "ordre": 1,
+    "afficher": true,
+    "type": "Comptoir",
+    "title": "Les Comptoirs du mercredi",
+    "titleEn": "The Wednesday Comptoirs",
+    "dateTexte": "Chaque mercredi",
+    "lieu": "Lieu partenaire annoncé à l'avance",
+    "cours": "Droit, marketing, comptabilité, stratégie…",
+    "resume": "Un thème de cours présenté en une dizaine de minutes par un membre, puis débattu à partir d'un cas concret ou de l'actualité. On ne vient pas faire ses devoirs : on échange.",
+    "resumeEn": "A course topic presented in about ten minutes by a member, then debated from a real case or the news. No homework here: we talk."
+  },
+  {
+    "ordre": 2,
+    "afficher": true,
+    "type": "Sortie Terrain",
+    "title": "Audience au tribunal de commerce",
+    "titleEn": "Commercial court hearing",
+    "dateTexte": "Date à confirmer",
+    "cours": "Droit des affaires",
+    "resume": "Assister à une audience publique pour voir le droit des affaires s'appliquer, en vrai.",
+    "resumeEn": "Sit in on a public hearing and watch business law at work, for real."
+  },
+  {
+    "ordre": 3,
+    "afficher": true,
+    "type": "Sortie Terrain",
+    "title": "Rencontre avec le maire",
+    "titleEn": "Meeting the mayor",
+    "dateTexte": "Date à confirmer",
+    "cours": "Institutions, économie territoriale",
+    "resume": "Un échange avec un élu sur l'action publique et l'économie du territoire.",
+    "resumeEn": "A conversation with an elected official about public action and the local economy."
+  },
+  {
+    "ordre": 4,
+    "afficher": true,
+    "type": "Meet and Talk",
+    "title": "Meet and Talk avec un dirigeant",
+    "titleEn": "Meet and Talk with a business leader",
+    "dateTexte": "Date à confirmer",
+    "cours": "Management, stratégie",
+    "resume": "Vingt minutes pour découvrir un parcours et un métier, quarante minutes de questions-réponses avec les étudiants.",
+    "resumeEn": "Twenty minutes on a career and a job, forty minutes of questions and answers with students."
+  },
+  {
+    "ordre": 5,
+    "afficher": true,
+    "type": "Conférence",
+    "title": "Conférence du Comptoir",
+    "titleEn": "Le Comptoir conference",
+    "dateTexte": "Date à confirmer",
+    "cours": "Thème choisi par les membres",
+    "resume": "Une conférence organisée par le club, ouverte aux autres étudiants.",
+    "resumeEn": "A conference organised by the club, open to other students."
+  },
+  {
+    "ordre": 6,
+    "afficher": true,
+    "type": "Sortie Terrain",
+    "title": "Visite d'entreprise ou de collectivité",
+    "titleEn": "Company or local authority visit",
+    "dateTexte": "Date à confirmer",
+    "cours": "Organisation, gestion",
+    "resume": "Pousser la porte d'une organisation pour voir comment elle fonctionne.",
+    "resumeEn": "Step inside an organisation and see how it runs."
+  },
+  {
+    "ordre": 7,
+    "afficher": true,
+    "type": "Sortie Terrain",
+    "title": "Les coulisses d'une émission",
+    "titleEn": "Behind the scenes of a TV show",
+    "dateTexte": "Date à confirmer",
+    "resume": "Au programme de l'année. Détails à venir.",
+    "resumeEn": "On this year's agenda. Details to come."
+  },
+  {
+    "ordre": 8,
+    "afficher": true,
+    "type": "Sortie Terrain",
+    "title": "Sortie à Paris",
+    "titleEn": "Trip to Paris",
+    "dateTexte": "Date à confirmer",
+    "resume": "Au programme de l'année. Détails à venir.",
+    "resumeEn": "On this year's agenda. Details to come."
+  }
+]
