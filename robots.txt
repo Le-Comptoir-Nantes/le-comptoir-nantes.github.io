@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /outils/
 
 Sitemap: https://le-comptoir-nantes.github.io/sitemap.xml

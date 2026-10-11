@@ -149,11 +149,8 @@
   }
   /* Un lien venu d'un fichier de contenu n'est gardé que si c'est une adresse web */
   function web(v) { v = String(v == null ? '' : v).trim(); return /^https?:\/\//i.test(v) ? v : ''; }
-  function img(v) {
-    if (!v) return '';
-    if (typeof v === 'object') v = v.url || v.src || '';
-    return String(v);
-  }
+  /* Une image venue d'un fichier de contenu : un fichier du site (assets/…) ou une adresse https, rien d'autre */
+  function img(v) { v = String(v == null ? '' : v).trim(); return /^(assets\/[\w\-.\/]+|https:\/\/\S+)$/i.test(v) ? v : ''; }
   function fail() { return '<p class="empty">' + t('Ce contenu ne se charge pas pour le moment. Rechargez la page, ou écrivez-nous : ', 'This content is not loading right now. Reload the page, or email us: ') + '<a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a></p>'; }
 
   /* Réglages : liens des réseaux, contact, tarifs, prochain rendez-vous */
@@ -162,7 +159,12 @@
     if (!rows) return;
     rows.forEach(function (r) { var v = t(r.valeur, r.valeurEn); if (v || r.title !== 'email') S[r.title] = v || ''; });
     $$('[data-set]').forEach(function (e) { var v = S[e.getAttribute('data-set')]; if (v) e.textContent = v; });
-    $$('[data-set-href]').forEach(function (e) { var v = S[e.getAttribute('data-set-href')], li = e.parentNode.tagName === 'LI' ? e.parentNode : null; if (v && /^https?:\/\//.test(v)) { e.href = v; e.hidden = false; if (li) li.hidden = false; } else { e.hidden = true; if (li) li.hidden = true; } });
+    /* Un lien dont l'adresse n'est pas renseignée est retiré de la page : un lien vide ne sert ni au visiteur ni aux moteurs de recherche */
+    $$('[data-set-href]').forEach(function (e) {
+      var v = web(S[e.getAttribute('data-set-href')]), holder = /^(LI|P)$/.test(e.parentNode.tagName) && e.parentNode.children.length === 1 ? e.parentNode : e;
+      if (v) { e.href = v; e.hidden = false; holder.hidden = false; } else holder.parentNode.removeChild(holder);
+    });
+    next();
     $$('[data-set-mail]').forEach(function (e) { e.href = 'mailto:' + S.email; e.textContent = S.email; });
     var any = S.instagram || S.linkedin || S.youtube;
     $$('[data-nosocial]').forEach(function (e) { e.hidden = !!any; });
@@ -177,6 +179,8 @@
       dg.addEventListener('click', function (e) { if (e.target === dg || e.target.className === 'x') dg.close(); });
     }
     dg.innerHTML = '<div class="dlg"><button class="x" aria-label="' + t('Fermer', 'Close') + '">×</button>' + html + '</div>';
+    var h = $('h2', dg);
+    if (h) { h.id = 'dlg-t'; dg.setAttribute('aria-labelledby', 'dlg-t'); }
     dg.showModal();
   }
 
@@ -184,7 +188,8 @@
   var TYPES = { 'Comptoir': 'Comptoir', 'Meet and Talk': 'Meet and Talk', 'Sortie Terrain': 'Field trip', 'Conférence': 'Conference' };
   var DT = { 'Date à confirmer': 'Date to be confirmed', 'Chaque mercredi': 'Every Wednesday' };
   var E = [], P = [], F = '';
-  function time(d) { if (!d) return null; var x = new Date(d.$date || d).getTime(); return isNaN(x) ? null : x; }
+  function time(d) { if (!d) return null; var x = new Date(d).getTime(); return isNaN(x) ? null : x; }
+  function timed(r) { return String(r.date || '').length > 10; }
   function day(r) {
     var x = time(r.date);
     if (x !== null) return new Date(x).toLocaleDateString(L === 'en' ? 'en-GB' : 'fr-FR', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
@@ -202,6 +207,9 @@
       if (x.d || y.d) return x.d ? -1 : 1;
       return x.no - y.no;
     });
+    NEXT = E.filter(function (e) { return e.d !== null && !e.past; })[0] || null;
+    next();
+    schema();
     var chips = $('#filters');
     if (chips) {
       var seen = [];
@@ -209,6 +217,54 @@
       chips.innerHTML = [''].concat(seen).map(function (k) { return '<button class="chip" data-f="' + esc(k) + '" aria-pressed="' + (k === F) + '">' + esc(k ? t(k, TYPES[k]) : t('Tout', 'All')) + '</button>'; }).join('');
     }
     drawEvents();
+  }
+  /* Dès qu'un événement à venir a une date, c'est lui le « prochain rendez-vous » de l'accueil */
+  var NEXT = null;
+  function hour(r) { return timed(r) ? new Date(time(r.date)).toLocaleTimeString(L === 'en' ? 'en-GB' : 'fr-FR', { hour: '2-digit', minute: '2-digit' }) : ''; }
+  function next() {
+    var a = $('[data-set=prochainRdv]'), b = $('[data-set=prochainRdvDetail]');
+    if (!NEXT || !a || !b) return;
+    var r = NEXT.r;
+    a.textContent = t(r.title, r.titleEn);
+    b.textContent = [day(r), hour(r), r.lieu].filter(Boolean).join(' · ');
+  }
+  /* Les événements datés sont décrits aux moteurs de recherche (schema.org/Event) */
+  function schema() {
+    var list = E.filter(function (e) { return e.d !== null && !e.past; }).map(function (e) {
+      var r = e.r;
+      return {
+        '@type': 'Event', name: r.title, description: r.resume || undefined, startDate: String(r.date),
+        eventStatus: 'https://schema.org/EventScheduled', eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+        location: { '@type': 'Place', name: r.lieu || 'Nantes', address: { '@type': 'PostalAddress', addressLocality: 'Nantes', addressCountry: 'FR' } },
+        organizer: { '@type': 'Organization', name: 'Le Comptoir', url: 'https://le-comptoir-nantes.github.io/' }
+      };
+    });
+    var old = D.getElementById('ld-events');
+    if (old) old.parentNode.removeChild(old);
+    if (!list.length) return;
+    var el = D.createElement('script');
+    el.type = 'application/ld+json'; el.id = 'ld-events';
+    el.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': list }).replace(/</g, '\\u003c');
+    D.head.appendChild(el);
+  }
+  /* Fichier d'agenda (.ics) d'un événement daté : 1 h 30 par défaut, journée entière si l'heure n'est pas donnée */
+  function ics(e) {
+    var r = e.r, d = new Date(e.d);
+    function p(n) { return ('0' + n).slice(-2); }
+    function ymd(x) { return x.getFullYear() + p(x.getMonth() + 1) + p(x.getDate()); }
+    function full(x) { return ymd(x) + 'T' + p(x.getHours()) + p(x.getMinutes()) + '00'; }
+    function txt(v) { return String(v || '').replace(/\\/g, '\\\\').replace(/([,;])/g, '\\$1').replace(/\r?\n/g, '\\n'); }
+    var end = timed(r) ? new Date(e.d + 54e5) : new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+    var rows = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Le Comptoir//Site//FR', 'BEGIN:VEVENT',
+      'UID:' + ymd(d) + '-' + e.no + '@le-comptoir-nantes.github.io', 'DTSTAMP:' + full(new Date()),
+      timed(r) ? 'DTSTART:' + full(d) : 'DTSTART;VALUE=DATE:' + ymd(d), timed(r) ? 'DTEND:' + full(end) : 'DTEND;VALUE=DATE:' + ymd(end),
+      'SUMMARY:' + txt('Le Comptoir · ' + r.title), 'DESCRIPTION:' + txt(r.resume), r.lieu ? 'LOCATION:' + txt(r.lieu) : '',
+      'URL:https://le-comptoir-nantes.github.io/evenements.html', 'END:VEVENT', 'END:VCALENDAR'].filter(Boolean);
+    var a = D.createElement('a');
+    a.href = URL.createObjectURL(new Blob([rows.join('\r\n')], { type: 'text/calendar;charset=utf-8' }));
+    a.download = 'le-comptoir-' + ymd(d) + '.ics';
+    D.body.appendChild(a); a.click(); a.parentNode.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
   }
   function drawEvents() {
     var box = $('#events'), lim = +box.getAttribute('data-limit') || 99;
@@ -220,14 +276,15 @@
     }).join('') : '<p class="empty">' + t('Rien dans cette catégorie pour le moment.', 'Nothing in this category for now.') + '</p>';
   }
   function eventDetail(e) {
-    var r = e.r, rows = [[t('Quand', 'When'), day(r)], [t('Où', 'Where'), r.lieu], [t('Avec', 'With'), r.intervenant], [t('Cours mis en pratique', 'Course put into practice'), r.cours]];
+    var r = e.r, rows = [[t('Quand', 'When'), [day(r), hour(r)].filter(Boolean).join(', ')], [t('Où', 'Where'), r.lieu], [t('Avec', 'With'), r.intervenant], [t('Cours mis en pratique', 'Course put into practice'), r.cours]];
     var pics = P.filter(function (p) { return p.autorisation === true && p.evenement === r.title && img(p.image); });
     var main = r.autorisationPhoto === true ? img(r.photo) : '';
     show('<p class="over">' + esc(t(r.type, TYPES[r.type])) + '</p><h2>' + esc(t(r.title, r.titleEn)) + '</h2><p>' + esc(t(r.resume, r.resumeEn)) + '</p>' +
       '<ul class="checks">' + rows.filter(function (x) { return x[1]; }).map(function (x) { return '<li><b>' + x[0] + ' :</b> ' + esc(x[1]) + '</li>'; }).join('') + '</ul>' +
       (web(r.video) ? '<p style="margin-top:1em"><a class="more" href="' + esc(web(r.video)) + '" target="_blank" rel="noopener">' + t('Voir la vidéo ↗', 'Watch the video ↗') + '</a></p>' : '') +
       (main || pics.length ? '<div class="shots">' + (main ? '<a href="' + esc(main) + '" target="_blank" rel="noopener"><img src="' + esc(main) + '" alt="' + esc(r.title) + '"></a>' : '') + pics.map(function (p) { var u = esc(img(p.image)); return '<a href="' + u + '" target="_blank" rel="noopener"><img src="' + u + '" alt="' + esc(p.title || r.title) + '" loading="lazy"></a>'; }).join('') + '</div>' : '') +
-      '<p class="actions"><a class="btn" href="rejoindre.html">' + t('Venir avec le club', 'Come with the club') + '</a></p>');
+      '<p class="actions"><a class="btn" href="rejoindre.html">' + t('Venir avec le club', 'Come with the club') + '</a>' +
+      (e.d !== null && !e.past ? '<button type="button" class="btn ghost" data-ics="' + E.indexOf(e) + '">' + t('Ajouter à mon agenda', 'Add to my calendar') + '</button>' : '') + '</p>');
   }
 
   /* Bureau */
@@ -334,7 +391,7 @@
         ev.preventDefault();
         var fd = new FormData(f), det = [], m = $('.msg', f), kind = f.getAttribute('data-form');
         if (fd.get('website')) return;
-        fd.forEach(function (v, k) { if (['nom', 'email', 'message', 'website', 'ok'].indexOf(k) < 0 && v) det.push(k + ' : ' + v); });
+        fd.forEach(function (v, k) { if (['nom', 'email', 'message', 'website'].indexOf(k) < 0 && v) det.push(k + ' : ' + v); });
         var subject = 'Le Comptoir · ' + kind + ' · ' + fd.get('nom');
         var head = [t('Nom', 'Name') + ' : ' + fd.get('nom'), 'E-mail : ' + fd.get('email')].concat(det).join('\n');
         var body = head + '\n\n' + (fd.get('message') || '');
@@ -387,9 +444,10 @@
   D.addEventListener('click', function (e) {
     var pick = e.target.closest ? e.target.closest('[data-pick]') : null;
     if (pick) { var sel = $('#article'); if (sel) sel.selectedIndex = +pick.getAttribute('data-pick'); return; }
-    var el = e.target.closest ? e.target.closest('[data-ev],[data-mb],[data-f],#draw') : null;
+    var el = e.target.closest ? e.target.closest('[data-ics],[data-ev],[data-mb],[data-f],#draw') : null;
     if (!el) return;
-    if (el.id === 'draw') draw();
+    if (el.hasAttribute('data-ics')) ics(E[+el.getAttribute('data-ics')]);
+    else if (el.id === 'draw') draw();
     else if (el.hasAttribute('data-f')) { F = el.getAttribute('data-f'); $$('.chip').forEach(function (c) { c.setAttribute('aria-pressed', c === el); }); drawEvents(); }
     else if (el.hasAttribute('data-ev')) eventDetail(E[+el.getAttribute('data-ev')]);
     else memberDetail(B[+el.getAttribute('data-mb')]);

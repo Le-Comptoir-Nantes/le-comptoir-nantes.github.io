@@ -53,13 +53,27 @@ Dépose les images dans `assets/` (portraits dans `assets/bureau/`, logos dans `
 
 Portraits du bureau attendus : `lucas-denis.webp`, `romain-rabiller.webp`, `felice-maire.webp`, `zoe-podevin.webp`, `adil-moutmir.webp`, `luc-grana.webp`. Tant qu'un portrait manque, le site affiche les initiales à la place.
 
+## Dater un événement
+
+Dès qu'un événement à venir porte une vraie date dans `evenements.json`, le site fait trois choses tout seul :
+
+- il devient le « Prochain rendez-vous » de la page d'accueil (à la place du texte de `reglages.json`) ;
+- sa fiche propose un bouton « Ajouter à mon agenda » ;
+- il est signalé aux moteurs de recherche comme un événement.
+
+Écris la date avec l'heure, `"date": "2026-11-04T18:30:00"`, et le lieu dans `"lieu"`. Sans heure (`"2026-11-04"`), l'événement est noté sur la journée entière. Une fois la date passée, il rejoint les événements passés.
+
+## Questions fréquentes
+
+Les questions de la page Rejoindre sont écrites dans `rejoindre.html` (bloc `id="faq"`), en français et en anglais, et une seconde fois en haut du fichier pour les moteurs de recherche. Si la cotisation ou le prix du billet change, corrige les trois endroits.
+
 ## Formulaires
 
 Les formulaires n'enregistrent rien : ils ouvrent la messagerie du visiteur avec un e-mail prêt à envoyer à l'adresse `email` de `reglages.json`.
 
 ## Le jeu « L'Affaire Ombreval »
 
-Le jeu n'est pas dans ce dossier : ses pages sont écrites une fois pour toutes, parce que les cartes, le plateau et le kit à imprimer doivent rester identiques.
+Le jeu n'est pas dans ce dossier : ses pages et le kit à imprimer sont fabriqués ensemble par un script, pour que les cartes soient identiques sur le site et dans le PDF. Le mode d'emploi est dans [`outils/README.md`](../outils/README.md).
 
 | Page | Contenu |
 | --- | --- |
@@ -70,7 +84,7 @@ Le jeu n'est pas dans ce dossier : ses pages sont écrites une fois pour toutes,
 | `jeu-enquete.html` | Scénario de l'enquête |
 | `assets/jeu/affaire-ombreval-kit-a-imprimer.pdf` | Kit à imprimer (A4) |
 
-Pour corriger une carte ou un point de règle, demande la modification : le texte doit être changé à la fois sur le site et dans le PDF.
+Pour corriger une carte ou un point de règle : modifie `outils/jeu/source.html`, puis lance `python3 outils/construire.py --pdf` (ou demande la modification).
 
 ## Sécurité du site
 
@@ -78,7 +92,7 @@ Chaque page porte une règle de sécurité (balise `Content-Security-Policy`, en
 
 Conséquence : une vidéo YouTube intégrée, un widget Instagram ou un outil de mesure d'audience ne s'afficheront pas tant que cette règle n'aura pas été élargie. Ces ajouts demandent aussi un bandeau cookies : demande la modification plutôt que de coller un code d'intégration.
 
-Les liens écrits dans les fichiers de ce dossier (`linkedin`, `site`, `video`, réseaux) doivent commencer par `https://`, sinon ils ne sont pas affichés.
+Les liens écrits dans les fichiers de ce dossier (`linkedin`, `site`, `video`, réseaux) doivent commencer par `https://`, sinon ils ne sont pas affichés. Les images sont soit un fichier du site (`assets/…`), soit une adresse en `https://`.
 
 ## Plan du site
 

@@ -1,0 +1,5 @@
+outils/jeu/fragments.json
+outils/jeu/tmp/
+__pycache__/
+*.pyc
+.DS_Store
