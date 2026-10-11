@@ -1,11 +1,10 @@
 """Corrections d'audit communes à toutes les pages (peut être relancé sans risque)."""
-import glob, os, re, hashlib, base64
+import glob, os, re, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 R = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')) + '/'
-BOOT = '!function(d,w){try{if(w.matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("m");w.setTimeout(function(){w.__lcMotion||d.classList.remove("m")},2500)}catch(e){}}(document.documentElement,window)'
-H = base64.b64encode(hashlib.sha256(BOOT.encode()).digest()).decode()
-CSP = ("default-src 'self'; script-src 'self' 'sha256-%s'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; "
-       "font-src 'self'; connect-src 'self'; media-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'") % H
+from regle import BOOT, CSP
 HEAD = ('<meta http-equiv="Content-Security-Policy" content="%s">\n'
+        '<meta name="referrer" content="strict-origin-when-cross-origin">\n'
         '<meta name="theme-color" content="#0B1F4D">\n'
         '<link rel="preload" href="assets/fonts/lora-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>\n'
         '<link rel="preload" href="assets/fonts/lato-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>\n') % CSP
@@ -25,7 +24,9 @@ for f in sorted(glob.glob(R + '*.html')):
     n = os.path.basename(f); t = open(f, encoding='utf-8').read(); o = t
     assert t.count('<script>' + BOOT + '</script>') == 1, n
     assert t.count('<script>') == 1, (n, 'script intégré inattendu')
-    t = re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>\n<meta name="theme-color"[^>]*>\n(?:<link rel="preload"[^>]*>\n)*', '', t)
+    t = re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>\n(?:<meta name="referrer"[^>]*>\n)?<meta name="theme-color"[^>]*>\n(?:<link rel="preload"[^>]*>\n)*', '', t)
+    assert '<style' not in t, (n, 'bloc <style> dans la page : le mettre dans un fichier de assets/')
+    assert not re.search(r'<[^>]+\son[a-z]+\s*=', t), (n, 'gestionnaire écrit dans le HTML (onclick=…) : le mettre dans un script de assets/')
     vp = '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
     assert t.count(vp) == 1, n
     t = t.replace(vp, vp + HEAD)

@@ -84,15 +84,17 @@ Le jeu n'est pas dans ce dossier : ses pages et le kit à imprimer sont fabriqu�
 | `jeu-enquete.html` | Scénario de l'enquête |
 | `assets/jeu/affaire-ombreval-kit-a-imprimer.pdf` | Kit à imprimer (A4) |
 
-Pour corriger une carte ou un point de règle : modifie `outils/jeu/source.html`, puis lance `python3 outils/construire.py --pdf` (ou demande la modification).
+Pour corriger une carte ou un point de règle : modifie `outils/jeu/source.txt`, puis lance `python3 outils/construire.py --pdf` (ou demande la modification).
 
 ## Sécurité du site
 
-Chaque page porte une règle de sécurité (balise `Content-Security-Policy`, en haut du fichier) : le site ne charge que ses propres scripts, styles et polices. Les images peuvent venir d'un autre site en `https`.
+Chaque page porte une règle de sécurité (balise `Content-Security-Policy`, en haut du fichier) : le site ne charge que ses propres fichiers : scripts, styles, polices et images. Rien ne vient d'un autre site.
 
 Conséquence : une vidéo YouTube intégrée, un widget Instagram ou un outil de mesure d'audience ne s'afficheront pas tant que cette règle n'aura pas été élargie. Ces ajouts demandent aussi un bandeau cookies : demande la modification plutôt que de coller un code d'intégration.
 
-Les liens écrits dans les fichiers de ce dossier (`linkedin`, `site`, `video`, réseaux) doivent commencer par `https://`, sinon ils ne sont pas affichés. Les images sont soit un fichier du site (`assets/…`), soit une adresse en `https://`.
+Les liens écrits dans les fichiers de ce dossier (`linkedin`, `site`, `video`, réseaux) doivent commencer par `https://`, sinon ils ne sont pas affichés. Les images sont toujours des fichiers du site, rangés dans `assets/` : l'adresse d'une image hébergée ailleurs n'est pas affichée.
+
+Avant de publier une modification, `python3 outils/verifier.py` relit les pages et les fichiers de ce dossier et signale ce qui affaiblirait la sécurité du site. GitHub le lance aussi tout seul à chaque publication : s'il échoue, le propriétaire du dépôt reçoit un e-mail.
 
 ## Plan du site
 

@@ -28,7 +28,9 @@ assets/site.css, site.js                                  mise en page et foncti
 assets/motion.css, motion.js                              animations (coupées si le visiteur le demande)
 assets/jeu.css, jeu.js, assets/jeu/                       pages du jeu et kit à imprimer (PDF)
 assets/fonts/, assets/bureau/                             polices et portraits, hébergés sur le site
-outils/                                                   scripts de fabrication (pas utiles aux visiteurs)
+outils/                                                   scripts de fabrication et de contrôle (pas utiles aux visiteurs)
+SECURITY.md, .well-known/security.txt                     sécurité : protections, signalement
+.github/workflows/verifier.yml                            contrôle automatique à chaque publication
 sitemap.xml, robots.txt                                   pour les moteurs de recherche
 ```
 
@@ -39,9 +41,17 @@ sitemap.xml, robots.txt                                   pour les moteurs de re
 - **Les formulaires n'enregistrent rien** : ils préparent un e-mail dans la messagerie du visiteur, à l'adresse `email` de `contenu/reglages.json`.
 - **Aucune photo d'une personne sans autorisation écrite** : dans les fichiers de `contenu/`, une photo ne s'affiche que si `autorisationPhoto` (ou `autorisation`) vaut `true`.
 - **Français et anglais** : tout texte ajouté dans une page a sa traduction dans `data-en`. Les cartes et la règle du jeu restent en français.
-- Chaque page porte une règle de sécurité (balise `Content-Security-Policy`) qui interdit les scripts écrits dans la page. Un script va dans `assets/`, jamais dans le HTML. Après avoir créé une page, lancer `python3 outils/finitions.py`.
+- Chaque page porte une règle de sécurité (balise `Content-Security-Policy`) : seuls les fichiers du site sont chargés. Un script ou un style va dans `assets/`, jamais dans le HTML. Après avoir créé une page, lancer `python3 outils/finitions.py`.
+- La sécurité du site, ce qui la protège et comment signaler un problème : [`SECURITY.md`](SECURITY.md).
 
 ## Vérifier avant de publier
+
+```
+python3 outils/verifier.py
+```
+
+doit répondre « aucune erreur ». Ce contrôle relit les pages, les scripts et les contenus ; GitHub le relance à chaque publication et chaque lundi.
+
 
 Ouvrir le site sur son ordinateur :
 

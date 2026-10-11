@@ -4,7 +4,7 @@ import importlib.util
 spec = importlib.util.spec_from_file_location('sitegen', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pages.py'))
 g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
 REPO = g.REPO
-s = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'presentation-base.html'), encoding='utf-8').read()
+s = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'presentation-base.txt'), encoding='utf-8').read()
 
 
 def rep(old, new, n=1):
@@ -71,5 +71,13 @@ s = s[:a] + '<script src="assets/jeu.js"></script>\n' + s[b:]
 rep('<meta property="og:image" content="https://le-comptoir-nantes.github.io/assets/partage.png">',
     '<meta property="og:locale" content="fr_FR">\n<meta property="og:image" content="https://le-comptoir-nantes.github.io/assets/partage.png">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n<meta name="twitter:card" content="summary_large_image">\n'
     '<script type="application/ld+json">{"@context":"https://schema.org","@type":"Game","name":"L’Affaire Ombreval","alternateName":"Le Comptoir, le jeu","description":"Un jeu de société pour réviser la négociation, le droit, la comptabilité, le marketing et l’économie de 1re année de bachelor, entre Monopoly, La Bonne Paie et Cluedo.","url":"https://le-comptoir-nantes.github.io/jeu.html","inLanguage":"fr","numberOfPlayers":{"@type":"QuantitativeValue","minValue":2,"maxValue":6},"author":{"@type":"Organization","name":"Le Comptoir","url":"https://le-comptoir-nantes.github.io/"}}</script>')
+# Les styles propres à cette page rejoignent assets/jeu.css : aucune page n'écrit de style dans son HTML
+i = s.index('<style>\n')
+j = s.index('</style>\n', i)
+page_css = s[i + len('<style>\n'):j]
+s = s[:i] + s[j + len('</style>\n'):]
+assert '<style' not in s
+with open(os.path.join(REPO, 'assets/jeu.css'), 'a', encoding='utf-8') as f:
+    f.write('\n/* ───────── Page de présentation du jeu (jeu.html) ───────── */\n' + page_css)
 open(os.path.join(REPO, 'jeu.html'), 'w', encoding='utf-8').write(s)
 print('jeu.html', len(s) // 1024, 'Ko')

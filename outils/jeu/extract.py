@@ -2,7 +2,7 @@
 import re, json, os, html as H
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.join(HERE, 'source.html')
+SRC = os.path.join(HERE, 'source.txt')
 t = open(SRC, encoding='utf-8').read()
 
 

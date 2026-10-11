@@ -3,6 +3,19 @@
   'use strict';
   var D = document;
 
+  /* Le site ne s'affiche pas dans le cadre d'un autre site : on ne peut pas faire cliquer un visiteur à son insu */
+  var framed = false;
+  try { framed = window.top !== window.self && window.top.location.host !== window.location.host; } catch (e) { framed = true; }
+  if (framed) {
+    D.body.textContent = '';
+    var out = D.createElement('a');
+    out.href = window.location.href; out.target = '_top'; out.rel = 'noopener';
+    out.textContent = 'Ouvrir le site du Comptoir · Open Le Comptoir’s website';
+    out.style.cssText = 'display:block;padding:24px;font:700 1rem/1.4 sans-serif;color:#0B1F4D';
+    D.body.appendChild(out);
+    return;
+  }
+
   function get(k) { try { return localStorage.getItem('lc_' + k); } catch (e) { return null; } }
   function put(k, v) { try { localStorage.setItem('lc_' + k, v); } catch (e) {} }
   var L = get('lang') === 'en' ? 'en' : 'fr';
@@ -149,15 +162,22 @@
   }
   /* Un lien venu d'un fichier de contenu n'est gardé que si c'est une adresse web */
   function web(v) { v = String(v == null ? '' : v).trim(); return /^https?:\/\//i.test(v) ? v : ''; }
-  /* Une image venue d'un fichier de contenu : un fichier du site (assets/…) ou une adresse https, rien d'autre */
-  function img(v) { v = String(v == null ? '' : v).trim(); return /^(assets\/[\w\-.\/]+|https:\/\/\S+)$/i.test(v) ? v : ''; }
+  /* Une image venue d'un fichier de contenu est toujours un fichier du site, rangé dans assets/ */
+  function img(v) { v = String(v == null ? '' : v).trim(); return /^assets\/[\w\-.\/]+$/.test(v) && v.indexOf('..') < 0 ? v : ''; }
+  /* Une adresse e-mail venue d'un fichier de contenu : une seule adresse, sans rien d'autre */
+  function mail(v) { v = String(v == null ? '' : v).trim(); return /^[^\s@<>"'?&,;:]+@[^\s@<>"'?&,;:]+\.[a-z]{2,}$/i.test(v) ? v : ''; }
   function fail() { return '<p class="empty">' + t('Ce contenu ne se charge pas pour le moment. Rechargez la page, ou écrivez-nous : ', 'This content is not loading right now. Reload the page, or email us: ') + '<a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a></p>'; }
 
   /* Réglages : liens des réseaux, contact, tarifs, prochain rendez-vous */
-  var S = { email: 'jblucas.denis@audencia.com' };
+  var S = Object.create(null);
+  S.email = 'jblucas.denis@audencia.com';
   function settings(rows) {
     if (!rows) return;
-    rows.forEach(function (r) { var v = t(r.valeur, r.valeurEn); if (v || r.title !== 'email') S[r.title] = v || ''; });
+    rows.forEach(function (r) {
+      if (!r || typeof r.title !== 'string' || !/^[a-zA-Z]+$/.test(r.title)) return;
+      var v = String(t(r.valeur, r.valeurEn) || '');
+      if (r.title === 'email') { if (mail(v)) S.email = mail(v); } else S[r.title] = v;
+    });
     $$('[data-set]').forEach(function (e) { var v = S[e.getAttribute('data-set')]; if (v) e.textContent = v; });
     /* Un lien dont l'adresse n'est pas renseignée est retiré de la page : un lien vide ne sert ni au visiteur ni aux moteurs de recherche */
     $$('[data-set-href]').forEach(function (e) {
@@ -166,7 +186,7 @@
     });
     next();
     $$('[data-set-mail]').forEach(function (e) { e.href = 'mailto:' + S.email; e.textContent = S.email; });
-    var any = S.instagram || S.linkedin || S.youtube;
+    var any = web(S.instagram) || web(S.linkedin) || web(S.youtube);
     $$('[data-nosocial]').forEach(function (e) { e.hidden = !!any; });
   }
 
@@ -323,7 +343,7 @@
   function memberDetail(r) {
     var vacant = open(r.title), links = [];
     if (web(r.linkedin)) links.push('<a class="more" href="' + esc(web(r.linkedin)) + '" target="_blank" rel="noopener">LinkedIn ↗</a>');
-    if (r.mail && /^[^\s@<>"']+@[^\s@<>"']+$/.test(r.mail)) links.push('<a class="more" href="mailto:' + esc(r.mail) + '">' + esc(r.mail) + '</a>');
+    if (mail(r.mail)) links.push('<a class="more" href="mailto:' + esc(mail(r.mail)) + '">' + esc(mail(r.mail)) + '</a>');
     show(face(r) + '<p class="over">' + esc(t(r.role, r.roleEn)) + '</p><h2>' + esc(who(r)) + '</h2>' +
       (!vacant && r.surnom ? '<p class="when">' + t('Surnom : ', 'Nickname: ') + '« ' + esc(r.surnom) + ' »</p>' : '') +
       (!vacant && r.accroche ? '<p class="lead">' + esc(r.accroche) + '</p>' : '') +

@@ -1,0 +1,23 @@
+# Contrôle de sécurité du site : à chaque publication sur main, et chaque lundi matin.
+# Il ne publie rien et n'a besoin d'aucun secret. S'il échoue, GitHub prévient le propriétaire du dépôt par e-mail.
+name: Vérification du site
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Récupérer le site
+        run: git clone --depth 1 --branch main "https://github.com/${GITHUB_REPOSITORY}.git" site
+      - name: Vérifier les pages, les scripts et les contenus
+        run: python3 site/outils/verifier.py
