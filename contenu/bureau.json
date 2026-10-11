@@ -69,8 +69,15 @@
     "roleEn": "Treasurer",
     "photo": "assets/bureau/adil-moutmir.webp",
     "autorisationPhoto": true,
+    "accroche": "Formé seul aux marchés financiers, il tient les comptes du Comptoir.",
+    "presentation": "Originaire d'Annemasse, en Haute-Savoie, à la frontière de Genève, Adil Moutmir découvre le métier de trader vers dix ans et garde ce cap. Après sa seconde, sa famille s'installe au Maroc : il prépare son bac STMG à distance avec le CNED, mention assez bien, et se forme seul aux marchés financiers. Pendant plus d'un an, il pratique le trading chaque jour sur les indices américains, le Dow Jones en tête. En 2026, il intègre le Bachelor in Management et devient trésorier du Comptoir. Son objectif : un master en finance de marché, puis un poste de trader en banque ou en fonds d'investissement.",
     "missions": "Tient les comptes, encaisse les recettes, délivre les reçus de cotisation et présente un point de trésorerie à chaque bureau.",
-    "missionsEn": "Keeps the accounts, collects income, issues membership receipts and reports on finances at every board meeting."
+    "missionsEn": "Keeps the accounts, collects income, issues membership receipts and reports on finances at every board meeting.",
+    "parcours": "2024 – 2026 · CNED, depuis le Maroc : première et terminale à distance, bac STMG mention assez bien, spécialités management et gestion des finances.\n2024 – 2025 · Marchés boursiers, en autodidacte : formation et premières opérations, gestion de portefeuille et du risque, analyse technique, analyse fondamentale et macroéconomie.\n2026 – aujourd'hui · Audencia et Le Comptoir : Bachelor in Management à Nantes, trésorier du club.",
+    "faits": "Plus d'un an de trading quotidien sur les indices américains, avec le Dow Jones (US30) comme actif principal.\nBac STMG mention assez bien, préparé entièrement à distance avec le CNED pendant deux ans passés au Maroc.\nStages de 3e et de 2de chez MC Service, l'entreprise familiale (serrurerie, électricité, plomberie) : contact client et interventions sur place.",
+    "expertises": "Finance de marché\nAnalyse technique et fondamentale\nMacroéconomie\nGestion du risque\nRelation client",
+    "citation": "« Viser les étoiles pour décrocher la lune, avoir des objectifs, c'est bien, mais s'en donner les moyens, c'est mieux. »",
+    "linkedin": "https://www.linkedin.com/in/adil-moutmir-328494434/"
   },
   {
     "ordre": 6,
