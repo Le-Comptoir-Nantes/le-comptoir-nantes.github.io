@@ -53,7 +53,7 @@
       RULES.forEach(function (r) {
         $$(r[0], root).forEach(function (el) {
           if (el.hasAttribute('data-rv') || el.__lc) return;
-          if (el.closest('.story, dialog, #hd')) return;
+          if (el.closest('.story, dialog, #hd, [data-norv]')) return;
           if (!el.closest('main, #ft')) return;
           if (el.parentElement && el.parentElement.closest('[data-rv]')) return;
           var t = r[1];

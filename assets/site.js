@@ -51,7 +51,10 @@
     rejoindre: [],
     jeu: [['#kit', 'Imprimer le jeu', 'Print the game'], ['rejoindre.html', 'Venir à un Comptoir', 'Come to a Comptoir']]
   };
-  function link(h, fr, en, cls) { return '<a' + (cls ? ' class="' + cls + '"' : '') + ' href="' + h + '"' + (here + '.html' === h ? ' aria-current="page"' : '') + '>' + t(fr, en) + '</a>'; }
+  /* Les pages du jeu (règle, plateau, cartes, enquête) partagent la même action et le même onglet « Le jeu » */
+  var inGame = here.indexOf('jeu-') === 0;
+  if (inGame) DOCK[here] = [['jeu.html#kit', 'Imprimer le jeu', 'Print the game']];
+  function link(h, fr, en, cls) { return '<a' + (cls ? ' class="' + cls + '"' : '') + ' href="' + h + '"' + (here + '.html' === h || (inGame && h === 'jeu.html') ? ' aria-current="page"' : '') + '>' + t(fr, en) + '</a>'; }
   function chrome() {
     var main = $('main');
     if (main && !main.id) main.id = 'main';

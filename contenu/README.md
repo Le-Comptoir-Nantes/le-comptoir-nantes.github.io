@@ -56,3 +56,18 @@ Portraits du bureau attendus : `lucas-denis.webp`, `romain-rabiller.webp`, `feli
 ## Formulaires
 
 Les formulaires n'enregistrent rien : ils ouvrent la messagerie du visiteur avec un e-mail prêt à envoyer à l'adresse `email` de `reglages.json`.
+
+## Le jeu « L'Affaire Ombreval »
+
+Le jeu n'est pas dans ce dossier : ses pages sont écrites une fois pour toutes, parce que les cartes, le plateau et le kit à imprimer doivent rester identiques.
+
+| Page | Contenu |
+| --- | --- |
+| `jeu.html` | Présentation du jeu |
+| `jeu-regle.html` | Règle complète |
+| `jeu-plateau.html` | Plateau, matériel et boîte |
+| `jeu-cartes.html` | Les 282 cartes, avec le mode révision |
+| `jeu-enquete.html` | Scénario de l'enquête |
+| `assets/jeu/affaire-ombreval-kit-a-imprimer.pdf` | Kit à imprimer (A4) |
+
+Pour corriger une carte ou un point de règle, demande la modification : le texte doit être changé à la fois sur le site et dans le PDF.
