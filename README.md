@@ -42,6 +42,7 @@ sitemap.xml, robots.txt                                   pour les moteurs de re
 - **Aucune photo d'une personne sans autorisation écrite** : dans les fichiers de `contenu/`, une photo ne s'affiche que si `autorisationPhoto` (ou `autorisation`) vaut `true`.
 - **Français et anglais** : tout texte ajouté dans une page a sa traduction dans `data-en`. Les cartes et la règle du jeu restent en français.
 - Chaque page porte une règle de sécurité (balise `Content-Security-Policy`) : seuls les fichiers du site sont chargés. Un script ou un style va dans `assets/`, jamais dans le HTML. Après avoir créé une page, lancer `python3 outils/finitions.py`.
+- **Ne pas retirer la balise `google-site-verification`** de `index.html` : elle prouve à Google Search Console que le site appartient au club. Elle ne charge rien et ne dépose aucun cookie. Si elle disparaît, le club perd l'accès aux statistiques de recherche.
 - La sécurité du site, ce qui la protège et comment signaler un problème : [`SECURITY.md`](SECURITY.md).
 
 ## Vérifier avant de publier
