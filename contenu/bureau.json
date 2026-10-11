@@ -42,8 +42,15 @@
     "roleEn": "Head of Events",
     "photo": "assets/bureau/felice-maire.webp",
     "autorisationPhoto": true,
+    "accroche": "Après une année de médecine, elle orchestre les rendez-vous du Comptoir.",
+    "presentation": "Avant Audencia, Félice Maire a fait une année d'études de médecine (LAS économie-gestion) à l'Université de Clermont-Ferrand, après un bac général mention assez bien, spécialités mathématiques et physique-chimie, en section européenne espagnol. Pendant quatre ans, elle s'engage auprès de Vision du Monde : parrainage de deux enfants et organisation de collectes de dons. En 2026, elle intègre le Bachelor in Management et prend en charge les événements du Comptoir, pour monter des projets qui rassemblent et créent du lien. Hors des cours : lecture, couture, pilates.",
     "missions": "Organise les Sorties Terrain et les conférences, annoncées dix jours à l'avance, et tient les fiches intervenants.",
-    "missionsEn": "Organises field trips and conferences, announced ten days ahead, and keeps the speaker files."
+    "missionsEn": "Organises field trips and conferences, announced ten days ahead, and keeps the speaker files.",
+    "parcours": "2025 · Lycée René Descartes, Cournon-d'Auvergne : bac général mention assez bien, spécialités mathématiques et physique-chimie, section européenne espagnol.\n2025 – 2026 · Université de Clermont-Ferrand : une année d'études de médecine (LAS économie-gestion).\n2026 – aujourd'hui · Audencia et Le Comptoir : Bachelor in Management à Nantes, responsable événements du club.",
+    "faits": "4 ans de bénévolat chez Vision du Monde : parrainage de deux enfants et organisation de collectes de dons et de fonds.\nBac général mention assez bien en section européenne espagnol, avec deux séjours d'immersion en famille d'accueil en Espagne.\nCertification RSE et espagnol niveau B2.",
+    "expertises": "Organisation et logistique\nCollecte de dons\nEsprit d'équipe\nEspagnol (B2)\nRSE",
+    "citation": "« Je souhaite m'impliquer dans des projets qui rassemblent et créent du lien. »",
+    "linkedin": "https://www.linkedin.com/in/f%C3%A9lice-maire-b24675435/"
   },
   {
     "ordre": 4,
