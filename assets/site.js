@@ -59,13 +59,13 @@
     var main = $('main');
     if (main && !main.id) main.id = 'main';
     D.body.insertAdjacentHTML('afterbegin', '<a class="skip" href="#main">' + t('Aller au contenu', 'Skip to content') + '</a>');
-    $('#hd').innerHTML = '<div class="wrap bar"><a class="brand" href="index.html" aria-label="Le Comptoir, ' + t('accueil', 'home') + '">' + seal() + '<span>Le Comptoir</span></a>' +
+    $('#hd').innerHTML = '<div class="wrap bar"><a class="brand" href="index.html">' + seal().replace(/ role="img" aria-label="[^"]*"/, ' aria-hidden="true" focusable="false"') + '<span>Le Comptoir<span class="sr">, ' + t('accueil', 'home') + '</span></span></a>' +
       '<button class="burger" aria-controls="menu" aria-expanded="false"><i aria-hidden="true"></i>' + t('Menu', 'Menu') + '</button>' +
       '<nav class="menu" id="menu" aria-label="' + t('Navigation principale', 'Main navigation') + '"><div class="links">' +
       NAV.map(function (v) { return link(v[0] + '.html', v[1], v[2]); }).join('') + '</div>' +
       '<a class="btn" href="rejoindre.html">' + t('Venir à un Comptoir', 'Come to a Comptoir') + '</a>' +
       '<p class="hint">' + t('Chaque mercredi · ouvert à tous les étudiants du City Campus', 'Every Wednesday · open to all City Campus students') + '</p>' +
-      '<button class="lang" aria-label="' + t('Switch to English', 'Passer en français') + '">' + t('EN', 'FR') + '</button></nav></div>';
+      '<button class="lang" lang="' + t('en', 'fr') + '" aria-label="' + t('EN, switch to English', 'FR, passer en français') + '">' + t('EN', 'FR') + '</button></nav></div>';
     $('#ft').innerHTML = '<div class="wrap"><div class="foot"><div class="about">' + seal() + '<p><b>Le Comptoir</b></p>' +
       '<p class="soft">' + t('Club étudiant du Bachelor in Management, incubé au Bureau des Clubs d’Audencia · City Campus, Nantes', 'Bachelor in Management student club, incubated by Audencia’s Bureau des Clubs · City Campus, Nantes') + '</p>' +
       '<p class="motto"><b>FORTES FORTUNA ADIUVAT</b><br>' + t('« La fortune sourit aux audacieux », Térence', '“Fortune favours the bold”, Terence') + '</p>' +
@@ -94,8 +94,9 @@
   function dock() {
     var acts = DOCK.hasOwnProperty(here) ? DOCK[here] : [['rejoindre.html', 'Venir à un Comptoir', 'Come to a Comptoir']];
     if (!acts.length || /^(mentions|confidentialite|conditions)$/.test(here)) return;
-    var d = D.createElement('div');
+    var d = D.createElement('nav');
     d.className = 'dock';
+    d.setAttribute('aria-label', t('Action principale', 'Main action'));
     d.innerHTML = acts.map(function (a, i) { return '<a class="btn' + (i ? ' ghost' : '') + '" href="' + a[0] + '">' + t(a[1], a[2]) + '</a>'; }).join('');
     D.body.appendChild(d);
     D.body.classList.add('has-dock');
@@ -146,6 +147,8 @@
       })
       .then(cb, function () { cb(null); });
   }
+  /* Un lien venu d'un fichier de contenu n'est gardé que si c'est une adresse web */
+  function web(v) { v = String(v == null ? '' : v).trim(); return /^https?:\/\//i.test(v) ? v : ''; }
   function img(v) {
     if (!v) return '';
     if (typeof v === 'object') v = v.url || v.src || '';
@@ -222,7 +225,7 @@
     var main = r.autorisationPhoto === true ? img(r.photo) : '';
     show('<p class="over">' + esc(t(r.type, TYPES[r.type])) + '</p><h2>' + esc(t(r.title, r.titleEn)) + '</h2><p>' + esc(t(r.resume, r.resumeEn)) + '</p>' +
       '<ul class="checks">' + rows.filter(function (x) { return x[1]; }).map(function (x) { return '<li><b>' + x[0] + ' :</b> ' + esc(x[1]) + '</li>'; }).join('') + '</ul>' +
-      (r.video ? '<p style="margin-top:1em"><a class="more" href="' + esc(r.video) + '" target="_blank" rel="noopener">' + t('Voir la vidéo ↗', 'Watch the video ↗') + '</a></p>' : '') +
+      (web(r.video) ? '<p style="margin-top:1em"><a class="more" href="' + esc(web(r.video)) + '" target="_blank" rel="noopener">' + t('Voir la vidéo ↗', 'Watch the video ↗') + '</a></p>' : '') +
       (main || pics.length ? '<div class="shots">' + (main ? '<a href="' + esc(main) + '" target="_blank" rel="noopener"><img src="' + esc(main) + '" alt="' + esc(r.title) + '"></a>' : '') + pics.map(function (p) { var u = esc(img(p.image)); return '<a href="' + u + '" target="_blank" rel="noopener"><img src="' + u + '" alt="' + esc(p.title || r.title) + '" loading="lazy"></a>'; }).join('') + '</div>' : '') +
       '<p class="actions"><a class="btn" href="rejoindre.html">' + t('Venir avec le club', 'Come with the club') + '</a></p>');
   }
@@ -262,8 +265,8 @@
   }
   function memberDetail(r) {
     var vacant = open(r.title), links = [];
-    if (r.linkedin) links.push('<a class="more" href="' + esc(r.linkedin) + '" target="_blank" rel="noopener">LinkedIn ↗</a>');
-    if (r.mail) links.push('<a class="more" href="mailto:' + esc(r.mail) + '">' + esc(r.mail) + '</a>');
+    if (web(r.linkedin)) links.push('<a class="more" href="' + esc(web(r.linkedin)) + '" target="_blank" rel="noopener">LinkedIn ↗</a>');
+    if (r.mail && /^[^\s@<>"']+@[^\s@<>"']+$/.test(r.mail)) links.push('<a class="more" href="mailto:' + esc(r.mail) + '">' + esc(r.mail) + '</a>');
     show(face(r) + '<p class="over">' + esc(t(r.role, r.roleEn)) + '</p><h2>' + esc(who(r)) + '</h2>' +
       (!vacant && r.surnom ? '<p class="when">' + t('Surnom : ', 'Nickname: ') + '« ' + esc(r.surnom) + ' »</p>' : '') +
       (!vacant && r.accroche ? '<p class="lead">' + esc(r.accroche) + '</p>' : '') +
@@ -283,7 +286,7 @@
     box.innerHTML = rows.length ? '<div class="logos">' + rows.map(function (r) {
       var u = img(r.logo);
       return '<div class="partner">' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy">' : '') + '<h3>' + esc(r.title) + '</h3>' + (r.categorie ? '<p class="when">' + esc(r.categorie) + '</p>' : '') +
-        (r.description ? '<p>' + esc(r.description) + '</p>' : '') + (r.site ? '<a class="more" href="' + esc(r.site) + '" target="_blank" rel="noopener">' + t('Voir le site ↗', 'Visit website ↗') + '</a>' : '') + '</div>';
+        (r.description ? '<p>' + esc(r.description) + '</p>' : '') + (web(r.site) ? '<a class="more" href="' + esc(web(r.site)) + '" target="_blank" rel="noopener">' + t('Voir le site ↗', 'Visit website ↗') + '</a>' : '') + '</div>';
     }).join('') + '</div>' : '<p class="empty">' + t('Les premiers partenaires du club seront présentés ici. Et si c’était vous ? ', 'The club’s first partners will be shown here. Why not you? ') + '<a class="more" href="#contact">' + t('Prendre rendez-vous', 'Book a call') + '</a></p>';
   }
   function products(rows) {
@@ -294,7 +297,7 @@
       var u = img(r.photo), price = [];
       if (r.prixMembre) price.push(t('Membre : ', 'Member: ') + r.prixMembre);
       if (r.prixPublic) price.push(t('Public : ', 'Non-member: ') + r.prixPublic);
-      return '<div class="good"><div class="pic">' + (u ? '<img src="' + esc(u) + '" alt="' + esc(r.title) + '" loading="lazy">' : seal()) + '</div><div class="txt"><h3>' + esc(t(r.title, r.titleEn)) + '</h3><p>' + esc(t(r.description, r.descriptionEn)) + '</p>' +
+      return '<div class="good' + (u ? '' : ' nopic') + '"><div class="pic">' + (u ? '<img src="' + esc(u) + '" alt="' + esc(r.title) + '" loading="lazy">' : seal()) + '</div><div class="txt"><h3>' + esc(t(r.title, r.titleEn)) + '</h3><p>' + esc(t(r.description, r.descriptionEn)) + '</p>' +
         '<p class="price">' + esc(price.join(' · ') || t('Prix à venir', 'Price to be announced')) + '</p>' + (r.tailles ? '<p class="soft">' + t('Tailles : ', 'Sizes: ') + esc(r.tailles) + '</p>' : '') +
         '<a class="btn small ghost" href="#precommande" data-pick="' + i + '">' + t('Réserver cet article', 'Reserve this item') + '</a></div></div>';
     }).join('');
@@ -339,8 +342,13 @@
         /* Un lien de messagerie trop long est coupé par certains logiciels : au-delà, le texte passe par le bouton « Copier » */
         if (encodeURIComponent(body).length > 1500) body = head + '\n\n' + t('(Collez ici votre message : utilisez le bouton « Copier le message » du site.)', '(Paste your message here: use the “Copy the message” button on the site.)');
         m.className = 'msg';
-        m.innerHTML = t('Votre messagerie s’ouvre avec le message prêt à partir : il ne reste qu’à cliquer sur « Envoyer ». Si rien ne s’ouvre, copiez le message et envoyez-le à ', 'Your mail app opens with the message ready to go: just press “Send”. If nothing opens, copy the message and send it to ') +
-          '<a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a>.<br><button type="button" class="btn small ghost" data-copy style="margin-top:12px">' + t('Copier le message', 'Copy the message') + '</button>';
+        var su = encodeURIComponent(subject), bo = encodeURIComponent(body), to = encodeURIComponent(S.email);
+        m.innerHTML = '<b>' + t('Votre messagerie s’ouvre avec le message prêt à partir : il ne reste qu’à cliquer sur « Envoyer ».', 'Your mail app opens with the message ready to go: just press “Send”.') + '</b><br>' +
+          t('Rien ne s’ouvre ? Passez par votre messagerie en ligne, ou copiez le message et envoyez-le à ', 'Nothing opens? Use your webmail, or copy the message and send it to ') +
+          '<a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a>.' +
+          '<span class="ways"><a class="btn small ghost" target="_blank" rel="noopener" href="https://outlook.office.com/mail/deeplink/compose?to=' + to + '&subject=' + su + '&body=' + bo + '">' + t('Ouvrir dans Outlook', 'Open in Outlook') + '</a>' +
+          '<a class="btn small ghost" target="_blank" rel="noopener" href="https://mail.google.com/mail/?view=cm&fs=1&to=' + to + '&su=' + su + '&body=' + bo + '">' + t('Ouvrir dans Gmail', 'Open in Gmail') + '</a>' +
+          '<button type="button" class="btn small ghost" data-copy>' + t('Copier le message', 'Copy the message') + '</button></span>';
         location.href = 'mailto:' + S.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
       });
       f.addEventListener('click', function (ev) {
@@ -350,7 +358,7 @@
     });
     /* Pré-remplit le formulaire quand on arrive avec ?demande=… ou depuis un bouton « Réserver cet article » */
     var q = /[?&]demande=([^&]+)/.exec(location.search), sel = $('select[name=Demande]');
-    if (q && sel) { var want = decodeURIComponent(q[1]); $$('option', sel).forEach(function (o, i) { if (o.value === want || o.textContent === want) sel.selectedIndex = i; }); }
+    if (q && sel) { var want = ''; try { want = decodeURIComponent(q[1]); } catch (e) {} $$('option', sel).forEach(function (o, i) { if (o.value === want || o.textContent === want) sel.selectedIndex = i; }); }
   }
 
   /* Une image qui ne se charge pas laisse la place aux initiales, ou au sceau, plutôt qu'à une icône cassée */

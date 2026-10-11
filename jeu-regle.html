@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-q0wZiuyyzFPtZWFpeXthCHx7TW0wRXHFKG/qY0puaGw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; media-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="theme-color" content="#0B1F4D">
+<link rel="preload" href="assets/fonts/lora-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/lato-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <title>La règle du jeu · L’Affaire Ombreval · Le Comptoir</title>
 <meta name="description" content="La règle complète de L’Affaire Ombreval, le jeu de société du Comptoir : but, mise en place, tour de jeu, défis, enquête, fin de partie, exemple de tour et variantes.">
 <link rel="canonical" href="https://le-comptoir-nantes.github.io/jeu-regle.html">
@@ -11,8 +15,13 @@
 <meta property="og:title" content="La règle du jeu · L’Affaire Ombreval">
 <meta property="og:description" content="La règle complète de L’Affaire Ombreval, le jeu de société du Comptoir : but, mise en place, tour de jeu, défis, enquête, fin de partie, exemple de tour et variantes.">
 <meta property="og:url" content="https://le-comptoir-nantes.github.io/jeu-regle.html">
+<meta property="og:locale" content="fr_FR">
 <meta property="og:image" content="https://le-comptoir-nantes.github.io/assets/partage.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icone-180.png">
 <link rel="stylesheet" href="assets/site.css">
 <link rel="stylesheet" href="assets/motion.css">
 <link rel="stylesheet" href="assets/jeu.css">
@@ -20,6 +29,7 @@
 </head>
 <body>
 <header id="hd"></header>
+<noscript><p class="nojs">Le menu et certains contenus ont besoin de JavaScript. Pages : <a href="index.html">Accueil</a><a href="club.html">Le club</a><a href="evenements.html">Événements</a><a href="jeu.html">Le jeu</a><a href="bureau.html">Le bureau</a><a href="merch.html">Merch</a><a href="partenaires.html">Partenaires</a><a href="rejoindre.html">Venir à un Comptoir</a><a href="mentions.html">Mentions légales</a></p></noscript>
 <main>
 <section class="pagehead navy">
   <div class="wrap">
@@ -50,7 +60,7 @@
 <li><strong>Qui commence ?</strong> La dernière personne à avoir bu un café. On joue ensuite dans le sens des aiguilles d’une montre.</li>
 </ol>
 
-<div class="j-table-wrap"><table class="j-tbl">
+<div class="j-table-wrap" tabindex="0" role="group" aria-label="Tableau, à faire défiler sur petit écran"><table class="j-tbl">
 <caption>Distribution des cartes d’enquête et durée de la partie</caption>
 <thead><tr><th>Joueurs</th><th>Cartes par joueur</th><th>Cartes visibles</th><th>Durée de la partie</th></tr></thead>
 <tbody>
@@ -114,7 +124,7 @@
 <p>La partie s’arrête à la fin du tour de table (après le joueur assis à droite du premier joueur) au cours duquel :</p>
 <ul class="j-list"><li>un joueur a fait une accusation juste ;</li><li>ou un joueur a coché le dernier mois prévu (voir le tableau de mise en place).</li></ul>
 <p>Chacun remplit alors sa Fiche Bilan :</p>
-<div class="j-table-wrap"><table class="j-tbl j-bilan">
+<div class="j-table-wrap" tabindex="0" role="group" aria-label="Tableau, à faire défiler sur petit écran"><table class="j-tbl j-bilan">
 <thead><tr><th>Ligne de la fiche</th><th>Calcul</th></tr></thead>
 <tbody>
 <tr><td>Boutiques</td><td>somme des prix d’achat (coût historique)</td></tr>
@@ -173,7 +183,7 @@
 <div class="j-aside-card">
 <h3>Le dé Matière</h3>
 <ol class="j-die">
-<li><span class="j-chip" style="--c:#8E2C3A"><svg class="j-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M2.5 4.5h11v7.5h-6l-3.5 3v-3h-1.5z"/><path d="M15.5 8.5h6v7.5h-1.5v3l-3.5-3h-5v-2.5"/></svg>Négociation</span></li><li><span class="j-chip" style="--c:#1F6B4F"><svg class="j-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M12 3v17M7.5 20.5h9M4.5 6.5h15"/><path d="M4.5 6.5L2 13h5zM19.5 6.5L17 13h5z"/><path d="M2 13a2.5 2 0 0 0 5 0M17 13a2.5 2 0 0 0 5 0"/></svg>Droit</span></li><li><span class="j-chip" style="--c:#2C5F8A"><svg class="j-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M3 5h18M12 5v15M5 9h5M5 12.5h4M14 9h5M14 12.5h3M14 16h4"/></svg>Comptabilité</span></li><li><span class="j-chip" style="--c:#6A3A86"><svg class="j-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><circle cx="11" cy="13" r="8.5"/><circle cx="11" cy="13" r="5"/><circle cx="11" cy="13" r="1.6"/><path d="M12.5 11.5L20 4M16.5 4H20v3.5"/></svg>Marketing</span></li><li><span class="j-chip" style="--c:#A65A24"><svg class="j-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M3 3v18h18"/><path d="M6 6.5L19.5 18M6 18L19.5 6"/><circle cx="12.6" cy="12.2" r="1.3"/></svg>Économie</span></li><li><span class="j-chip" style="--c:#9A7A2E">au choix</span></li>
+<li><span class="j-chip" style="--c:#8E2C3A"><svg class="j-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M2.5 4.5h11v7.5h-6l-3.5 3v-3h-1.5z"/><path d="M15.5 8.5h6v7.5h-1.5v3l-3.5-3h-5v-2.5"/></svg>Négociation</span></li><li><span class="j-chip" style="--c:#1F6B4F"><svg class="j-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M12 3v17M7.5 20.5h9M4.5 6.5h15"/><path d="M4.5 6.5L2 13h5zM19.5 6.5L17 13h5z"/><path d="M2 13a2.5 2 0 0 0 5 0M17 13a2.5 2 0 0 0 5 0"/></svg>Droit</span></li><li><span class="j-chip" style="--c:#2C5F8A"><svg class="j-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M3 5h18M12 5v15M5 9h5M5 12.5h4M14 9h5M14 12.5h3M14 16h4"/></svg>Comptabilité</span></li><li><span class="j-chip" style="--c:#6A3A86"><svg class="j-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><circle cx="11" cy="13" r="8.5"/><circle cx="11" cy="13" r="5"/><circle cx="11" cy="13" r="1.6"/><path d="M12.5 11.5L20 4M16.5 4H20v3.5"/></svg>Marketing</span></li><li><span class="j-chip" style="--c:#A65A24"><svg class="j-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M3 3v18h18"/><path d="M6 6.5L19.5 18M6 18L19.5 6"/><circle cx="12.6" cy="12.2" r="1.3"/></svg>Économie</span></li><li><span class="j-chip" style="--c:#7A6230">au choix</span></li>
 </ol>
 </div>
 <div class="j-aside-card">

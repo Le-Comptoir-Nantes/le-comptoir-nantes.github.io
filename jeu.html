@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-q0wZiuyyzFPtZWFpeXthCHx7TW0wRXHFKG/qY0puaGw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; media-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="theme-color" content="#0B1F4D">
+<link rel="preload" href="assets/fonts/lora-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/lato-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <title>Le jeu · Le Comptoir, club étudiant d’Audencia</title>
 <meta name="description" content="L’Affaire Ombreval, le jeu de société du Comptoir : réviser la négociation, le droit, la compta, le marketing et l’économie en jouant, entre Monopoly, La Bonne Paie et Cluedo.">
 <link rel="canonical" href="https://le-comptoir-nantes.github.io/jeu.html">
@@ -11,8 +15,14 @@
 <meta property="og:title" content="L’Affaire Ombreval · le jeu du Comptoir">
 <meta property="og:description" content="Un jeu de société pour réviser les cinq matières de 1re année en jouant. 2 à 6 joueurs, 60 à 90 minutes.">
 <meta property="og:url" content="https://le-comptoir-nantes.github.io/jeu.html">
+<meta property="og:locale" content="fr_FR">
 <meta property="og:image" content="https://le-comptoir-nantes.github.io/assets/partage.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Game","name":"L’Affaire Ombreval","alternateName":"Le Comptoir, le jeu","description":"Un jeu de société pour réviser la négociation, le droit, la comptabilité, le marketing et l’économie de 1re année de bachelor, entre Monopoly, La Bonne Paie et Cluedo.","url":"https://le-comptoir-nantes.github.io/jeu.html","inLanguage":"fr","numberOfPlayers":{"@type":"QuantitativeValue","minValue":2,"maxValue":6},"author":{"@type":"Organization","name":"Le Comptoir","url":"https://le-comptoir-nantes.github.io/"}}</script>
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icone-180.png">
 <link rel="stylesheet" href="assets/site.css">
 <link rel="stylesheet" href="assets/motion.css">
 <link rel="stylesheet" href="assets/jeu.css">
@@ -43,6 +53,7 @@
 </head>
 <body>
 <header id="hd"></header>
+<noscript><p class="nojs">Le menu et certains contenus ont besoin de JavaScript. Pages : <a href="index.html">Accueil</a><a href="club.html">Le club</a><a href="evenements.html">Événements</a><a href="jeu.html">Le jeu</a><a href="bureau.html">Le bureau</a><a href="merch.html">Merch</a><a href="partenaires.html">Partenaires</a><a href="rejoindre.html">Venir à un Comptoir</a><a href="mentions.html">Mentions légales</a></p></noscript>
 <main>
 
 <section class="hero navy">
@@ -159,34 +170,7 @@
 </main>
 <footer id="ft"></footer>
 <script src="assets/site.js"></script>
-<script>
-(function () {
-  var C = [
-    ['Négociation', '#8E2C3A', '★ · QCM', 'La règle des 4x20, c’est…', ['20 secondes, 20 mots, 20 gestes, 20 cm', '20 minutes, 20 questions, 20 arguments, 20 % de remise', '20 jours de délai, 20 relances, 20 devis, 20 clients'], 'A', 'La première impression (effet de halo). Les 20 cm, c’est le visage.'],
-    ['Négociation', '#8E2C3A', '★★ · QCM', 'Le client : « Votre concurrent est 10 % moins cher. » Votre première réaction ?', ['Baisser votre prix de 10 %', '« Qu’est-ce qui est compris dans leur offre ? »', 'Dire que ce concurrent fait de la mauvaise qualité'], 'B', 'On questionne, puis on valorise sans jamais critiquer un concurrent.'],
-    ['Droit', '#1F6B4F', '★ · QCM', 'Lequel n’est PAS un vice du consentement ?', ['Le dol', 'La violence', 'L’erreur sur la valeur'], 'C', 'Vices : erreur, dol, violence. L’erreur sur la valeur ne compte pas.'],
-    ['Droit', '#1F6B4F', '★★ · QCM', 'Clause piège ! Quelle clause de ces CGV en ligne est illégale ?', ['Prix affichés toutes taxes comprises', 'Droit de rétractation de 7 jours francs', 'Délai de livraison maximal de 60 jours ouvrés'], 'B', 'Le délai légal de rétractation à distance est de 14 jours.'],
-    ['Comptabilité', '#2C5F8A', '★ · QCM', 'Pour l’entreprise, la TVA est…', ['Une charge', 'Un produit', 'Ni l’un ni l’autre : des mouvements de trésorerie'], 'C', 'Elle la collecte pour l’État ; c’est le consommateur final qui la supporte.'],
-    ['Comptabilité', '#2C5F8A', '★ · QCM', 'Un ordinateur à 1 200 € HT utilisé 3 ans est…', ['Une charge', 'Une immobilisation', 'Un stock'], 'B', 'Plus de 500 € et utilisé plus d’un an : immobilisation.'],
-    ['Marketing', '#6A3A86', '★ · QCM', 'Une campagne qui vise à « faire agir » a un objectif…', ['Cognitif', 'Affectif', 'Conatif'], 'C', 'Cognitif : faire connaître. Affectif : faire aimer. Conatif : faire agir.'],
-    ['Marketing', '#6A3A86', '★ · QCM', 'Soutien sans contrepartie directe à une œuvre d’intérêt général : c’est…', ['Le mécénat', 'Le parrainage', 'La promotion des ventes'], 'A', 'Le parrainage, lui, vise un bénéfice direct.'],
-    ['Économie', '#A65A24', '★★ · QCM', 'L’effet Veblen, c’est quand…', ['La demande d’un bien de prestige augmente avec son prix', 'Le prix baisse quand l’offre augmente', 'Les salaires suivent l’inflation'], 'A', 'Consommation ostentatoire : un prix élevé signale le statut.'],
-    ['Économie', '#A65A24', '★★ · QCM', 'L’euro s’apprécie face au dollar. À New York, les sacs fabriqués en France deviennent…', ['Moins chers en dollars', 'Plus chers en dollars', 'Gratuits'], 'B', 'Un euro fort pénalise les exportations.']
-  ];
-  var i = 0, $ = function (id) { return document.getElementById(id); };
-  function show(k) {
-    var c = C[k];
-    $('gcard').style.setProperty('--c', c[1]);
-    $('gsub').textContent = c[0]; $('glvl').textContent = c[2]; $('gq').textContent = c[3];
-    $('go').innerHTML = c[4].map(function (o) { var li = document.createElement('li'); li.textContent = o; return li.outerHTML; }).join('');
-    $('gr').textContent = 'Réponse ' + c[5] + ' · ' + c[4]['ABC'.indexOf(c[5])];
-    $('ge').textContent = c[6]; $('ga').hidden = true;
-  }
-  $('gdraw').addEventListener('click', function () { var j; do { j = Math.floor(Math.random() * C.length); } while (j === i); i = j; show(i); });
-  $('gshow').addEventListener('click', function () { $('ga').hidden = false; });
-  show(0);
-})();
-</script>
+<script src="assets/jeu.js"></script>
 <script src="assets/motion.js"></script>
 </body>
 </html>

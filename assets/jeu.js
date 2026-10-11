@@ -82,3 +82,33 @@
   show(h && box.querySelector('.j-deck[data-group="' + h.replace(/[^a-z]/g, '') + '"]') ? h : 'nego', true);
   window.addEventListener('hashchange', function () { var g = location.hash.slice(1).replace(/[^a-z]/g, ''); if (g && g !== current) show(g, true); });
 })();
+
+/* Tirage de la page de présentation : dix cartes Défi d'exemple (les cartes sont en français) */
+(function () {
+  if (!document.getElementById('gcard')) return;
+  var en = document.documentElement.lang === 'en';
+  var C = [
+    ['Négociation', '#8E2C3A', '★ · QCM', 'La règle des 4x20, c’est…', ['20 secondes, 20 mots, 20 gestes, 20 cm', '20 minutes, 20 questions, 20 arguments, 20 % de remise', '20 jours de délai, 20 relances, 20 devis, 20 clients'], 'A', 'La première impression (effet de halo). Les 20 cm, c’est le visage.'],
+    ['Négociation', '#8E2C3A', '★★ · QCM', 'Le client : « Votre concurrent est 10 % moins cher. » Votre première réaction ?', ['Baisser votre prix de 10 %', '« Qu’est-ce qui est compris dans leur offre ? »', 'Dire que ce concurrent fait de la mauvaise qualité'], 'B', 'On questionne, puis on valorise sans jamais critiquer un concurrent.'],
+    ['Droit', '#1F6B4F', '★ · QCM', 'Lequel n’est PAS un vice du consentement ?', ['Le dol', 'La violence', 'L’erreur sur la valeur'], 'C', 'Vices : erreur, dol, violence. L’erreur sur la valeur ne compte pas.'],
+    ['Droit', '#1F6B4F', '★★ · QCM', 'Clause piège ! Quelle clause de ces CGV en ligne est illégale ?', ['Prix affichés toutes taxes comprises', 'Droit de rétractation de 7 jours francs', 'Délai de livraison maximal de 60 jours ouvrés'], 'B', 'Le délai légal de rétractation à distance est de 14 jours.'],
+    ['Comptabilité', '#2C5F8A', '★ · QCM', 'Pour l’entreprise, la TVA est…', ['Une charge', 'Un produit', 'Ni l’un ni l’autre : des mouvements de trésorerie'], 'C', 'Elle la collecte pour l’État ; c’est le consommateur final qui la supporte.'],
+    ['Comptabilité', '#2C5F8A', '★ · QCM', 'Un ordinateur à 1 200 € HT utilisé 3 ans est…', ['Une charge', 'Une immobilisation', 'Un stock'], 'B', 'Plus de 500 € et utilisé plus d’un an : immobilisation.'],
+    ['Marketing', '#6A3A86', '★ · QCM', 'Une campagne qui vise à « faire agir » a un objectif…', ['Cognitif', 'Affectif', 'Conatif'], 'C', 'Cognitif : faire connaître. Affectif : faire aimer. Conatif : faire agir.'],
+    ['Marketing', '#6A3A86', '★ · QCM', 'Soutien sans contrepartie directe à une œuvre d’intérêt général : c’est…', ['Le mécénat', 'Le parrainage', 'La promotion des ventes'], 'A', 'Le parrainage, lui, vise un bénéfice direct.'],
+    ['Économie', '#A65A24', '★★ · QCM', 'L’effet Veblen, c’est quand…', ['La demande d’un bien de prestige augmente avec son prix', 'Le prix baisse quand l’offre augmente', 'Les salaires suivent l’inflation'], 'A', 'Consommation ostentatoire : un prix élevé signale le statut.'],
+    ['Économie', '#A65A24', '★★ · QCM', 'L’euro s’apprécie face au dollar. À New York, les sacs fabriqués en France deviennent…', ['Moins chers en dollars', 'Plus chers en dollars', 'Gratuits'], 'B', 'Un euro fort pénalise les exportations.']
+  ];
+  var i = 0, $ = function (id) { return document.getElementById(id); };
+  function show(k) {
+    var c = C[k];
+    $('gcard').style.setProperty('--c', c[1]);
+    $('gsub').textContent = c[0]; $('glvl').textContent = c[2]; $('gq').textContent = c[3];
+    $('go').innerHTML = c[4].map(function (o) { var li = document.createElement('li'); li.textContent = o; return li.outerHTML; }).join('');
+    $('gr').textContent = (en ? 'Answer ' : 'Réponse ') + c[5] + ' · ' + c[4]['ABC'.indexOf(c[5])];
+    $('ge').textContent = c[6]; $('ga').hidden = true;
+  }
+  $('gdraw').addEventListener('click', function () { var j; do { j = Math.floor(Math.random() * C.length); } while (j === i); i = j; show(i); });
+  $('gshow').addEventListener('click', function () { $('ga').hidden = false; });
+  show(0);
+})();

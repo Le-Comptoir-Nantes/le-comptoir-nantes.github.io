@@ -333,3 +333,26 @@ blockquote{margin:1em 0;padding-left:18px;border-left:3px solid var(--brass);fon
  .stage-cta{position:static;justify-content:flex-start}
  .chapters{display:none}
 }
+
+/* ───────── Correctifs d'audit (11 octobre 2026) ───────── */
+/* Un bloc clair posé sur une bande bleu nuit reprend les couleurs de texte du fond clair
+   (sinon le texte « discret » restait bleu pâle sur blanc, illisible) */
+.navy form.card .soft,.navy .topic .soft{color:var(--slate)}
+.navy .topic .when{color:var(--brassink)}
+/* Portraits de l'accueil : ils gardent leur taille et le texte passe dessous sur petit écran */
+.faces .stack,.faces img,.faces .ini{flex:none}
+.faces>span:last-child{min-width:0}
+/* Texte réservé aux lecteurs d'écran */
+.sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+/* Article sans photo : une fiche compacte plutôt qu'un grand cadre vide */
+.good.nopic .pic{display:none}
+.good.nopic{border-top:1px solid var(--line);padding-top:22px}
+.good.nopic div.txt{padding-top:0}
+/* Après l'envoi d'un formulaire : les messageries en ligne en solution de secours */
+.msg .ways{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.msg{font-weight:400}
+.msg b{font-weight:700}
+/* Menu de secours si JavaScript est coupé */
+.nojs{padding:14px var(--gut);background:var(--chalk);font-size:.95rem}
+.nojs a{margin-right:14px;font-weight:700}
+@media (max-width:560px){.faces{flex-wrap:wrap;row-gap:10px}}

@@ -71,3 +71,15 @@ Le jeu n'est pas dans ce dossier : ses pages sont écrites une fois pour toutes,
 | `assets/jeu/affaire-ombreval-kit-a-imprimer.pdf` | Kit à imprimer (A4) |
 
 Pour corriger une carte ou un point de règle, demande la modification : le texte doit être changé à la fois sur le site et dans le PDF.
+
+## Sécurité du site
+
+Chaque page porte une règle de sécurité (balise `Content-Security-Policy`, en haut du fichier) : le site ne charge que ses propres scripts, styles et polices. Les images peuvent venir d'un autre site en `https`.
+
+Conséquence : une vidéo YouTube intégrée, un widget Instagram ou un outil de mesure d'audience ne s'afficheront pas tant que cette règle n'aura pas été élargie. Ces ajouts demandent aussi un bandeau cookies : demande la modification plutôt que de coller un code d'intégration.
+
+Les liens écrits dans les fichiers de ce dossier (`linkedin`, `site`, `video`, réseaux) doivent commencer par `https://`, sinon ils ne sont pas affichés.
+
+## Plan du site
+
+Le fichier `sitemap.xml` liste les pages à faire connaître aux moteurs de recherche. Les pages légales n'y sont pas, volontairement.
