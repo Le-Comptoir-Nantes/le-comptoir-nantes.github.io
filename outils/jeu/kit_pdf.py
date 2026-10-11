@@ -1,4 +1,8 @@
-"""Fabrique le kit à imprimer (PDF A4) à partir des mêmes fragments que les pages du site."""
+"""Fabrique le kit à imprimer (PDF A4) à partir des mêmes fragments que les pages du site.
+
+Le kit sert au bureau pour imprimer l'exemplaire du club : il n'est pas proposé sur le site.
+Il est écrit dans outils/jeu/tmp/, un dossier que Git ignore, donc il n'est jamais mis en ligne.
+"""
 import json, os, re, subprocess, sys
 from playwright.sync_api import sync_playwright
 
@@ -7,7 +11,7 @@ WORK = os.path.join(HERE, 'tmp')
 REPO = os.path.abspath(os.path.join(HERE, '..', '..'))
 FONTS = 'file://' + os.path.join(REPO, 'assets', 'fonts') + '/'
 ITAL = 'file://' + os.path.join(HERE, 'polices') + '/'
-OUT = os.path.join(REPO, 'assets/jeu/affaire-ombreval-kit-a-imprimer.pdf')
+OUT = os.path.join(WORK, 'affaire-ombreval-kit-a-imprimer.pdf')
 F = json.load(open(os.path.join(HERE, 'fragments.json'), encoding='utf-8'))
 NB = ' '
 
@@ -271,6 +275,5 @@ if __name__ == '__main__':
         if nrules == guess:
             break
         guess = nrules
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
     os.replace(tmp, OUT)
     print(OUT, os.path.getsize(OUT) // 1024, 'Ko', '· pages fixes :', len(fixed), counts)

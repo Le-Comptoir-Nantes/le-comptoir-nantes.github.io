@@ -73,18 +73,17 @@ Les formulaires n'enregistrent rien : ils ouvrent la messagerie du visiteur avec
 
 ## Le jeu « L'Affaire Ombreval »
 
-Le jeu n'est pas dans ce dossier : ses pages et le kit à imprimer sont fabriqués ensemble par un script, pour que les cartes soient identiques sur le site et dans le PDF. Le mode d'emploi est dans [`outils/README.md`](../outils/README.md).
+Le jeu n'est pas dans ce dossier : ses pages sont fabriquées par un script. Le jeu ne se télécharge pas sur le site : pour le voir, le visiteur écrit au bureau avec le formulaire en bas de `jeu.html`. Le mode d'emploi est dans [`outils/README.md`](../outils/README.md).
 
 | Page | Contenu |
 | --- | --- |
-| `jeu.html` | Présentation du jeu |
+| `jeu.html` | Présentation du jeu et formulaire « Voir le jeu » |
 | `jeu-regle.html` | Règle complète |
 | `jeu-plateau.html` | Plateau, matériel et boîte |
 | `jeu-cartes.html` | Les 282 cartes, avec le mode révision |
 | `jeu-enquete.html` | Scénario de l'enquête |
-| `assets/jeu/affaire-ombreval-kit-a-imprimer.pdf` | Kit à imprimer (A4) |
 
-Pour corriger une carte ou un point de règle : modifie `outils/jeu/source.txt`, puis lance `python3 outils/construire.py --pdf` (ou demande la modification).
+Pour corriger une carte ou un point de règle : modifie `outils/jeu/source.txt`, puis lance `python3 outils/construire.py` (ou demande la modification).
 
 ## Sécurité du site
 

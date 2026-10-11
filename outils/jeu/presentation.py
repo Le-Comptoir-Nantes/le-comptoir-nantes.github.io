@@ -23,7 +23,7 @@ rep('.steps li::before{counter-increment:s;content:counter(s);position:absolute;
     '.gsteps li::before{counter-increment:g;content:counter(g);position:absolute;left:16px;top:16px;width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--navy);font-weight:700;display:grid;place-items:center}')
 rep('<ol class="steps">', '<ol class="gsteps">')
 rep('<a class="btn" href="rejoindre.html" data-en="Play at a Comptoir">Jouer à un Comptoir</a><a class="btn ghost" href="#kit" data-en="Print the game">Imprimer le jeu</a>',
-    '<a class="btn" href="jeu-regle.html" data-en="Read the rules">Lire la règle</a><a class="btn ghost" href="#kit" data-en="Print the game">Imprimer le jeu</a>')
+    '<a class="btn" href="jeu-regle.html" data-en="Read the rules">Lire la règle</a><a class="btn ghost" href="#contact" data-en="See the game with the board">Voir le jeu avec le bureau</a>')
 doors = '''
 %s
 
@@ -58,11 +58,43 @@ rep('<ul class="suspects">', '<ul class="suspects">', 1)
 rep('''<p style="margin-top:24px" class="soft" data-en="Misdeeds: leaked sketches, counterfeiting, embezzlement, greenwashing, supplier bribe, phantom stock. Each one leads back to a point of the course.">Méfaits : fuite des croquis, contrefaçon, détournement de fonds, greenwashing, pot-de-vin fournisseur, stock fantôme. Chacun renvoie à une notion du cours.</p>''',
     '''<p style="margin-top:24px" class="soft" data-en="Misdeeds: leaked sketches, counterfeiting, embezzlement, greenwashing, supplier bribe, phantom stock. Each one leads back to a point of the course.">Méfaits : fuite des croquis, contrefaçon, détournement de fonds, greenwashing, pot-de-vin fournisseur, stock fantôme. Chacun renvoie à une notion du cours.</p>
     <p class="actions"><a class="btn ghost" href="jeu-enquete.html" data-en="Open the case file">Ouvrir le dossier d’enquête</a></p>''')
-old_kit = s[s.index('      <p data-en="The whole game prints on A4 at home'):s.index('    </div>\n    <div>\n      <h3 data-en="In the box">')]
-new_kit = '''      <p data-en="The whole game prints on A4 at home: rules, a 38 × 38 cm board in four sheets, 282 cards nine per page, bills, pawns, score sheets.">Tout le jeu s’imprime en A4 à la maison : la règle, le plateau de 38 × 38 cm en quatre feuilles, les 282 cartes à neuf par page, les billets, les pions et les fiches.</p>
-      <p class="soft" data-en="Print at 100% (actual size), in colour, single-sided. Thick paper (160 to 250 g) for the board, cards and pawns; plain paper for everything else. Add two dice and a pencil per player.">Imprimez à 100 % (taille réelle), en couleur, en recto seul. Papier épais (160 à 250 g) pour le plateau, les cartes et les pions ; papier ordinaire pour le reste. Ajoutez deux dés et un crayon par joueur.</p>
-      <p class="actions" id="kitdl"><a class="btn" href="@PDF@" download data-en="Download the kit <span class=&quot;sub&quot;>@EN@</span>">Télécharger le kit <span class="sub">@FR@</span></a><a class="btn ghost" href="rejoindre.html" data-en="Play it at a Comptoir">Y jouer à un Comptoir</a></p>
-'''.replace('@PDF@', g.PDF).replace('@EN@', g.PDF_EN).replace('@FR@', g.PDF_FR)
+# Le jeu ne se télécharge pas : la dernière section est un espace de contact avec le bureau pour le voir
+old_kit = s[s.index('<section class="band" id="kit">'):s.index('</main>')]
+new_kit = '''<section class="band" id="contact">
+  <div class="wrap split">
+    <div>
+      <h2 data-en="See the game, with the board">Voir le jeu, avec le bureau</h2>
+      <p data-en="The Ombreval Affair is not available to download: the board of Le Comptoir shows it to you in person. Write to us to see the game or to play it at a Comptoir.">L’Affaire Ombreval ne se télécharge pas : c’est le bureau du Comptoir qui vous le présente. Écrivez-nous pour voir le jeu ou pour y jouer à un Comptoir.</p>
+      <p><b>Lucas Denis</b>, <span data-en="president">président</span><br><a data-set-mail href="mailto:jblucas.denis@audencia.com">jblucas.denis@audencia.com</a><br><a href="https://www.linkedin.com/in/lucas-denis-jb" target="_blank" rel="noopener">linkedin.com/in/lucas-denis-jb ↗</a></p>
+      <h3 style="margin-top:1.8em" data-en="In the box">Dans la boîte</h3>
+      <ul class="checks">
+        <li data-en="1 board, 6 pawns, 2 dice">1 plateau, 6 pions, 2 dés</li>
+        <li data-en="180 challenge cards, 18 clues, 24 mail cards">180 cartes Défi, 18 Indices, 24 Imprévus</li>
+        <li data-en="18 investigation cards, 6 roles, 12 secret objectives">18 cartes d’enquête, 6 Rôles, 12 Objectifs secrets</li>
+        <li data-en="12 deeds, 12 loans, 12 Flagships, 144 bills">12 titres, 12 emprunts, 12 Flagships, 144 billets</li>
+        <li data-en="Balance sheets, detective notebooks, player aids">Fiches Bilan, carnets d’enquêteur, aides de jeu</li>
+      </ul>
+    </div>
+    <form class="card" data-form="Voir le jeu">
+      <p class="form-intro" data-en="Ask to see the game: a board member gets back to you to set a time.">Demandez à voir le jeu : un membre du bureau vous répond pour convenir d’un moment.</p>
+      <div class="row">
+        <label><span data-en="Your name">Votre nom</span><input name="nom" required autocomplete="name"></label>
+        <label><span data-en="E-mail">E-mail</span><input name="email" type="email" required autocomplete="email"></label>
+      </div>
+      <div class="row">
+        <label><span data-en="Programme and year">Programme et année</span><input name="Programme" placeholder="Bachelor in Management, 1re année" data-en-ph="Bachelor in Management, year 1"></label>
+        <label><span data-en="I would like to">Je souhaite</span><select name="Demande"><option data-en="See the game">Voir le jeu</option><option data-en="Play a game at a Comptoir">Jouer une partie à un Comptoir</option><option data-en="Something else">Autre demande</option></select></label>
+      </div>
+      <label><span data-en="Your message">Votre message</span><textarea name="message"></textarea></label>
+      <label class="hp" aria-hidden="true">Site web<input name="website" tabindex="-1" autocomplete="off"></label>
+      <p class="soft" style="font-size:.86em;line-height:1.5;margin:4px 0 0" data-en="Your details are used only by the Comptoir board to answer your request and arrange a time to show you the game. Name and e-mail are needed so we can reply; the other fields are optional. They are deleted at the end of the academic year. You can access, correct or delete them by writing to the club, and complain to the CNIL. &lt;a href=\'confidentialite.html\'&gt;Privacy policy&lt;/a&gt;">Vos informations servent uniquement au bureau du Comptoir pour répondre à votre demande et convenir d’un moment pour vous montrer le jeu. Le nom et l’e-mail sont nécessaires pour vous répondre ; les autres champs sont facultatifs. Elles sont supprimées à la fin de l’année universitaire. Vous pouvez y accéder, les corriger ou les faire effacer en écrivant au club, et saisir la CNIL. <a href="confidentialite.html">Politique de confidentialité</a></p>
+      <button class="btn" type="submit" data-en="Send my request">Envoyer ma demande</button>
+      <p class="msg" role="status"></p>
+    </form>
+  </div>
+</section>
+
+'''
 rep(old_kit, new_kit)
 # Le tirage de cartes passe dans assets/jeu.js (plus aucun script écrit dans la page)
 a = s.index('<script>\n(function () {\n  var C = [')

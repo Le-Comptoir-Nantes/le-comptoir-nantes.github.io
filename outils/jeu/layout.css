@@ -17,7 +17,7 @@
 .j-nav a{display:flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);text-decoration:none;font-weight:700;font-size:.95rem;white-space:nowrap}
 .j-nav a:hover{border-color:var(--brass)}
 .j-nav a[aria-current]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
-.j-nav a.j-dl{border-color:var(--brass);background:var(--brass);color:var(--ink)}
+.j-nav a.j-cta{border-color:var(--brass);background:var(--brass);color:var(--ink)}
 
 .j-facts{display:flex;flex-wrap:wrap;gap:8px;margin:1.6em 0 0}
 .j-facts li{border:1px solid var(--brassink);border-radius:99px;padding:4px 14px;font-size:.95rem;color:var(--brassink);font-variant-numeric:tabular-nums}

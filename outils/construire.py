@@ -1,11 +1,12 @@
 """Reconstruit les pages du jeu et applique les finitions communes à toutes les pages.
 
     python3 outils/construire.py          pages du jeu + finitions (quelques secondes)
-    python3 outils/construire.py --pdf    refait aussi le kit à imprimer (PDF)
+    python3 outils/construire.py --pdf    fabrique aussi le kit à imprimer du bureau (PDF, hors du site : outils/jeu/tmp/)
 
-À relancer après toute modification de outils/jeu/source.html (texte d'une carte, d'une règle…)
+À relancer après toute modification de outils/jeu/source.txt (texte d'une carte, d'une règle…)
 ou des fichiers de outils/jeu. Sans risque : relancé deux fois, il donne le même résultat.
 Besoins : Python 3 ; pour le PDF, en plus : playwright (avec Chromium) et pdfinfo (poppler).
+Le PDF n'est pas publié : le jeu ne se télécharge pas sur le site, on écrit au bureau pour le voir.
 """
 import os, subprocess, sys
 
@@ -19,7 +20,7 @@ def run(*path):
 
 run('jeu', 'extract.py')            # découpe la page d'origine du jeu en fragments
 if '--pdf' in sys.argv:
-    run('jeu', 'kit_pdf.py')        # assets/jeu/affaire-ombreval-kit-a-imprimer.pdf
+    run('jeu', 'kit_pdf.py')        # outils/jeu/tmp/affaire-ombreval-kit-a-imprimer.pdf (jamais en ligne)
 run('jeu', 'pages.py')              # jeu-regle, jeu-plateau, jeu-cartes, jeu-enquete, assets/jeu.css, assets/jeu.js
 run('jeu', 'presentation.py')       # jeu.html
 run('finitions.py')                 # règle de sécurité, icônes, titres : sur toutes les pages

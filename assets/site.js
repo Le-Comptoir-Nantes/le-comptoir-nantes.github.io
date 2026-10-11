@@ -62,11 +62,11 @@
     merch: [['#precommande', 'Réserver un article', 'Reserve an item']],
     partenaires: [['#contact', 'Prendre rendez-vous', 'Book a call']],
     rejoindre: [],
-    jeu: [['#kit', 'Imprimer le jeu', 'Print the game'], ['rejoindre.html', 'Venir à un Comptoir', 'Come to a Comptoir']]
+    jeu: [['#contact', 'Voir le jeu', 'See the game'], ['rejoindre.html', 'Venir à un Comptoir', 'Come to a Comptoir']]
   };
   /* Les pages du jeu (règle, plateau, cartes, enquête) partagent la même action et le même onglet « Le jeu » */
   var inGame = here.indexOf('jeu-') === 0;
-  if (inGame) DOCK[here] = [['jeu.html#kit', 'Imprimer le jeu', 'Print the game']];
+  if (inGame) DOCK[here] = [['jeu.html#contact', 'Voir le jeu', 'See the game']];
   function link(h, fr, en, cls) { return '<a' + (cls ? ' class="' + cls + '"' : '') + ' href="' + h + '"' + (here + '.html' === h || (inGame && h === 'jeu.html') ? ' aria-current="page"' : '') + '>' + t(fr, en) + '</a>'; }
   function chrome() {
     var main = $('main');

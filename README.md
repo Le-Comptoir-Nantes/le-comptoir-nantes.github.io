@@ -12,7 +12,7 @@ Le site est fait de pages HTML simples, sans base de données ni service extéri
 | Changer un événement, une fiche du bureau, un article du merch, un partenaire, un réglage (contact, cotisation, réseaux) | Dossier [`contenu/`](contenu/README.md) : un fichier par rubrique, mode d'emploi dedans |
 | Ajouter une photo, un portrait, un logo | Dossier `assets/` (`assets/bureau/`, `assets/partenaires/`, `assets/photos/`), puis le chemin dans le fichier de `contenu/` |
 | Changer un texte fixe d'une page | Le fichier `.html` de la page. Le texte français est entre les balises, sa traduction dans l'attribut `data-en` juste à côté |
-| Corriger une carte, la règle ou le plateau du jeu | [`outils/`](outils/README.md) : les pages du jeu et le PDF sont fabriqués par un script |
+| Corriger une carte, la règle ou le plateau du jeu | [`outils/`](outils/README.md) : les pages du jeu sont fabriquées par un script |
 
 ## Ce que contient le dépôt
 
@@ -26,7 +26,7 @@ mentions.html, confidentialite.html, conditions.html      pages légales
 contenu/                                                  les contenus modifiables (fichiers .json)
 assets/site.css, site.js                                  mise en page et fonctionnement du site
 assets/motion.css, motion.js                              animations (coupées si le visiteur le demande)
-assets/jeu.css, jeu.js, assets/jeu/                       pages du jeu et kit à imprimer (PDF)
+assets/jeu.css, jeu.js                                    mise en page et fonctionnement des pages du jeu
 assets/fonts/, assets/bureau/                             polices et portraits, hébergés sur le site
 outils/                                                   scripts de fabrication et de contrôle (pas utiles aux visiteurs)
 SECURITY.md, .well-known/security.txt                     sécurité : protections, signalement
@@ -40,6 +40,7 @@ sitemap.xml, robots.txt                                   pour les moteurs de re
 - **Aucun service extérieur** : pas de police Google, pas de mesure d'audience, pas de vidéo intégrée. C'est ce qui permet de se passer de bandeau cookies. Si cela change, la page Confidentialité doit changer aussi.
 - **Les formulaires n'enregistrent rien** : ils préparent un e-mail dans la messagerie du visiteur, à l'adresse `email` de `contenu/reglages.json`.
 - **Aucune photo d'une personne sans autorisation écrite** : dans les fichiers de `contenu/`, une photo ne s'affiche que si `autorisationPhoto` (ou `autorisation`) vaut `true`.
+- **Le jeu ne se télécharge pas** : aucun PDF du jeu sur le site. Pour le voir, le visiteur écrit au bureau (formulaire en bas de `jeu.html`).
 - **Français et anglais** : tout texte ajouté dans une page a sa traduction dans `data-en`. Les cartes et la règle du jeu restent en français.
 - Chaque page porte une règle de sécurité (balise `Content-Security-Policy`) : seuls les fichiers du site sont chargés. Un script ou un style va dans `assets/`, jamais dans le HTML. Après avoir créé une page, lancer `python3 outils/finitions.py`.
 - **Ne pas retirer la balise `google-site-verification`** de `index.html` : elle prouve à Google Search Console que le site appartient au club. Elle ne charge rien et ne dépose aucun cookie. Si elle disparaît, le club perd l'accès aux statistiques de recherche.

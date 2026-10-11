@@ -1,21 +1,12 @@
 """Écrit les pages du jeu dans le dépôt du site (règle, plateau et matériel, cartes, enquête)."""
-import json, os, re, shutil, subprocess, html as H
+import json, os, shutil, html as H
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..', '..'))
 F = json.load(open(os.path.join(HERE, 'fragments.json'), encoding='utf-8'))
-PDF = 'assets/jeu/affaire-ombreval-kit-a-imprimer.pdf'
 BASE = 'https://le-comptoir-nantes.github.io/'
-
-pdf_path = os.path.join(REPO, PDF)
-if os.path.exists(pdf_path):
-    info = subprocess.run(['pdfinfo', pdf_path], capture_output=True, text=True).stdout
-    PAGES = int(re.search(r'Pages:\s+(\d+)', info).group(1))
-    MO = ('%.1f' % (os.path.getsize(pdf_path) / 1e6)).replace('.', ',')
-else:
-    PAGES, MO = 0, '?'
-PDF_FR = 'PDF, %d pages A4, %s Mo' % (PAGES, MO)
-PDF_EN = 'PDF, %d A4 pages, %s MB' % (PAGES, MO.replace(',', '.'))
+# Le jeu ne se télécharge pas : pour le voir, on écrit au bureau (formulaire en bas de jeu.html)
+CONTACT = 'jeu.html#contact'
 
 
 def a(s):
@@ -41,7 +32,7 @@ NAV = [('jeu.html', 'Présentation', 'Overview'), ('jeu-regle.html', 'Règle', '
 def jnav(cur):
     li = ''.join('<li><a href="%s"%s data-en="%s">%s</a></li>' % (h, ' aria-current="page"' if h == cur else '', a(en), fr)
                  for h, fr, en in NAV)
-    li += '<li><a class="j-dl" href="%s" download data-en="Print the game (PDF)">Imprimer le jeu (PDF)</a></li>' % PDF
+    li += '<li><a class="j-cta" href="%s" data-en="See the game: write to the board">Voir le jeu : écrire au bureau</a></li>' % CONTACT
     return ('<nav class="j-nav" aria-label="Le jeu"><div class="wrap"><ul>%s</ul></div></nav>' % li)
 
 
@@ -112,7 +103,7 @@ def head(h1, h1_en, lead, lead_en, facts=(), note=True):
 
 
 def nxt(*links):
-    out = ['<a class="btn" href="%s" download data-en="Download the print-and-play kit <span class=&quot;sub&quot;>%s</span>">Télécharger le kit à imprimer <span class="sub">%s</span></a>' % (PDF, PDF_EN, PDF_FR)]
+    out = ['<a class="btn" href="%s" data-en="Ask the board to see the game">Demander au bureau à voir le jeu</a>' % CONTACT]
     for h, fr, en in links:
         out.append('<a class="btn ghost" href="%s" data-en="%s">%s</a>' % (h, a(en), fr))
     return '<p class="j-next">%s</p>' % ''.join(out)
@@ -314,4 +305,4 @@ css = open(os.path.join(HERE, 'layout.css'), encoding='utf-8').read().rstrip() +
     '.j-flat-lid{--s:min(420px,calc(100vw - 2 * var(--gut)))}\n.j-box3d-wrap{padding:20px 0 50px}\n.j-box-back,.j-lid{font-family:var(--f-texte)}\n.j-box-back h3{font:600 13px/1.3 var(--f-texte);letter-spacing:.16em;text-transform:uppercase;margin:0;color:#7A6230}\n.j-show.j-box{grid-template-columns:auto minmax(0,1fr)}\n@media (max-width:960px){.j-show.j-box{grid-template-columns:minmax(0,1fr)}}\n'
 open(os.path.join(REPO, 'assets/jeu.css'), 'w', encoding='utf-8').write(css)
 shutil.copy(os.path.join(HERE, 'jeu.js'), os.path.join(REPO, 'assets/jeu.js'))
-print('jeu.css', len(css) // 1024, 'Ko ; kit :', PDF_FR)
+print('jeu.css', len(css) // 1024, 'Ko')
