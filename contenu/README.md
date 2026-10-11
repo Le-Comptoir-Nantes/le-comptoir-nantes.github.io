@@ -51,7 +51,7 @@ Exemple de partenaire :
 
 Dépose les images dans `assets/` (portraits dans `assets/bureau/`, logos dans `assets/partenaires/`, photos dans `assets/photos/`), puis écris leur chemin dans le fichier, par exemple `"photo": "assets/bureau/lucas-denis.webp"`.
 
-Portraits du bureau attendus : `lucas-denis.webp`, `romain-rabiller.webp`, `felice-maire.webp`, `zoe-podevin.webp`, `adil-moutmir.webp`, `luc-grana.webp`. Tant qu'un portrait manque, le site affiche les initiales à la place.
+Portraits du bureau attendus : `lucas-denis.webp`, `romain-rabiller.webp`, `felice-maire.webp`, `zoe-podevin.webp`, `adil-moutmir.webp`, `luc-grana.webp`, `pauline-chaillou-lheveder.webp`. Tant qu'un portrait manque, le site affiche les initiales à la place.
 
 ## Dater un événement
 

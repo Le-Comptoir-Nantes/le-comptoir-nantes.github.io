@@ -102,8 +102,16 @@
     "title": "Pauline Chaillou-L'Heveder",
     "role": "Responsable communication",
     "roleEn": "Head of Communications",
+    "photo": "assets/bureau/pauline-chaillou-lheveder.webp",
+    "autorisationPhoto": true,
+    "accroche": "Volleyeuse, bénévole, voyageuse : elle porte la voix du Comptoir.",
+    "presentation": "Avant Audencia, Pauline Chaillou-L'Heveder s'engage sur trois terrains : la solidarité, le sport et le voyage. Au lycée, elle participe à des actions de bénévolat en faveur de Madagascar. Volleyeuse en club, elle prend part à la vie associative de son club, qui a accueilli les finales de la Coupe de France, donne des cours de baby-volley aux plus jeunes et se porte bénévole sur plusieurs courses. Ses voyages aux quatre coins du monde et son goût pour l'art nourrissent sa curiosité. En 2026, elle intègre le Bachelor in Management et prend en charge la communication du Comptoir. Son envie : s'engager, partager et apprendre des autres.",
     "missions": "Gère Instagram et le site, conçoit les affiches et l'identité visuelle, archive les autorisations de droit à l'image.",
-    "missionsEn": "Runs Instagram and the website, designs posters and the visual identity, and files image-rights consents."
+    "missionsEn": "Runs Instagram and the website, designs posters and the visual identity, and files image-rights consents.",
+    "parcours": "Au lycée · Solidarité : actions de bénévolat en faveur de Madagascar.\nEn club · Volley-ball : joueuse, engagée dans la vie associative de son club et animatrice de cours de baby-volley pour les plus jeunes.\n2026 – aujourd'hui · Audencia et Le Comptoir : Bachelor in Management à Nantes, responsable communication du club.",
+    "faits": "Engagée dans la vie associative de son club de volley-ball, qui a accueilli les finales de la Coupe de France.\nCours de baby-volley donnés aux plus jeunes de son club.\nBénévole sur plusieurs courses et dans des actions de solidarité en faveur de Madagascar.",
+    "expertises": "Esprit d'équipe\nBénévolat et événements sportifs\nTransmission aux plus jeunes\nOuverture culturelle\nAdaptabilité",
+    "citation": "« Le seul véritable voyage […] ce ne serait pas d'aller vers de nouveaux paysages, mais d'avoir d'autres yeux. » (Marcel Proust, La Prisonnière)"
   },
   {
     "ordre": 8,
