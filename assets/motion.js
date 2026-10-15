@@ -91,11 +91,11 @@
         return (a.boundingClientRect.top - b.boundingClientRect.top) || (a.boundingClientRect.left - b.boundingClientRect.left);
       });
       list.forEach(function (e, i) {
-        var el = e.target, d = Math.min(i, 7) * 85;
+        var el = e.target, d = Math.min(i, 7) * 60;
         io.unobserve(el);
         el.style.setProperty('--d', d + 'ms');
         el.classList.add('in');
-        W.setTimeout(function () { done(el); }, d + 1700);
+        W.setTimeout(function () { done(el); }, d + 1200);
       });
     }
 
@@ -159,7 +159,7 @@
     W.addEventListener('scroll', askScroll, { passive: true });
     W.addEventListener('resize', askScroll);
 
-    /* ── Curseur : lumière sur les bandes sombres, billets qui s'inclinent ── */
+    /* ── Curseur : les billets s'inclinent sous la souris ── */
     if (fine) {
       var px = 0, py = 0, pt = null, pending = false;
       D.addEventListener('pointermove', function (e) {
@@ -169,13 +169,7 @@
         W.requestAnimationFrame(function () {
           pending = false;
           if (!pt || !pt.closest) return;
-          var glow = pt.closest('.band.navy, .hero.navy'), r;
-          if (glow) {
-            r = glow.getBoundingClientRect();
-            glow.style.setProperty('--mx', (px - r.left).toFixed(0) + 'px');
-            glow.style.setProperty('--my', (py - r.top).toFixed(0) + 'px');
-          }
-          var tk = pt.closest('button.ticket');
+          var r, tk = pt.closest('button.ticket');
           if (tk) {
             r = tk.getBoundingClientRect();
             tk.style.setProperty('--ry', (((px - r.left) / r.width - 0.5) * 7).toFixed(2) + 'deg');

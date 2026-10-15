@@ -81,8 +81,8 @@
       '<button class="lang" lang="' + t('en', 'fr') + '" aria-label="' + t('EN, switch to English', 'FR, passer en français') + '">' + t('EN', 'FR') + '</button></nav></div>';
     $('#ft').innerHTML = '<div class="wrap"><div class="foot"><div class="about">' + seal() + '<p><b>Le Comptoir</b></p>' +
       '<p class="soft">' + t('Club étudiant du Bachelor in Management, incubé au Bureau des Clubs d’Audencia · City Campus, Nantes', 'Bachelor in Management student club, incubated by Audencia’s Bureau des Clubs · City Campus, Nantes') + '</p>' +
-      '<p class="motto"><b>FORTES FORTUNA ADIUVAT</b><br>' + t('« La fortune sourit aux audacieux », Térence', '“Fortune favours the bold”, Terence') + '</p>' +
-      '<p>Contact : <a data-set-mail href="mailto:jblucas.denis@audencia.com">jblucas.denis@audencia.com</a></p></div>' +
+      '<p class="motto"><b>FORTES FORTUNA ADIUVAT</b><br>' + t('« La fortune sourit aux audacieux », Térence', '“Fortune favours the bold”, Terence') + '</p>' +
+      '<p>Contact : <a data-set-mail href="mailto:jblucas.denis@audencia.com">jblucas.denis@audencia.com</a></p></div>' +
       '<nav aria-label="' + t('Découvrir', 'Discover') + '"><h2>' + t('Découvrir', 'Discover') + '</h2><ul>' +
       '<li>' + link('club.html', 'Le club', 'The club') + '</li><li>' + link('evenements.html', 'Événements', 'Events') + '</li><li>' + link('jeu.html', 'Le jeu', 'The game') + '</li><li>' + link('bureau.html', 'Le bureau', 'The board') + '</li></ul></nav>' +
       '<nav aria-label="' + t('Agir', 'Get involved') + '"><h2>' + t('Agir', 'Get involved') + '</h2><ul>' +
@@ -90,7 +90,7 @@
       '<nav aria-label="' + t('Suivre', 'Follow') + '"><h2>' + t('Suivre', 'Follow') + '</h2><ul>' +
       '<li><a href="https://www.audencia.com" target="_blank" rel="noopener">Audencia ↗</a></li>' +
       '<li><a data-set-href="instagram" target="_blank" rel="noopener" hidden>Instagram ↗</a></li><li><a data-set-href="linkedin" target="_blank" rel="noopener" hidden>LinkedIn ↗</a></li><li><a data-set-href="youtube" target="_blank" rel="noopener" hidden>YouTube ↗</a></li>' +
-      '<li data-nosocial class="soft">' + t('Instagram et YouTube : bientôt en ligne.', 'Instagram and YouTube: coming soon.') + '</li>' +
+      '<li data-nosocial class="soft">' + t('Instagram et YouTube : bientôt en ligne.', 'Instagram and YouTube: coming soon.') + '</li>' +
       '<li><a href="https://www.linkedin.com/in/lucas-denis-jb" target="_blank" rel="noopener">' + t('LinkedIn du président ↗', 'The president on LinkedIn ↗') + '</a></li></ul></nav></div>' +
       '<div class="legal"><span>© ' + new Date().getFullYear() + ' Le Comptoir</span><span style="display:flex;gap:18px;flex-wrap:wrap"><a href="mentions.html">' + t('Mentions légales', 'Legal notice') + '</a><a href="confidentialite.html">' + t('Confidentialité et cookies', 'Privacy and cookies') + '</a><a href="conditions.html">' + t('Conditions de précommande', 'Pre-order terms') + '</a></span></div></div>';
     $$('[data-seal]').forEach(function (e) { e.innerHTML = seal(); });
@@ -166,7 +166,7 @@
   function img(v) { v = String(v == null ? '' : v).trim(); return /^assets\/[\w\-.\/]+$/.test(v) && v.indexOf('..') < 0 ? v : ''; }
   /* Une adresse e-mail venue d'un fichier de contenu : une seule adresse, sans rien d'autre */
   function mail(v) { v = String(v == null ? '' : v).trim(); return /^[^\s@<>"'?&,;:]+@[^\s@<>"'?&,;:]+\.[a-z]{2,}$/i.test(v) ? v : ''; }
-  function fail() { return '<p class="empty">' + t('Ce contenu ne se charge pas pour le moment. Rechargez la page, ou écrivez-nous : ', 'This content is not loading right now. Reload the page, or email us: ') + '<a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a></p>'; }
+  function fail() { return '<p class="empty">' + t('Ce contenu ne se charge pas pour le moment. Rechargez la page, ou écrivez-nous : ', 'This content is not loading right now. Reload the page, or email us: ') + '<a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a></p>'; }
 
   /* Réglages : liens des réseaux, contact, tarifs, prochain rendez-vous */
   var S = Object.create(null);
@@ -300,7 +300,7 @@
     var pics = P.filter(function (p) { return p.autorisation === true && p.evenement === r.title && img(p.image); });
     var main = r.autorisationPhoto === true ? img(r.photo) : '';
     show('<p class="over">' + esc(t(r.type, TYPES[r.type])) + '</p><h2>' + esc(t(r.title, r.titleEn)) + '</h2><p>' + esc(t(r.resume, r.resumeEn)) + '</p>' +
-      '<ul class="checks">' + rows.filter(function (x) { return x[1]; }).map(function (x) { return '<li><b>' + x[0] + ' :</b> ' + esc(x[1]) + '</li>'; }).join('') + '</ul>' +
+      '<ul class="checks">' + rows.filter(function (x) { return x[1]; }).map(function (x) { return '<li><b>' + x[0] + ' :</b> ' + esc(x[1]) + '</li>'; }).join('') + '</ul>' +
       (web(r.video) ? '<p style="margin-top:1em"><a class="more" href="' + esc(web(r.video)) + '" target="_blank" rel="noopener">' + t('Voir la vidéo ↗', 'Watch the video ↗') + '</a></p>' : '') +
       (main || pics.length ? '<div class="shots">' + (main ? '<a href="' + esc(main) + '" target="_blank" rel="noopener"><img src="' + esc(main) + '" alt="' + esc(r.title) + '"></a>' : '') + pics.map(function (p) { var u = esc(img(p.image)); return '<a href="' + u + '" target="_blank" rel="noopener"><img src="' + u + '" alt="' + esc(p.title || r.title) + '" loading="lazy"></a>'; }).join('') + '</div>' : '') +
       '<p class="actions"><a class="btn" href="rejoindre.html">' + t('Venir avec le club', 'Come with the club') + '</a>' +
@@ -372,10 +372,10 @@
     rows = rows.filter(function (r) { return r.afficher !== false; });
     box.innerHTML = rows.map(function (r, i) {
       var u = img(r.photo), price = [];
-      if (r.prixMembre) price.push(t('Membre : ', 'Member: ') + r.prixMembre);
-      if (r.prixPublic) price.push(t('Public : ', 'Non-member: ') + r.prixPublic);
+      if (r.prixMembre) price.push(t('Membre : ', 'Member: ') + r.prixMembre);
+      if (r.prixPublic) price.push(t('Public : ', 'Non-member: ') + r.prixPublic);
       return '<div class="good' + (u ? '' : ' nopic') + '"><div class="pic">' + (u ? '<img src="' + esc(u) + '" alt="' + esc(r.title) + '" loading="lazy">' : seal()) + '</div><div class="txt"><h3>' + esc(t(r.title, r.titleEn)) + '</h3><p>' + esc(t(r.description, r.descriptionEn)) + '</p>' +
-        '<p class="price">' + esc(price.join(' · ') || t('Prix à venir', 'Price to be announced')) + '</p>' + (r.tailles ? '<p class="soft">' + t('Tailles : ', 'Sizes: ') + esc(r.tailles) + '</p>' : '') +
+        '<p class="price">' + esc(price.join(' · ') || t('Prix à venir', 'Price to be announced')) + '</p>' + (r.tailles ? '<p class="soft">' + t('Tailles : ', 'Sizes: ') + esc(r.tailles) + '</p>' : '') +
         '<a class="btn small ghost" href="#precommande" data-pick="' + i + '">' + t('Réserver cet article', 'Reserve this item') + '</a></div></div>';
     }).join('');
     if (sel) sel.innerHTML = rows.map(function (r) { return '<option>' + esc(t(r.title, r.titleEn)) + '</option>'; }).join('');
@@ -421,7 +421,7 @@
         m.className = 'msg';
         var su = encodeURIComponent(subject), bo = encodeURIComponent(body), to = encodeURIComponent(S.email);
         m.innerHTML = '<b>' + t('Votre messagerie s’ouvre avec le message prêt à partir : il ne reste qu’à cliquer sur « Envoyer ».', 'Your mail app opens with the message ready to go: just press “Send”.') + '</b><br>' +
-          t('Rien ne s’ouvre ? Passez par votre messagerie en ligne, ou copiez le message et envoyez-le à ', 'Nothing opens? Use your webmail, or copy the message and send it to ') +
+          t('Rien ne s’ouvre ? Passez par votre messagerie en ligne, ou copiez le message et envoyez-le à ', 'Nothing opens? Use your webmail, or copy the message and send it to ') +
           '<a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a>.' +
           '<span class="ways"><a class="btn small ghost" target="_blank" rel="noopener" href="https://outlook.office.com/mail/deeplink/compose?to=' + to + '&subject=' + su + '&body=' + bo + '">' + t('Ouvrir dans Outlook', 'Open in Outlook') + '</a>' +
           '<a class="btn small ghost" target="_blank" rel="noopener" href="https://mail.google.com/mail/?view=cm&fs=1&to=' + to + '&su=' + su + '&body=' + bo + '">' + t('Ouvrir dans Gmail', 'Open in Gmail') + '</a>' +
@@ -460,7 +460,12 @@
   if ($('#board') || $('#roster') || $('#faces')) load('Bureau', board);
   if ($('#partners')) load('Partenaires', partners);
   if ($('#products')) load('Produits', products);
-  if ($('#topic')) load('Sujets', function (r) { T = r || []; });
+  /* Le sujet affiché au chargement est le premier du fichier : le premier tirage en propose un autre */
+  if ($('#topic')) load('Sujets', function (r) {
+    T = r || [];
+    var q = $('#topic q'), shown = q ? q.textContent.trim() : '';
+    T.forEach(function (x, i) { if (x && (x.title === shown || x.titleEn === shown)) last = i; });
+  });
   D.addEventListener('click', function (e) {
     var pick = e.target.closest ? e.target.closest('[data-pick]') : null;
     if (pick) { var sel = $('#article'); if (sel) sel.selectedIndex = +pick.getAttribute('data-pick'); return; }

@@ -6,14 +6,14 @@
   },
   {
     "title": "prochainRdv",
-    "valeur": "Chaque mercredi : un Comptoir.",
+    "valeur": "Chaque mercredi : un Comptoir.",
     "valeurEn": "Every Wednesday: a Comptoir.",
     "note": "Titre du billet « Prochain rendez-vous » en page d'accueil."
   },
   {
     "title": "prochainRdvDetail",
-    "valeur": "Un sujet, un débat, tout le monde parle. Le lieu partenaire est annoncé à l'avance.",
-    "valeurEn": "One topic, one debate, everyone speaks. The partner venue is announced in advance.",
+    "valeur": "Le lieu et le sujet sont annoncés chaque semaine.",
+    "valeurEn": "The venue and the topic are announced each week.",
     "note": "Détail du billet : date, heure, lieu, thème."
   },
   {
