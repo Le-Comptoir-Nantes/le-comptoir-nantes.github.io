@@ -93,7 +93,8 @@
     "role": "Second trésorier",
     "roleEn": "Deputy treasurer",
     "missions": "Tient le tableur du budget avec le trésorier et prévoit les provisions de chaque événement.",
-    "missionsEn": "Keeps the budget spreadsheet with the treasurer and plans each event's provisions."
+    "missionsEn": "Keeps the budget spreadsheet with the treasurer and plans each event's provisions.",
+    "linkedin": "https://www.linkedin.com/in/louis-saffre-253947384/"
   },
   {
     "ordre": 7,
@@ -136,7 +137,10 @@
     "role": "Conseillère",
     "roleEn": "Advisor",
     "missions": "Rassemble les devis avec le secrétaire et fait le point avec le président sur les projets en cours.",
-    "missionsEn": "Collects quotes with the secretary and reviews ongoing projects with the president."
+    "missionsEn": "Collects quotes with the secretary and reviews ongoing projects with the president.",
+    "photo": "assets/bureau/noemie-jeunesse.webp",
+    "autorisationPhoto": true,
+    "linkedin": "https://www.linkedin.com/in/no%C3%A9mie-jeunesse-0415ba435/"
   },
   {
     "ordre": 10,
