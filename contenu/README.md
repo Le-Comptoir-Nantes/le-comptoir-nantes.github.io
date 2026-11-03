@@ -16,7 +16,7 @@ Si une rubrique affiche « Ce contenu ne se charge pas » après une modificatio
 | Fichier | Rubrique | À savoir |
 | --- | --- | --- |
 | `reglages.json` | Contact, cotisation, prix du billet, prochain rendez-vous, liens des réseaux | Une ligne `note` explique chaque réglage. Un lien laissé vide (`""`) masque le bouton correspondant. |
-| `evenements.json` | Billets de la page Événements et de l'accueil | `type` : `Comptoir`, `Meet and Talk`, `Sortie Terrain` ou `Conférence`. Pour une vraie date, ajoute `"date": "2026-11-04T18:00:00"` : l'événement passe alors tout seul dans les événements passés. Champs facultatifs : `lieu`, `intervenant`, `cours`, `video`. |
+| `evenements.json` | Billets de la page Événements et de l'accueil | `type` : `Comptoir`, `Meet and Talk`, `Sortie Terrain`, `Conférence`, `Formation` ou `Simulation`. Tant que la date n'est pas confirmée, écris-la dans `dateTexte` (et `dateTexteEn` en anglais). Pour une vraie date, ajoute `"date": "2026-11-04T18:00:00"` : l'événement passe alors tout seul dans les événements passés. Champs facultatifs : `lieu`, `intervenant`, `cours`, `video`. |
 | `bureau.json` | Fiches du bureau | La photo ne s'affiche que si `"autorisationPhoto": true`. Dans `parcours`, `faits` et `expertises`, `\n` marque un retour à la ligne. |
 | `merch.json` | Articles de la page Merch | `"afficher": false` masque un article. `prixMembre` et `prixPublic` vides affichent « Prix à venir ». |
 | `partenaires.json` | « Ils accompagnent le club » | Vide pour l'instant. N'y ajoute un partenaire qu'une fois sa convention signée. |

@@ -1,7 +1,7 @@
 [
   {
     "ordre": 1,
-    "afficher": true,
+    "afficher": false,
     "title": "La veste du Comptoir",
     "titleEn": "The Comptoir jacket",
     "description": "Veste de style universitaire bleu marine et blanc, fermeture par boutons pression, intérieur gratté. Logo du Comptoir brodé côté cœur ou sérigraphié au dos.",
@@ -13,7 +13,7 @@
   },
   {
     "ordre": 2,
-    "afficher": true,
+    "afficher": false,
     "title": "Le sweat à capuche",
     "titleEn": "The hoodie",
     "description": "Sweat à capuche bleu marine, capuche doublée et intérieur gratté, sans poche pour laisser toute la place au logo du Comptoir, brodé ou sérigraphié.",
@@ -25,7 +25,7 @@
   },
   {
     "ordre": 3,
-    "afficher": true,
+    "afficher": false,
     "title": "Le sweat col zippé",
     "titleEn": "The quarter-zip sweatshirt",
     "description": "Sweat bleu marine à col zippé, intérieur gratté, aux couleurs du Comptoir.",
@@ -40,8 +40,8 @@
     "afficher": true,
     "title": "Le pull col rond",
     "titleEn": "The crew-neck sweatshirt",
-    "description": "Pull col rond bleu marine, intérieur gratté, avec le logo du Comptoir côté cœur ou au dos.",
-    "descriptionEn": "Navy crew-neck sweatshirt with a brushed lining and the Comptoir logo on the chest or the back.",
+    "description": "Pull col rond bleu marine aux couleurs du club, commandé via Sapencia, avec le logo du Comptoir. Précommandé avant la commande.",
+    "descriptionEn": "Navy crew-neck sweatshirt in the club colours, ordered through Sapencia, with the Comptoir logo. Pre-ordered before the order is placed.",
     "tailles": "XS à XXL (3XL à 5XL possibles)",
     "prixMembre": "",
     "prixPublic": "",

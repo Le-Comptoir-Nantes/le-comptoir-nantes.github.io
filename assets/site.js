@@ -205,7 +205,7 @@
   }
 
   /* Événements : un même billet sert l'agenda et l'archive */
-  var TYPES = { 'Comptoir': 'Comptoir', 'Meet and Talk': 'Meet and Talk', 'Sortie Terrain': 'Field trip', 'Conférence': 'Conference' };
+  var TYPES = { 'Comptoir': 'Comptoir', 'Meet and Talk': 'Meet and Talk', 'Sortie Terrain': 'Field trip', 'Conférence': 'Conference', 'Formation': 'Workshop', 'Simulation': 'Simulation' };
   var DT = { 'Date à confirmer': 'Date to be confirmed', 'Chaque mercredi': 'Every Wednesday' };
   var E = [], P = [], F = '';
   function time(d) { if (!d) return null; var x = new Date(d).getTime(); return isNaN(x) ? null : x; }
@@ -213,7 +213,7 @@
   function day(r) {
     var x = time(r.date);
     if (x !== null) return new Date(x).toLocaleDateString(L === 'en' ? 'en-GB' : 'fr-FR', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
-    return t(r.dateTexte, DT[r.dateTexte]) || '';
+    return t(r.dateTexte, r.dateTexteEn || DT[r.dateTexte]) || '';
   }
   function events(rows) {
     var box = $('#events');
