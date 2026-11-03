@@ -95,8 +95,13 @@
     "surnom": "Le chat",
     "photo": "assets/bureau/louis-saffre.webp",
     "autorisationPhoto": true,
+    "accroche": "Passé par le pricing et la comptabilité, il veille aux comptes du Comptoir.",
+    "presentation": "Avant Audencia, Louis Saffre obtient un bac général avec mention très bien au lycée Talensac – Jeanne Bernard, à Nantes. En 2025, il enchaîne trois stages : atelier, vente et conseil chez ASA à Royan, pricing pour des loueurs de véhicules chez Weboost, puis découverte de la comptabilité, des RH et du juridique chez Wedeal. Attiré par l'entrepreneuriat, il suit un programme de coaching sur le rachat d'entreprise et se forme à la finance personnelle. En 2026, il entre en Bachelor in Management à Audencia et devient second trésorier du Comptoir. Hors des cours : tennis, parkour et psychologie.",
     "missions": "Tient le tableur du budget avec le trésorier et prévoit les provisions de chaque événement.",
     "missionsEn": "Keeps the budget spreadsheet with the treasurer and plans each event's provisions.",
+    "parcours": "2022 · Blanche de Castille, Nantes : diplôme national du brevet, mention bien.\n2024 · Association européenne d'analyse transactionnelle (EATA) : formation « Le 101 », introduction à l'analyse transactionnelle.\n2025 · Stages : ASA à Royan (atelier acoustique, vente et conseil), Weboost à Nantes (yield management et pricing), Wedeal à Nantes (comptabilité, RH et juridique).\n2026 · Lycée Talensac – Jeanne Bernard, Nantes : bac général, mention très bien.\n2026 – aujourd'hui · Audencia et Le Comptoir : Bachelor in Management à Nantes, second trésorier du club.",
+    "faits": "Bac général obtenu avec mention très bien.\nPricing pour des sociétés de location de véhicules chez Weboost, avec une étude de marché à la clé.\nFinition d'une enceinte acoustique haut de gamme à l'atelier ASA de Royan, puis vente et conseil en magasin.",
+    "expertises": "Pricing et yield management\nComptabilité\nFinance personnelle\nRelations humaines (analyse transactionnelle)\nAnglais (B2)",
     "citation": "« Ils ne savaient pas que c'était impossible, alors ils l'ont fait. » (attribuée à Mark Twain)",
     "linkedin": "https://www.linkedin.com/in/louis-saffre-253947384/"
   },
