@@ -92,8 +92,12 @@
     "title": "Louis Saffre",
     "role": "Second trésorier",
     "roleEn": "Deputy treasurer",
+    "surnom": "Le chat",
+    "photo": "assets/bureau/louis-saffre.webp",
+    "autorisationPhoto": true,
     "missions": "Tient le tableur du budget avec le trésorier et prévoit les provisions de chaque événement.",
     "missionsEn": "Keeps the budget spreadsheet with the treasurer and plans each event's provisions.",
+    "citation": "« Ils ne savaient pas que c'était impossible, alors ils l'ont fait. » (attribuée à Mark Twain)",
     "linkedin": "https://www.linkedin.com/in/louis-saffre-253947384/"
   },
   {
