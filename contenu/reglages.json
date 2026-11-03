@@ -45,6 +45,11 @@
     "note": "Lien complet du compte Instagram du club. Vide = icône masquée."
   },
   {
+    "title": "tiktok",
+    "valeur": "",
+    "note": "Lien complet du compte TikTok du club. Vide = icône masquée."
+  },
+  {
     "title": "linkedin",
     "valeur": "",
     "note": "Lien complet de la page LinkedIn du club. Vide = icône masquée."

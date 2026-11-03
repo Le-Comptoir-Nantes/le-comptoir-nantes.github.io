@@ -89,7 +89,7 @@
       '<li>' + link('rejoindre.html', 'Venir à un Comptoir', 'Come to a Comptoir') + '</li><li>' + link('merch.html', 'Réserver le merch', 'Reserve merch') + '</li><li>' + link('partenaires.html', 'Devenir partenaire', 'Become a partner') + '</li><li>' + link('partenaires.html#contact', 'Prendre rendez-vous', 'Book a call') + '</li></ul></nav>' +
       '<nav aria-label="' + t('Suivre', 'Follow') + '"><h2>' + t('Suivre', 'Follow') + '</h2><ul>' +
       '<li><a href="https://www.audencia.com" target="_blank" rel="noopener">Audencia ↗</a></li>' +
-      '<li><a data-set-href="instagram" target="_blank" rel="noopener" hidden>Instagram ↗</a></li><li><a data-set-href="linkedin" target="_blank" rel="noopener" hidden>LinkedIn ↗</a></li><li><a data-set-href="youtube" target="_blank" rel="noopener" hidden>YouTube ↗</a></li>' +
+      '<li><a data-set-href="instagram" target="_blank" rel="noopener" hidden>Instagram ↗</a></li><li><a data-set-href="linkedin" target="_blank" rel="noopener" hidden>LinkedIn ↗</a></li><li><a data-set-href="tiktok" target="_blank" rel="noopener" hidden>TikTok ↗</a></li><li><a data-set-href="youtube" target="_blank" rel="noopener" hidden>YouTube ↗</a></li>' +
       '<li data-nosocial class="soft">' + t('Instagram et YouTube : bientôt en ligne.', 'Instagram and YouTube: coming soon.') + '</li>' +
       '<li><a href="https://www.linkedin.com/in/lucas-denis-jb" target="_blank" rel="noopener">' + t('LinkedIn du président ↗', 'The president on LinkedIn ↗') + '</a></li></ul></nav></div>' +
       '<div class="legal"><span>© ' + new Date().getFullYear() + ' Le Comptoir</span><span style="display:flex;gap:18px;flex-wrap:wrap"><a href="mentions.html">' + t('Mentions légales', 'Legal notice') + '</a><a href="confidentialite.html">' + t('Confidentialité et cookies', 'Privacy and cookies') + '</a><a href="conditions.html">' + t('Conditions de précommande', 'Pre-order terms') + '</a></span></div></div>';
@@ -186,7 +186,7 @@
     });
     next();
     $$('[data-set-mail]').forEach(function (e) { e.href = 'mailto:' + S.email; e.textContent = S.email; });
-    var any = web(S.instagram) || web(S.linkedin) || web(S.youtube);
+    var any = web(S.instagram) || web(S.tiktok) || web(S.linkedin) || web(S.youtube);
     $$('[data-nosocial]').forEach(function (e) { e.hidden = !!any; });
   }
 
