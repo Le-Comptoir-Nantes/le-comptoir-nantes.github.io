@@ -30,19 +30,20 @@
   function seal() {
     n++;
     var a = 'sa' + n, b = 'sb' + n, star = 'M0 -9 L2.6 -2.6 L9 0 L2.6 2.6 L0 9 L-2.6 2.6 L-9 0 L-2.6 -2.6Z';
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" role="img" aria-label="Le Comptoir, club étudiant. Fortes fortuna adiuvat.">' +
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" role="img" aria-label="Le Comptoir, club étudiant Audencia. Fortes fortuna adiuvat.">' +
       '<defs><path id="' + a + '" d="M 80 250 A 170 170 0 0 1 420 250"/><path id="' + b + '" d="M 72 250 A 178 178 0 0 0 428 250"/></defs>' +
       '<circle cx="250" cy="250" r="238" fill="#0B1F4D"/><circle cx="250" cy="250" r="226" fill="none" stroke="#D9A441" stroke-width="5"/><circle cx="250" cy="250" r="214" fill="none" stroke="#D9A441" stroke-width="1.5"/>' +
       '<text font-family="Lora, Georgia, serif" font-weight="700" font-size="46" letter-spacing="2" fill="#F5F1E6" text-anchor="middle"><textPath href="#' + a + '" startOffset="50%">LE COMPTOIR</textPath></text>' +
       '<g fill="#D9A441"><path transform="translate(62 250)" d="' + star + '"/><path transform="translate(438 250)" d="' + star + '"/></g>' +
-      '<line x1="190" y1="352" x2="310" y2="352" stroke="#D9A441" stroke-width="1.2" opacity=".7"/>' +
+      '<line x1="190" y1="349" x2="310" y2="349" stroke="#D9A441" stroke-width="1.2" opacity=".7"/>' +
       '<g transform="translate(250 205)"><path class="steam" d="M -14 -52 q -10 -12 0 -24 q 10 -12 0 -24" fill="none" stroke="#D9A441" stroke-width="4" stroke-linecap="round"/><path class="steam" d="M 10 -52 q -10 -12 0 -24 q 10 -12 0 -24" fill="none" stroke="#D9A441" stroke-width="4" stroke-linecap="round"/>' +
       '<path d="M -38 -36 h 76 v 30 a 38 38 0 0 1 -76 0 z" fill="#F5F1E6"/><path d="M 38 -26 h 10 a 14 14 0 0 1 0 28 h -12" fill="none" stroke="#F5F1E6" stroke-width="7"/><rect x="-52" y="26" width="104" height="7" rx="3.5" fill="#D9A441"/></g>' +
       '<g transform="translate(250 300)"><path d="M 0 -40 C -30 -58 -80 -58 -118 -44 L -118 20 C -80 6 -30 6 0 24 Z" fill="#F5F1E6"/><path d="M 0 -40 C 30 -58 80 -58 118 -44 L 118 20 C 80 6 30 6 0 24 Z" fill="#EDE4D0"/>' +
       '<g stroke="#0B1F4D" stroke-width="2.2" opacity=".35" fill="none"><path d="M -20 -30 C -45 -40 -80 -40 -100 -32"/><path d="M -20 -16 C -45 -26 -80 -26 -100 -18"/><path d="M -20 -2 C -45 -12 -80 -12 -100 -4"/><path d="M 20 -30 C 45 -40 80 -40 100 -32"/><path d="M 20 -16 C 45 -26 80 -26 100 -18"/><path d="M 20 -2 C 45 -12 80 -12 100 -4"/></g>' +
       '<path d="M -130 24 C -80 12 -30 14 0 34 C 30 14 80 12 130 24" fill="none" stroke="#D9A441" stroke-width="6" stroke-linecap="round"/></g>' +
       '<text font-family="Lato, Carlito, sans-serif" font-weight="700" font-size="20" letter-spacing="3" fill="#E8B04B" text-anchor="middle"><textPath href="#' + b + '" startOffset="50%">FORTES FORTUNA ADIUVAT</textPath></text>' +
-      '<text x="250" y="376" font-family="Lato, Carlito, sans-serif" font-size="14" letter-spacing="3" fill="#F5F1E6" text-anchor="middle">' + t('CLUB ÉTUDIANT', 'STUDENT CLUB') + '</text></svg>';
+      '<text x="250" y="372" font-family="Lato, Carlito, sans-serif" font-size="14" letter-spacing="3" fill="#F5F1E6" text-anchor="middle">' + t('CLUB ÉTUDIANT', 'STUDENT CLUB') + '</text>' +
+      '<text x="250" y="393" font-family="Lato, Carlito, sans-serif" font-weight="700" font-size="14" letter-spacing="4" fill="#F5F1E6" text-anchor="middle">AUDENCIA</text></svg>';
   }
 
   /* Langue : le texte anglais est porté par l'attribut data-en de chaque élément */
