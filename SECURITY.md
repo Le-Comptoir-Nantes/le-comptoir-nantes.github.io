@@ -2,7 +2,7 @@
 
 ## Signaler un problème
 
-Écrivez à **jblucas.denis@audencia.com** avec l'adresse de la page et ce que vous avez observé. Merci de ne pas publier le problème avant d'avoir eu une réponse du club.
+Écrivez à **lecomptoir@audencia.com** avec l'adresse de la page et ce que vous avez observé. Merci de ne pas publier le problème avant d'avoir eu une réponse du club.
 
 *Found a security issue? Email the address above with the page and what you observed. Please wait for a reply before disclosing it.*
 

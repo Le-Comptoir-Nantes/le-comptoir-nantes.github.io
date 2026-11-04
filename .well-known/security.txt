@@ -1,6 +1,6 @@
 # Signaler un problème de sécurité sur le site du Comptoir (club étudiant d'Audencia, Nantes)
 # Report a security issue on Le Comptoir's website
-Contact: mailto:jblucas.denis@audencia.com
+Contact: mailto:lecomptoir@audencia.com
 Expires: 2027-10-01T00:00:00.000Z
 Preferred-Languages: fr, en
 Canonical: https://le-comptoir-nantes.github.io/.well-known/security.txt

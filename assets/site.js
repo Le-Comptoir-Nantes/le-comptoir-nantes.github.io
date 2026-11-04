@@ -82,7 +82,7 @@
     $('#ft').innerHTML = '<div class="wrap"><div class="foot"><div class="about">' + seal() + '<p><b>Le Comptoir</b></p>' +
       '<p class="soft">' + t('Club étudiant du Bachelor in Management, incubé au Bureau des Clubs d’Audencia · City Campus, Nantes', 'Bachelor in Management student club, incubated by Audencia’s Bureau des Clubs · City Campus, Nantes') + '</p>' +
       '<p class="motto"><b>FORTES FORTUNA ADIUVAT</b><br>' + t('« La fortune sourit aux audacieux », Térence', '“Fortune favours the bold”, Terence') + '</p>' +
-      '<p>Contact : <a data-set-mail href="mailto:jblucas.denis@audencia.com">jblucas.denis@audencia.com</a></p></div>' +
+      '<p>Contact : <a data-set-mail href="mailto:lecomptoir@audencia.com">lecomptoir@audencia.com</a></p></div>' +
       '<nav aria-label="' + t('Découvrir', 'Discover') + '"><h2>' + t('Découvrir', 'Discover') + '</h2><ul>' +
       '<li>' + link('club.html', 'Le club', 'The club') + '</li><li>' + link('evenements.html', 'Événements', 'Events') + '</li><li>' + link('jeu.html', 'Le jeu', 'The game') + '</li><li>' + link('bureau.html', 'Le bureau', 'The board') + '</li></ul></nav>' +
       '<nav aria-label="' + t('Agir', 'Get involved') + '"><h2>' + t('Agir', 'Get involved') + '</h2><ul>' +
@@ -170,7 +170,7 @@
 
   /* Réglages : liens des réseaux, contact, tarifs, prochain rendez-vous */
   var S = Object.create(null);
-  S.email = 'jblucas.denis@audencia.com';
+  S.email = 'lecomptoir@audencia.com';
   function settings(rows) {
     if (!rows) return;
     rows.forEach(function (r) {
