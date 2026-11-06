@@ -9,7 +9,7 @@ Le site est fait de pages HTML simples, sans base de données ni service extéri
 
 | Je veux… | Où aller |
 | --- | --- |
-| Changer un événement, une fiche du bureau, un article du merch, un partenaire, un réglage (contact, cotisation, réseaux) | Dossier [`contenu/`](contenu/README.md) : un fichier par rubrique, mode d'emploi dedans |
+| Changer un événement, une fiche du bureau, un article du merch, un partenaire, un réglage (contact, adhésion, réseaux) | Dossier [`contenu/`](contenu/README.md) : un fichier par rubrique, mode d'emploi dedans |
 | Ajouter une photo, un portrait, un logo | Dossier `assets/` (`assets/bureau/`, `assets/partenaires/`, `assets/photos/`), puis le chemin dans le fichier de `contenu/` |
 | Changer un texte fixe d'une page | Le fichier `.html` de la page. Le texte français est entre les balises, sa traduction dans l'attribut `data-en` juste à côté |
 | Corriger une carte, la règle ou le plateau du jeu | [`outils/`](outils/README.md) : les pages du jeu sont fabriquées par un script |

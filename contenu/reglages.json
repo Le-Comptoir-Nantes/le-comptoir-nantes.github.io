@@ -18,15 +18,15 @@
   },
   {
     "title": "cotisation",
-    "valeur": "30 € pour l'année",
-    "valeurEn": "€30 for the year",
-    "note": "Montant de la cotisation affiché sur le site."
+    "valeur": "gratuite",
+    "valeurEn": "free",
+    "note": "Adhésion au club, affichée après « Adhésion : ». Elle est gratuite depuis novembre 2026 (plus de cotisation)."
   },
   {
     "title": "billet",
     "valeur": "8 €",
     "valeurEn": "€8",
-    "note": "Prix d'entrée des non-membres aux Meet and Talk et conférences."
+    "note": "Supplément payé par un non-membre sur les sorties et événements payants (en plus du prix membre)."
   },
   {
     "title": "precommande",
