@@ -19,7 +19,7 @@
     "mail": "jblucas.denis@audencia.com"
   },
   {
-    "ordre": 2,
+    "ordre": 3,
     "title": "Romain Rabiller",
     "role": "Vice-président",
     "roleEn": "Vice-President",
@@ -36,7 +36,7 @@
     "linkedin": "https://www.linkedin.com/in/romain-rabiller-494b343a9/"
   },
   {
-    "ordre": 3,
+    "ordre": 4,
     "title": "Félice Maire",
     "role": "Responsable événements",
     "roleEn": "Head of Events",
@@ -53,7 +53,7 @@
     "linkedin": "https://www.linkedin.com/in/f%C3%A9lice-maire-b24675435/"
   },
   {
-    "ordre": 4,
+    "ordre": 5,
     "title": "Zoé Podevin",
     "role": "Responsable partenariats",
     "roleEn": "Head of Partnerships",
@@ -71,7 +71,7 @@
     "linkedin": "https://www.linkedin.com/in/zoe-podevin12855"
   },
   {
-    "ordre": 5,
+    "ordre": 6,
     "title": "Adil Moutmir",
     "role": "Trésorier",
     "roleEn": "Treasurer",
@@ -88,7 +88,7 @@
     "linkedin": "https://www.linkedin.com/in/adil-moutmir-328494434/"
   },
   {
-    "ordre": 6,
+    "ordre": 7,
     "title": "Louis Saffre",
     "role": "Second trésorier",
     "roleEn": "Deputy treasurer",
@@ -106,7 +106,7 @@
     "linkedin": "https://www.linkedin.com/in/louis-saffre-253947384/"
   },
   {
-    "ordre": 7,
+    "ordre": 8,
     "title": "Luc Grana",
     "role": "Secrétaire",
     "roleEn": "Secretary",
@@ -124,7 +124,7 @@
     "linkedin": "https://www.linkedin.com/in/luc-grana-824488371/"
   },
   {
-    "ordre": 8,
+    "ordre": 9,
     "title": "Pauline Chaillou-L'Heveder",
     "role": "Responsable communication",
     "roleEn": "Head of Communications",
@@ -141,12 +141,12 @@
     "linkedin": "https://www.linkedin.com/in/pauline-chaillou-l%E2%80%99heveder-367613435"
   },
   {
-    "ordre": 9,
+    "ordre": 2,
     "title": "Noémie Jeunesse",
     "role": "Responsable coordination",
     "roleEn": "Head of Coordination",
-    "missions": "Coordonne l'agenda et les tâches du bureau, répartit les missions entre les membres et suit l'avancement des projets. Rassemble les devis avec le secrétaire et fait le point avec le président.",
-    "missionsEn": "Coordinates the board's calendar and tasks, shares out missions among members and tracks project progress. Collects quotes with the secretary and reviews ongoing projects with the president.",
+    "missions": "Bras droit du président : coordonne l'agenda et les tâches du bureau, répartit les missions entre les membres et suit l'avancement des projets. Rassemble les devis avec le secrétaire et fait le point avec le président.",
+    "missionsEn": "The president's right hand: coordinates the board's calendar and tasks, shares out missions among members and tracks project progress. Collects quotes with the secretary and reviews ongoing projects with the president.",
     "photo": "assets/bureau/noemie-jeunesse.webp",
     "autorisationPhoto": true,
     "linkedin": "https://www.linkedin.com/in/no%C3%A9mie-jeunesse-0415ba435/"
