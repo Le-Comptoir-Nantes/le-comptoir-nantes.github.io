@@ -143,10 +143,10 @@
   {
     "ordre": 9,
     "title": "Noémie Jeunesse",
-    "role": "Conseillère",
-    "roleEn": "Advisor",
-    "missions": "Rassemble les devis avec le secrétaire et fait le point avec le président sur les projets en cours.",
-    "missionsEn": "Collects quotes with the secretary and reviews ongoing projects with the president.",
+    "role": "Responsable coordination",
+    "roleEn": "Head of Coordination",
+    "missions": "Coordonne l'agenda et les tâches du bureau, répartit les missions entre les membres et suit l'avancement des projets. Rassemble les devis avec le secrétaire et fait le point avec le président.",
+    "missionsEn": "Coordinates the board's calendar and tasks, shares out missions among members and tracks project progress. Collects quotes with the secretary and reviews ongoing projects with the president.",
     "photo": "assets/bureau/noemie-jeunesse.webp",
     "autorisationPhoto": true,
     "linkedin": "https://www.linkedin.com/in/no%C3%A9mie-jeunesse-0415ba435/"
