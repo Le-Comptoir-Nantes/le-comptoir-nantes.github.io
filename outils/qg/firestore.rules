@@ -1,0 +1,38 @@
+rules_version = '2';
+// QG du Comptoir : règles de la base Firestore.
+// À coller dans la console Firebase : Firestore Database > Règles > Publier.
+// Seules les adresses e-mail vérifiées présentes dans la collection « acces » (ou le président) lisent et modifient les données.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function connecte() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    function adresse() {
+      return request.auth.token.email.lower();
+    }
+    // Le président : toujours administrateur (même adresse que « proprietaire » dans assets/qg/config.js)
+    function president() {
+      return connecte() && adresse() == 'jblucas.denis@audencia.com';
+    }
+    function membre() {
+      return president() || (connecte() && exists(/databases/$(database)/documents/acces/$(adresse())));
+    }
+    function admin() {
+      return president() || (membre() && get(/databases/$(database)/documents/acces/$(adresse())).data.admin == true);
+    }
+
+    // Liste des accès : lisible par le bureau, modifiable par les administrateurs
+    match /acces/{mail} {
+      allow read: if membre();
+      allow create, update: if admin() && request.resource.data.membreId is string;
+      allow delete: if admin() && mail != 'jblucas.denis@audencia.com';
+    }
+
+    // Données du club : réservées au bureau
+    match /{rubrique}/{id} {
+      allow read, write: if membre()
+        && rubrique in ['membres', 'evenements', 'taches', 'annonces', 'presences', 'preparations'];
+    }
+  }
+}

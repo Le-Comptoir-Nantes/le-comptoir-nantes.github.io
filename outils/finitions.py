@@ -2,7 +2,7 @@
 import glob, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 R = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')) + '/'
-from regle import BOOT, CSP
+from regle import BOOT, CSP, PAGES_QG
 HEAD = ('<meta http-equiv="Content-Security-Policy" content="%s">\n'
         '<meta name="referrer" content="strict-origin-when-cross-origin">\n'
         '<meta name="theme-color" content="#0B1F4D">\n'
@@ -22,6 +22,8 @@ TITLES = {
 }
 for f in sorted(glob.glob(R + '*.html')):
     n = os.path.basename(f); t = open(f, encoding='utf-8').read(); o = t
+    if n in PAGES_QG:
+        print('%-22s %s' % (n, 'à part (règle du QG, contrôlée par verifier.py)')); continue
     assert t.count('<script>' + BOOT + '</script>') == 1, n
     assert t.count('<script>') == 1, (n, 'script intégré inattendu')
     t = re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>\n(?:<meta name="referrer"[^>]*>\n)?<meta name="theme-color"[^>]*>\n(?:<link rel="preload"[^>]*>\n)*', '', t)

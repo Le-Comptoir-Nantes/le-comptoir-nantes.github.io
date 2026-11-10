@@ -6,12 +6,12 @@ un script écrit dans une page, une règle de sécurité affaiblie, un lien pié
 Il ne modifie rien. Code de sortie 0 = tout va bien, 1 = au moins une erreur.
 N'utilise que Python 3, sans rien installer.
 """
-import datetime, glob, json, os, re, sys
+import datetime, glob, hashlib, json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 R = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
-from regle import BOOT, CSP      # la règle attendue, celle que finitions.py pose
+from regle import BOOT, CSP, CSP_QG, PAGES_QG, VENDOR      # la règle attendue, celle que finitions.py pose ; le QG a la sienne
 errors = []
 
 
@@ -46,8 +46,11 @@ if len(pages) < 10:
 for n in pages:
     t = re.sub(r'<!--.*?-->', '', read(n), flags=re.S)       # ce qui est en commentaire ne protège rien
     metas = re.findall(r'<meta\b[^>]*http-equiv\s*=\s*["\']?Content-Security-Policy[^>]*>', t, I)
-    if len(metas) != 1 or metas[0] != '<meta http-equiv="Content-Security-Policy" content="%s">' % CSP:
+    attendue = CSP_QG if n in PAGES_QG else CSP
+    if len(metas) != 1 or metas[0] != '<meta http-equiv="Content-Security-Policy" content="%s">' % attendue:
         err(n, 'règle de sécurité absente, en double ou modifiée : elle doit être, mot pour mot, celle de outils/regle.py (lancer python3 outils/finitions.py)')
+    if n in PAGES_QG and not re.search(r'<meta name="robots" content="noindex, nofollow">', t):
+        err(n, 'le QG doit rester hors des moteurs de recherche (balise robots noindex)')
     if re.search(r'<meta\b[^>]*http-equiv\s*=\s*["\']?refresh', t, I):
         err(n, 'redirection automatique (meta refresh)')
     # Scripts : des fichiers du site, des données pour moteurs de recherche, ou le script d'amorçage connu
@@ -100,6 +103,11 @@ scripts = [p for p in walk('.js') + walk('.mjs') if not p.startswith('outils' + 
 for n in scripts:
     if not n.startswith('assets' + os.sep):
         err(n, 'script hors de assets/')
+    if n.replace(os.sep, '/') in VENDOR or n.startswith(os.path.join('assets', 'qg', 'vendor') + os.sep):
+        empreinte = hashlib.sha256(open(os.path.join(R, n), 'rb').read()).hexdigest()
+        if VENDOR.get(n.replace(os.sep, '/')) != empreinte:
+            err(n, 'bibliothèque Firebase inconnue ou modifiée : son empreinte doit figurer dans outils/regle.py (VENDOR)')
+        continue
     t = read(n)
     for pat, what in ((r'\beval\s*\(', 'eval('), (r'\bnew\s+Function\b', 'new Function'), (r'document\.write', 'document.write'),
                       (r'setTimeout\s*\(\s*[\'"`]', 'setTimeout avec du texte'), (r'\bimportScripts\b', 'importScripts')):

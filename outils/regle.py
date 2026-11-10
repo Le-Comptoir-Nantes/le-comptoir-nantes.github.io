@@ -26,3 +26,33 @@ CSP = '; '.join([
     "base-uri 'self'",                     # la page 404 pose <base href="/"> pour retrouver ses fichiers
     "form-action 'self'",
 ])
+
+# Le QG du Comptoir (qg.html) : espace réservé au bureau, avec sa propre règle.
+# Même règle que le site, sauf « connect-src » qui ouvre la connexion et la base de données Firebase (Google),
+# seuls services extérieurs, appelés uniquement depuis cette page.
+CSP_QG = '; '.join([
+    "default-src 'self'",
+    "script-src 'self'",
+    "script-src-attr 'none'",
+    "style-src 'self' 'unsafe-inline'",
+    "style-src-elem 'self'",
+    "style-src-attr 'unsafe-inline'",
+    "img-src 'self'",
+    "font-src 'self'",
+    "connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com",
+    "media-src 'none'",
+    "manifest-src 'self'",
+    "frame-src 'none'",
+    "child-src 'none'",
+    "worker-src 'none'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+])
+PAGES_QG = ('qg.html',)
+# Bibliothèque Firebase 10.12.2 (npm « firebase »), hébergée sur le site : reconnue par son empreinte, elle ne doit pas être modifiée
+VENDOR = {
+    'assets/qg/vendor/firebase-app-compat.js': '24a1fd90a9424647636669f59013201ba385eff82a58f88c76a7d400d4d71139',
+    'assets/qg/vendor/firebase-auth-compat.js': '277f6ef70525168247921e7a51fe995ecc66f9c3cf56c97f0d2bc262f74b5906',
+    'assets/qg/vendor/firebase-firestore-compat.js': '25133ac64bef210c19384ed72eafdec440c27c02a6b48e9d2b6b48bf7b00ad04',
+}

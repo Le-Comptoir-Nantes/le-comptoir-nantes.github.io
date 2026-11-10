@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /outils/
+Disallow: /qg.html
+Disallow: /assets/qg/
 
 Sitemap: https://le-comptoir-nantes.github.io/sitemap.xml

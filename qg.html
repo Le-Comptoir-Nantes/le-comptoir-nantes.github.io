@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; style-src-attr 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; media-src 'none'; manifest-src 'self'; frame-src 'none'; child-src 'none'; worker-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#14213D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="QG Comptoir">
+<title>QG du Comptoir</title>
+<link rel="manifest" href="assets/qg/manifest.webmanifest">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/qg/icone-180.png">
+<link rel="stylesheet" href="assets/qg/qg.css">
+</head>
+<body>
+<header class="band">
+  <div class="wrap">
+    <div class="top">
+      <img src="assets/favicon.svg" width="40" height="40" alt="">
+      <div class="name"><b>Le Comptoir</b><span>Club étudiant · Audencia</span></div>
+      <div class="status" id="status" hidden><i class="dot"></i><span id="statusTxt">Connexion…</span></div>
+      <button class="btn small logout" id="logoutBtn" type="button" hidden>Déconnexion</button>
+    </div>
+    <section class="now" id="now" aria-live="polite"></section>
+    <div class="strip" id="strip"></div>
+  </div>
+</header>
+
+<main><div class="wrap" id="view"></div></main>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="wrap" role="tablist">
+    <button role="tab" data-tab="agenda" id="tab-agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Agenda</button>
+    <button role="tab" data-tab="taches" id="tab-taches"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5l2 2 3.5-3.5M4 13.5l2 2 3.5-3.5M13 7h7M13 14h7M4 20h16"/></svg>Tâches<span class="badge" id="lateBadge" hidden></span></button>
+    <button role="tab" data-tab="annonces" id="tab-annonces"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h3l7 4V6L7 10z"/><path d="M17.5 9a4 4 0 0 1 0 6"/></svg>Annonces</button>
+    <button role="tab" data-tab="coord" id="tab-coord"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/><path d="M12 3.5v1.5M20.5 12H19M12 20.5V19M3.5 12H5"/></svg>Coordination<span class="badge" id="coordBadge" hidden></span></button>
+    <button role="tab" data-tab="bureau" id="tab-bureau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.8-3.2 3-5 5.5-5s4.7 1.8 5.5 5"/><circle cx="17" cy="9.5" r="2.4"/><path d="M15.5 14.4c2.3-.4 4.3 1 5 4"/></svg>Bureau</button>
+  </div>
+</nav>
+
+<div id="sheetRoot"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script src="assets/qg/vendor/firebase-app-compat.js"></script>
+<script src="assets/qg/vendor/firebase-auth-compat.js"></script>
+<script src="assets/qg/vendor/firebase-firestore-compat.js"></script>
+<script src="assets/qg/config.js"></script>
+<script src="assets/qg/app.js"></script>
+</body>
+</html>

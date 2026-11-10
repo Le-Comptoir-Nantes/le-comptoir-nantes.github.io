@@ -23,6 +23,7 @@ jeu.html, jeu-regle.html, jeu-plateau.html,               le jeu « L'Affaire Om
 jeu-cartes.html, jeu-enquete.html                         (pages fabriquées par outils/)
 mentions.html, confidentialite.html, conditions.html      pages légales
 404.html                                                  page « introuvable »
+qg.html, assets/qg/                                       le QG du Comptoir, espace réservé au bureau (voir plus bas)
 contenu/                                                  les contenus modifiables (fichiers .json)
 assets/site.css, site.js                                  mise en page et fonctionnement du site
 assets/motion.css, motion.js                              animations (coupées si le visiteur le demande)
@@ -37,7 +38,7 @@ sitemap.xml, robots.txt                                   pour les moteurs de re
 ## Règles à garder
 
 - **Le dépôt doit rester public.** Avec un compte GitHub gratuit, un dépôt privé coupe le site (erreur 404).
-- **Aucun service extérieur** : pas de police Google, pas de mesure d'audience, pas de vidéo intégrée. C'est ce qui permet de se passer de bandeau cookies. Si cela change, la page Confidentialité doit changer aussi.
+- **Aucun service extérieur** : pas de police Google, pas de mesure d'audience, pas de vidéo intégrée. C'est ce qui permet de se passer de bandeau cookies. Si cela change, la page Confidentialité doit changer aussi. Seule exception : le QG du bureau (`qg.html`, voir plus bas), qui se connecte à Firebase. Aucune page publique n'y fait appel.
 - **Les formulaires n'enregistrent rien** : ils préparent un e-mail dans la messagerie du visiteur, à l'adresse `email` de `contenu/reglages.json`.
 - **Aucune photo d'une personne sans autorisation écrite** : dans les fichiers de `contenu/`, une photo ne s'affiche que si `autorisationPhoto` (ou `autorisation`) vaut `true`.
 - **Le jeu ne se télécharge pas** : aucun PDF du jeu sur le site. Pour le voir, le visiteur écrit au bureau (formulaire en bas de `jeu.html`).
@@ -64,3 +65,14 @@ python3 -m http.server 8000
 puis <http://localhost:8000> dans le navigateur. Regarder la page modifiée sur ordinateur et sur téléphone, en français et en anglais (bouton EN).
 
 Si une rubrique affiche « Ce contenu ne se charge pas » : une virgule ou un guillemet a sauté dans un fichier de `contenu/`. L'historique du fichier sur GitHub (**History**) permet de revenir à la version précédente.
+
+## QG du Comptoir (espace du bureau)
+
+`qg.html` est l'appli de coordination du bureau : agenda, tâches, annonces, coordination. Elle s'installe sur téléphone et ordinateur (« Sur l'écran d'accueil » / « Installer l'application »).
+
+- **Connexion** : adresse e-mail et mot de passe, à chaque ouverture. L'adresse doit être confirmée par le lien reçu par e-mail.
+- **Qui entre** : seules les adresses de la liste « Accès au QG » (onglet Bureau de l'appli), reliées chacune à une fiche du bureau. Le président (`proprietaire` dans `assets/qg/config.js`) est toujours administrateur et gère la liste.
+- **Où sont les données** : dans Firebase (Google), projet du club. Les règles qui réservent les données au bureau sont dans [`outils/qg/firestore.rules`](outils/qg/firestore.rules) : après toute modification, les recoller dans la console Firebase (Firestore Database > Règles > Publier). Si l'adresse du président change, la changer dans ce fichier **et** dans `assets/qg/config.js`.
+- **Branchement** : `assets/qg/config.js` contient l'identifiant du projet Firebase. Ces valeurs ne sont pas secrètes ; la protection vient des règles.
+- **Sécurité de la page** : `qg.html` a sa propre règle (`CSP_QG` dans `outils/regle.py`), qui n'autorise en plus que les adresses de Firebase. La bibliothèque Firebase est hébergée dans `assets/qg/vendor/` et reconnue par son empreinte (`VENDOR`) : `verifier.py` signale toute modification.
+- **Sauvegarde** : onglet Bureau > Sauvegarde, réservé aux administrateurs.
