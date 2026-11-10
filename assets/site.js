@@ -79,6 +79,7 @@
       NAV.map(function (v) { return link(v[0] + '.html', v[1], v[2]); }).join('') + '</div>' +
       '<a class="btn" href="rejoindre.html">' + t('Venir à un Comptoir', 'Come to a Comptoir') + '</a>' +
       '<p class="hint">' + t('Chaque mercredi · ouvert à tous les étudiants du City Campus', 'Every Wednesday · open to all City Campus students') + '</p>' +
+      '<p class="hint"><a href="qg.html">' + t('Membres : télécharger l’appli du club', 'Members: get the club app') + '</a></p>' +
       '<button class="lang" lang="' + t('en', 'fr') + '" aria-label="' + t('EN, switch to English', 'FR, passer en français') + '">' + t('EN', 'FR') + '</button></nav></div>';
     $('#ft').innerHTML = '<div class="wrap"><div class="foot"><div class="about">' + seal() + '<p><b>Le Comptoir</b></p>' +
       '<p class="soft">' + t('Club étudiant du Bachelor in Management, incubé au Bureau des Clubs d’Audencia · City Campus, Nantes', 'Bachelor in Management student club, incubated by Audencia’s Bureau des Clubs · City Campus, Nantes') + '</p>' +
@@ -87,7 +88,7 @@
       '<nav aria-label="' + t('Découvrir', 'Discover') + '"><h2>' + t('Découvrir', 'Discover') + '</h2><ul>' +
       '<li>' + link('club.html', 'Le club', 'The club') + '</li><li>' + link('evenements.html', 'Événements', 'Events') + '</li><li>' + link('jeu.html', 'Le jeu', 'The game') + '</li><li>' + link('bureau.html', 'Le bureau', 'The board') + '</li></ul></nav>' +
       '<nav aria-label="' + t('Agir', 'Get involved') + '"><h2>' + t('Agir', 'Get involved') + '</h2><ul>' +
-      '<li>' + link('rejoindre.html', 'Venir à un Comptoir', 'Come to a Comptoir') + '</li><li>' + link('merch.html', 'Réserver le merch', 'Reserve merch') + '</li><li>' + link('partenaires.html', 'Devenir partenaire', 'Become a partner') + '</li><li>' + link('partenaires.html#contact', 'Prendre rendez-vous', 'Book a call') + '</li></ul></nav>' +
+      '<li>' + link('rejoindre.html', 'Venir à un Comptoir', 'Come to a Comptoir') + '</li><li>' + link('merch.html', 'Réserver le merch', 'Reserve merch') + '</li><li>' + link('partenaires.html', 'Devenir partenaire', 'Become a partner') + '</li><li>' + link('partenaires.html#contact', 'Prendre rendez-vous', 'Book a call') + '</li><li>' + link('qg.html', 'Télécharger l’appli du club (membres)', 'Get the club app (members)') + '</li></ul></nav>' +
       '<nav aria-label="' + t('Suivre', 'Follow') + '"><h2>' + t('Suivre', 'Follow') + '</h2><ul>' +
       '<li><a href="https://www.audencia.com" target="_blank" rel="noopener">Audencia ↗</a></li>' +
       '<li><a data-set-href="instagram" target="_blank" rel="noopener" hidden>Instagram ↗</a></li><li><a data-set-href="linkedin" target="_blank" rel="noopener" hidden>LinkedIn ↗</a></li><li><a data-set-href="tiktok" target="_blank" rel="noopener" hidden>TikTok ↗</a></li><li><a data-set-href="youtube" target="_blank" rel="noopener" hidden>YouTube ↗</a></li>' +

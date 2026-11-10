@@ -1,6 +1,6 @@
 # QG du Comptoir : envoie les notifications (annonces, rendez-vous, rappels 2 h avant) aux appareils inscrits.
 # Toutes les 5 minutes (GitHub peut décaler un passage de quelques minutes). Ne publie rien sur le site.
-# Il lui faut le secret QG_FIREBASE_SA (clé du compte de service Firebase) : sans lui, il ne fait rien.
+# Aucune clé : il se connecte à Google par la fédération d'identité GitHub (voir outils/qg/notifier.py).
 name: QG - notifications
 
 on:
@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write   # jeton d'identité GitHub, échangé contre un accès Google de quelques minutes
 
 concurrency:
   group: qg-notifications
@@ -22,11 +23,7 @@ jobs:
     steps:
       - name: Récupérer le script
         run: git clone --depth 1 --branch main "https://github.com/${GITHUB_REPOSITORY}.git" site
-      - name: Installer les bibliothèques Google
-        run: python3 -m pip install --quiet --disable-pip-version-check google-auth==2.35.0 requests==2.32.3
       - name: Vérifier le calcul des notifications
         run: python3 site/outils/qg/test_notifier.py
       - name: Envoyer les notifications
-        env:
-          QG_FIREBASE_SA: ${{ secrets.QG_FIREBASE_SA }}
         run: python3 site/outils/qg/notifier.py

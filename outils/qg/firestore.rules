@@ -58,6 +58,12 @@ service cloud.firestore {
       allow delete: if bureau() || (inscrit() && resource.data.mail == adresse());
     }
 
+    // Révisions (fiches et quiz) : lues par tous les inscrits, publiées par le bureau
+    match /revisions/{id} {
+      allow read: if inscrit();
+      allow write: if bureau();
+    }
+
     // Tâches et coordination : réservées au bureau
     match /taches/{id} {
       allow read, write: if bureau();
@@ -67,7 +73,7 @@ service cloud.firestore {
     }
 
     // Appareils inscrits aux notifications : chacun enregistre les siens, personne ne les lit
-    // (seul l'envoyeur automatique, outils/qg/notifier.py, y accède avec sa clé de service)
+    // (seul l'envoyeur automatique, outils/qg/notifier.py, y accède, sans clé, via la fédération d'identité GitHub)
     match /jetons/{jeton} {
       allow create, update: if inscrit() && request.resource.data.mail == adresse();
       allow delete: if inscrit() && resource.data.mail == adresse();

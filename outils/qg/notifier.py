@@ -7,8 +7,10 @@ Lancé toutes les 5 minutes par .github/workflows/qg-notifications.yml. À chaqu
   - rendez-vous qui commence dans 2 h   -> rappel (une seule fois par date)
 Les notifications partent vers les appareils (collection « jetons ») dont l'adresse a encore un accès.
 
-Clé : la variable QG_FIREBASE_SA contient la clé du compte de service Firebase (fichier JSON),
-rangée dans les secrets GitHub du dépôt. Sans elle, le script ne fait rien.
+Connexion à Google sans clé : GitHub fournit au workflow un jeton d'identité (OIDC) prouvant qu'il s'agit
+du dépôt du club ; Google l'échange contre un accès de quelques minutes au compte de service
+qg-notifications (rôles : Firestore et envoi de notifications). Rien de secret n'est stocké.
+Hors de GitHub Actions, le script ne fait rien.
 Ce qui a déjà été envoyé est noté dans le document Firestore notifs/etat.
 """
 import datetime as dt
@@ -16,7 +18,9 @@ import json
 import os
 import sys
 import time
-from urllib.parse import quote
+from urllib.error import HTTPError
+from urllib.parse import quote, urlencode
+from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
 PROJET = 'qg-le-comptoir'
@@ -148,19 +152,71 @@ def notifications(annonces, evenements, etat, maintenant):
     return envois, nouvel
 
 
-# ---------- Accès Google ----------
+# ---------- Accès Google (fédération d'identité GitHub, sans clé) ----------
+NUMERO = '139731513780'
+FOURNISSEUR = '//iam.googleapis.com/projects/%s/locations/global/workloadIdentityPools/github/providers/depot' % NUMERO
+COMPTE = 'qg-notifications@%s.iam.gserviceaccount.com' % PROJET
+
+
+class Reponse:
+    def __init__(self, code, texte):
+        self.status_code, self.text = code, texte
+
+    def json(self):
+        return json.loads(self.text or '{}')
+
+    def raise_for_status(self):
+        if self.status_code >= 300:
+            raise RuntimeError('HTTP %d : %s' % (self.status_code, self.text[:300]))
+
+
+class Session:
+    """Petit client HTTP (bibliothèque standard) : aucune dépendance à installer."""
+    def __init__(self, jeton=None):
+        self.headers = {'Authorization': 'Bearer ' + jeton} if jeton else {}
+
+    def requete(self, methode, url, params=None, json_=None, headers=None, data=None, timeout=20):
+        if params:
+            url += ('&' if '?' in url else '?') + urlencode(params)
+        h = dict(self.headers, **(headers or {}))
+        corps = None
+        if json_ is not None:
+            corps = json.dumps(json_).encode(); h['Content-Type'] = 'application/json'
+        elif data is not None:
+            corps = urlencode(data).encode(); h['Content-Type'] = 'application/x-www-form-urlencoded'
+        r = Request(url, data=corps, headers=h, method=methode)
+        try:
+            with urlopen(r, timeout=timeout) as rep:
+                return Reponse(rep.status, rep.read().decode())
+        except HTTPError as e:
+            return Reponse(e.code, e.read().decode(errors='replace'))
+
+    def get(self, url, **k): return self.requete('GET', url, **k)
+    def delete(self, url, **k): return self.requete('DELETE', url, **k)
+    def post(self, url, json=None, **k): return self.requete('POST', url, json_=json, **k)
+    def patch(self, url, json=None, **k): return self.requete('PATCH', url, json_=json, **k)
+
+
 def session():
-    import requests
-    from google.auth.transport.requests import Request
-    from google.oauth2 import service_account
-    info = json.loads(os.environ['QG_FIREBASE_SA'])
-    cred = service_account.Credentials.from_service_account_info(info, scopes=[
-        'https://www.googleapis.com/auth/datastore',
-        'https://www.googleapis.com/auth/firebase.messaging'])
-    cred.refresh(Request())
-    s = requests.Session()
-    s.headers['Authorization'] = 'Bearer ' + cred.token
-    return s
+    # 1. Jeton d'identité GitHub, destiné au fournisseur Google du projet
+    gh = Session(os.environ['ACTIONS_ID_TOKEN_REQUEST_TOKEN'])
+    r = gh.get(os.environ['ACTIONS_ID_TOKEN_REQUEST_URL'], params={'audience': 'https:' + FOURNISSEUR})
+    r.raise_for_status()
+    identite = r.json()['value']
+    # 2. Échange contre un jeton Google fédéré
+    r = Session().post('https://sts.googleapis.com/v1/token', json={
+        'grantType': 'urn:ietf:params:oauth:grant-type:token-exchange',
+        'audience': FOURNISSEUR, 'scope': 'https://www.googleapis.com/auth/cloud-platform',
+        'requestedTokenType': 'urn:ietf:params:oauth:token-type:access_token',
+        'subjectToken': identite, 'subjectTokenType': 'urn:ietf:params:oauth:token-type:jwt'})
+    r.raise_for_status()
+    federe = r.json()['access_token']
+    # 3. Accès de courte durée au compte de service qg-notifications
+    r = Session(federe).post('https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/%s:generateAccessToken' % COMPTE,
+                             json={'scope': ['https://www.googleapis.com/auth/datastore',
+                                             'https://www.googleapis.com/auth/firebase.messaging'], 'lifetime': '600s'})
+    r.raise_for_status()
+    return Session(r.json()['accessToken'])
 
 
 def lire(s, collection):
@@ -177,8 +233,8 @@ def lire(s, collection):
 
 
 def main():
-    if not os.environ.get('QG_FIREBASE_SA'):
-        print('Pas de clé QG_FIREBASE_SA : rien à faire (voir README, « Notifications »).')
+    if not os.environ.get('ACTIONS_ID_TOKEN_REQUEST_URL'):
+        print('Hors de GitHub Actions (pas de jeton d\'identité) : rien à faire.')
         return 0
     s = session()
     maintenant = dt.datetime.now(PARIS)

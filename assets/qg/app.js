@@ -12,11 +12,11 @@ const TYPES = {
 const STATUTS = {a_faire:"À faire", en_cours:"En cours", fait:"Fait"};
 /* Données du club : une collection Firestore par rubrique. Les règles d'accès sont dans outils/qg/firestore.rules. */
 const COLLS=["membres","evenements","taches","annonces","presences","preparations"];
-const PUBLIC_COLLS=["membres","evenements","annonces","presences"];   /* visibles par les membres du club */
+const PUBLIC_COLLS=["membres","evenements","annonces","presences","revisions"];   /* visibles par les membres du club */
 const roleOf = a => (a&&a.role) || (a&&a.membreId ? "bureau" : "membre");
 const OWNER=((window.QG_FIREBASE||{}).proprietaire||"jblucas.denis@audencia.com").toLowerCase();
 const S = {
-  membres:[], evenements:[], taches:[], annonces:[], presences:[], preparations:[], acces:[],
+  membres:[], evenements:[], taches:[], annonces:[], presences:[], preparations:[], acces:[], revisions:[], rev:null,
   authUser:null, authView:"login", authMsg:null, authEmail:"", installEvt:null, isAdmin:false, denied:false,
   me:null, user:null, db:null, canWrite:true, live:false, offline:false,
   loaded:{}, tab:"agenda", weekOffset:0, filtre:"actives", names:{}, now:new Date()
@@ -378,7 +378,7 @@ function installHint(){
 }
 
 /* ---------- Rendu global ---------- */
-function loadedAll(){ return S.offline || ["membres","evenements","taches","annonces","presences","preparations"].every(k=>S.loaded[k]); }
+function loadedAll(){ return S.offline || ["membres","evenements","taches","annonces","presences","preparations","revisions"].every(k=>S.loaded[k]); }
 
 /* ---------- Coordination ---------- */
 const SUGG = {
@@ -529,7 +529,8 @@ function render(){
   }
   S.lastGate="";
   ["taches","coord"].forEach(t=>{ $("#tab-"+t).hidden=!S.bureau; });
-  $("nav.tabs .wrap").style.gridTemplateColumns="repeat("+(S.bureau?5:3)+",1fr)";
+  $("nav.tabs .wrap").style.gridTemplateColumns="repeat("+(S.bureau?6:4)+",1fr)";
+  document.body.classList.toggle("protege", protege());
   if(!S.bureau && (S.tab==="taches"||S.tab==="coord")) S.tab="agenda";
   renderNotifBar();
   renderNow();
@@ -540,7 +541,7 @@ function render(){
   const addFocus = active && active.id && active.id.startsWith("add-") ? {id:active.id,v:active.value} : null;
   const keep={}; ["acc-mail","acc-role","acc-nom","acc-mem","acc-admin"].forEach(id=>{ const el=document.getElementById(id); if(el) keep[id]=el.type==="checkbox"?el.checked:el.value; });
   const fid=active&&active.id&&keep.hasOwnProperty(active.id)?active.id:null;
-  view.innerHTML = S.tab==="agenda"?renderAgenda(): S.tab==="taches"?renderTaches(): S.tab==="annonces"?renderAnnonces(): S.tab==="coord"?renderCoord(): renderBureau();
+  view.innerHTML = S.tab==="agenda"?renderAgenda(): S.tab==="taches"?renderTaches(): S.tab==="annonces"?renderAnnonces(): S.tab==="coord"?renderCoord(): S.tab==="revisions"?renderRevisions(): renderBureau();
   if(addFocus){ const el=document.getElementById(addFocus.id); if(el){ el.value=addFocus.v; el.focus(); } }
   Object.keys(keep).forEach(id=>{ const el=document.getElementById(id); if(el){ if(el.type==="checkbox") el.checked=keep[id]; else el.value=keep[id]; } });
   if(fid&&document.getElementById(fid)) document.getElementById(fid).focus();
@@ -702,6 +703,7 @@ document.addEventListener("click",async e=>{
   const a=b.dataset.act;
   if(a==="week"){ const d=+b.dataset.d; S.weekOffset = d===0?0:S.weekOffset+d; render(); return; }
   if(a==="filtre"){ S.filtre=b.dataset.f; render(); return; }
+  if(a.startsWith("rev") && revAction(a,b)) return;
   if(!S.db) return;
   if(a==="newEvent") return eventSheet();
   if(a==="editOcc"){ const ev=S.evenements.find(x=>x.id===b.dataset.ev); if(ev) occSheet(ev,b.dataset.key); return; }
@@ -829,7 +831,7 @@ document.addEventListener("submit",async e=>{
 });
 
 /* ---------- Démarrage ---------- */
-const VALID=["agenda","taches","annonces","coord","bureau"];
+const VALID=["agenda","taches","annonces","revisions","coord","bureau"];
 function readHash(){ const h=(location.hash||"").slice(1); if(VALID.includes(h)) S.tab=h; }
 try{ const t=localStorage.getItem("qg-tab"); if(VALID.includes(t)) S.tab=t; }catch(_){}
 readHash();
@@ -837,18 +839,157 @@ window.addEventListener("hashchange",()=>{ readHash(); render(); });
 render();
 setInterval(()=>{ if(!$("#scrim")) render(); else renderNow(); },30000);
 
+/* ---------- Révisions : fiches et quiz (consultables uniquement dans l'appli) ---------- */
+const REV_KEY = id => "qg-erreurs-"+id;
+function revErrors(id){ try{ return JSON.parse(lsGet(REV_KEY(id))||"[]"); }catch(_){ return []; } }
+function setRevErrors(id,list){ lsSet(REV_KEY(id), JSON.stringify([...new Set(list)])); }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function filigrane(){
+  const who=(S.email||"QG du Comptoir")+" · "+new Intl.DateTimeFormat("fr-FR",{day:"numeric",month:"short"}).format(new Date());
+  return '<div class="filigrane" aria-hidden="true">'+Array.from({length:60},()=>'<span>'+esc(who)+'</span>').join("")+'</div>';
+}
+function renderRevisions(){
+  const it=S.rev&&S.revisions.find(r=>r.id===S.rev.id);
+  if(it) return it.type==="quiz"? renderQuiz(it) : renderFiche(it);
+  let h='<div class="sechead"><h2>Révisions</h2></div><p class="help">Fiches et quiz du club, à faire ici : ils ne se téléchargent pas et restent réservés aux inscrits.</p>';
+  if(!loadedAll()) return h+'<div class="empty"><b>Chargement…</b></div>';
+  if(!S.revisions.length) return h+'<div class="empty"><b>Rien pour l\'instant</b><span>Les fiches et les quiz de chaque cours apparaîtront ici.</span></div>';
+  const groups={};
+  [...S.revisions].sort((a,b)=>(a.matiere||"").localeCompare(b.matiere||"")||(a.ordre??99)-(b.ordre??99)).forEach(r=>{ (groups[r.matiere||"Autres"]=groups[r.matiere||"Autres"]||[]).push(r); });
+  h+='<div class="revlist">';
+  for(const [mat,list] of Object.entries(groups)){
+    h+='<section class="revgroup"><h3>'+esc(mat)+'</h3>';
+    for(const r of list){
+      const quiz=r.type==="quiz", n=quiz?(r.questions||[]).length:(r.sections||[]).length, err=quiz?revErrors(r.id).length:0;
+      h+='<div class="revcard"><div class="ico">'+(quiz?"QCM":"Fiche")+'</div><div><div class="ttl">'+esc(r.titre)+'</div><div class="sub2">'+
+        (quiz? n+' questions'+(err?' · '+err+' erreur'+(err>1?"s":"")+' à revoir':"") : n+' fiche'+(n>1?"s":""))+'</div></div>'+
+        '<button class="btn small gold" data-act="revOpen" data-id="'+esc(r.id)+'">'+(quiz?"Commencer":"Ouvrir")+'</button></div>';
+    }
+    h+='</section>';
+  }
+  return h+'</div>';
+}
+function quizPool(it){
+  const qs=it.questions||[], st=S.rev;
+  return qs.map((q,i)=>i).filter(i=>st.parts.has(qs[i].p));
+}
+function startQuiz(it, indices){
+  const st=S.rev;
+  const nb=st.nb==="tout"?indices.length:Math.min(+st.nb,indices.length);
+  st.order=shuffle(indices).slice(0,nb).map(i=>({i,opts:shuffle((it.questions[i].o||[]).map((_,k)=>k))}));
+  st.pos=0; st.choix=null; st.bons=0; st.rates=[]; st.step="q";
+}
+function renderQuiz(it){
+  const st=S.rev, parts=it.parts||[], qs=it.questions||[];
+  const back='<button class="btn ghost small" data-act="revBack">← Révisions</button>';
+  let h='<div class="sechead"><h2>'+esc(it.titre)+'</h2>'+back+'</div><div class="quiz">'+filigrane();
+  if(st.step==="setup"){
+    const counts={}; qs.forEach(q=>counts[q.p]=(counts[q.p]||0)+1);
+    const pool=quizPool(it).length, err=revErrors(it.id).filter(i=>i<qs.length);
+    h+='<p class="help" style="margin:0">'+esc(it.source||"")+'</p><b>Parties du cours</b><div class="qparts">'+
+      (parts.length?parts:[{id:undefined,name:"Tout le cours"}]).map(p=>'<label class="qpart"><input type="checkbox" data-rev-part="'+esc(p.id)+'"'+(st.parts.has(p.id)?" checked":"")+'><span><b>'+esc(p.name)+'</b><small>'+esc(p.sub||"")+' · '+(counts[p.id]||0)+' q.</small></span></label>').join("")+'</div>'+
+      '<b>Nombre de questions</b><div class="qseg">'+["10","20","40","tout"].map(v=>'<label><input type="radio" name="revnb" value="'+v+'"'+(st.nb===v?" checked":"")+'> '+(v==="tout"?"Tout ("+pool+")":v)+'</label>').join("")+'</div>'+
+      '<div class="row" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn gold" data-act="revStart"'+(pool?"":" disabled")+'>Commencer</button>'+
+      (err.length?'<button class="btn" data-act="revErr">Refaire mes erreurs ('+err.length+')</button>':"")+'</div>';
+  } else if(st.step==="q"){
+    const cur=st.order[st.pos], q=qs[cur.i], part=parts.find(p=>p.id===q.p);
+    h+='<div class="qtop"><span>Question <b>'+(st.pos+1)+'/'+st.order.length+'</b>'+(part?' · '+esc(part.name):"")+'</span><span>Score <b>'+st.bons+'</b></span></div>'+
+      '<div class="qbar"><i style="width:'+Math.round(st.pos/st.order.length*100)+'%"></i></div>'+
+      '<p class="qq">'+esc(q.q)+'</p><div class="qopts">'+cur.opts.map((k,n)=>{
+        let cls=""; if(st.choix!==null){ if(k===q.a) cls=" good"; else if(k===st.choix) cls=" bad"; else cls=" dim"; }
+        return '<button class="qopt'+cls+'" data-act="revAns" data-k="'+k+'"'+(st.choix!==null?" disabled":"")+'><span class="l">'+"ABCDEF"[n]+'</span><span>'+esc(q.o[k])+'</span></button>';
+      }).join("")+'</div>';
+    if(st.choix!==null){
+      const ok=st.choix===q.a;
+      h+='<div class="qfb '+(ok?"ok":"ko")+'"><b>'+(ok?"Bonne réponse":"Raté. Bonne réponse : "+esc(q.o[q.a]))+'</b>'+(q.e?'<span>'+esc(q.e)+'</span>':"")+'</div>'+
+        '<div><button class="btn gold" data-act="revNext">'+(st.pos+1<st.order.length?"Question suivante":"Voir mon score")+'</button></div>';
+    }
+  } else {
+    const n=st.order.length, pct=n?Math.round(st.bons/n*100):0;
+    h+='<div class="qbig">'+st.bons+'/'+n+'</div><p style="margin:0;font-weight:700">'+pct+' % de bonnes réponses'+(pct>=80?" : excellent !":pct>=50?" : continue comme ça.":" : refais tes erreurs pour progresser.")+'</p>'+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap">'+(st.rates.length?'<button class="btn gold" data-act="revRedo">Refaire mes erreurs ('+st.rates.length+')</button>':"")+'<button class="btn" data-act="revNew">Nouveau quiz</button></div>';
+    if(st.rates.length){
+      h+='<b>À revoir</b>'+st.rates.map(i=>{ const q=qs[i]; return '<div class="qmiss"><span class="n">'+esc((parts.find(p=>p.id===q.p)||{}).name||"")+'</span><span>'+esc(q.q)+'</span><span><b>'+esc(q.o[q.a])+'</b></span>'+(q.e?'<span class="qsrc">'+esc(q.e)+'</span>':"")+'</div>'; }).join("");
+    }
+  }
+  return h+'</div>';
+}
+function renderFiche(it){
+  let h='<div class="sechead"><h2>'+esc(it.titre)+'</h2><button class="btn ghost small" data-act="revBack">← Révisions</button></div><div class="quiz fiche">'+filigrane();
+  (it.sections||[]).forEach(s=>{
+    h+='<section style="display:flex;flex-direction:column;gap:8px">'+(s.titre?'<h3 class="qq" style="font-size:20px">'+esc(s.titre)+'</h3>':"");
+    (s.blocs||[]).forEach(b=>{
+      if(b.t==="p") h+='<p style="margin:0">'+esc(b.v)+'</p>';
+      else if(b.t==="liste") h+='<ul style="margin:0;padding-left:20px">'+(b.v||[]).map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul>';
+      else if(b.t==="encadre") h+='<div class="qfb '+(b.style==="attention"?"ko":"ok")+'"><b>'+esc(b.titre||"")+'</b><span>'+esc(b.v)+'</span></div>';
+      else if(b.t==="tableau") h+='<div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:14px;min-width:100%">'+(b.v||[]).map((r,ri)=>'<tr>'+r.map(c=>(ri?'<td':'<th')+' style="border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top">'+esc(c)+(ri?'</td>':'</th>')).join("")+'</tr>').join("")+'</table></div>';
+    });
+    h+='</section>';
+  });
+  return h+'</div>';
+}
+function revAction(a,b){
+  const it=S.rev&&S.revisions.find(r=>r.id===S.rev.id);
+  if(a==="revOpen"){ const r=S.revisions.find(x=>x.id===b.dataset.id); if(!r) return true;
+    S.rev={id:r.id,step:"setup",nb:"20",parts:new Set((r.parts||[]).map(p=>p.id).concat((r.parts||[]).length?[]:[undefined]))}; render(); window.scrollTo(0,0); return true; }
+  if(a==="revBack"){ S.rev=null; render(); window.scrollTo(0,0); return true; }
+  if(!it) return false;
+  if(a==="revStart"){ startQuiz(it, quizPool(it)); render(); window.scrollTo(0,0); return true; }
+  if(a==="revErr"){ const err=revErrors(it.id).filter(i=>i<(it.questions||[]).length); S.rev.nb="tout"; startQuiz(it, err); render(); window.scrollTo(0,0); return true; }
+  if(a==="revAns"){ if(S.rev.choix!==null) return true; const k=+b.dataset.k, cur=S.rev.order[S.rev.pos], q=it.questions[cur.i];
+    S.rev.choix=k; const errs=revErrors(it.id);
+    if(k===q.a){ S.rev.bons++; setRevErrors(it.id, errs.filter(i=>i!==cur.i)); } else { S.rev.rates.push(cur.i); setRevErrors(it.id, errs.concat([cur.i])); }
+    render(); return true; }
+  if(a==="revNext"){ S.rev.pos++; S.rev.choix=null; if(S.rev.pos>=S.rev.order.length) S.rev.step="fin"; render(); window.scrollTo(0,0); return true; }
+  if(a==="revRedo"){ S.rev.nb="tout"; startQuiz(it, S.rev.rates.slice()); render(); window.scrollTo(0,0); return true; }
+  if(a==="revNew"){ S.rev.step="setup"; render(); window.scrollTo(0,0); return true; }
+  return false;
+}
+document.addEventListener("change",e=>{
+  const el=e.target;
+  if(el.dataset && "revPart" in el.dataset && S.rev){ const id=el.dataset.revPart==="undefined"?undefined:el.dataset.revPart; if(el.checked) S.rev.parts.add(id); else S.rev.parts.delete(id); render(); }
+  else if(el.name==="revnb" && S.rev){ S.rev.nb=el.value; render(); }
+});
+
+/* Protection du contenu : écran noir dès qu'on quitte l'appli, pas de copie, pas d'impression */
+const protege = () => S.tab==="revisions" && !!S.db;
+let voileTimer=null;
+function voile(on, ms){
+  const v=$("#voile"); if(!v) return;
+  clearTimeout(voileTimer);
+  if(on && protege()){ v.hidden=false; if(ms) voileTimer=setTimeout(()=>{ if(document.visibilityState==="visible"&&document.hasFocus()) v.hidden=true; },ms); }
+  else if(!on) v.hidden=true;
+}
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState!=="visible") voile(true); else setTimeout(()=>voile(false),150); });
+window.addEventListener("blur",()=>voile(true));
+window.addEventListener("pagehide",()=>voile(true));
+window.addEventListener("focus",()=>setTimeout(()=>voile(false),150));
+["contextmenu","copy","cut","dragstart","selectstart"].forEach(ev=>document.addEventListener(ev,e=>{ if(protege() && !e.target.closest("input,textarea")) e.preventDefault(); }));
+document.addEventListener("keydown",e=>{
+  if(!protege()) return;
+  const k=(e.key||"").toLowerCase();
+  if(k==="printscreen"||k==="meta"||k==="os"||(e.metaKey&&e.shiftKey)||((e.ctrlKey||e.metaKey)&&["p","s"].includes(k))){
+    if(k==="p"||k==="s") e.preventDefault();
+    voile(true,1500);
+  }
+});
+document.addEventListener("keyup",e=>{
+  if(protege() && (e.key||"").toLowerCase()==="printscreen"){ voile(true,1500); try{ navigator.clipboard.writeText("Contenu protégé : QG du Comptoir").catch(()=>{}); }catch(_){} }
+});
+window.addEventListener("beforeprint",()=>voile(true,3000));
+
 /* ---------- Connexion (Firebase) ---------- */
 let unsubs=[], dataTimer=null;
 function stopData(){
   unsubs.forEach(u=>{ try{u();}catch(_){} }); unsubs=[]; clearTimeout(dataTimer);
-  S.db=null; S.loaded={}; S.live=false; S.slow=false; COLLS.forEach(c=>S[c]=[]); S.acces=[];
+  S.db=null; S.loaded={}; S.live=false; S.slow=false; COLLS.forEach(c=>S[c]=[]); S.acces=[]; S.revisions=[]; S.rev=null;
   S.me=null; S.email=null; S.myName=""; S.bureau=false; S.isAdmin=false; S.isOwner=false; S.canWrite=false; S.denied=false;
 }
 function startData(fs){
   const fresh={};
   dataTimer=setTimeout(()=>{ if(!S.live){ S.slow=true; render(); } },10000);
   if(!S.bureau) ["taches","preparations"].forEach(c=>{ S.loaded[c]=true; fresh[c]=true; });
-  COLLS.filter(c=>S.bureau||PUBLIC_COLLS.includes(c)).concat(S.isAdmin?["acces"]:[]).forEach(name=>{
+  COLLS.filter(c=>S.bureau||PUBLIC_COLLS.includes(c)).concat(["revisions"],S.isAdmin?["acces"]:[]).forEach(name=>{
     unsubs.push(fs.collection(name).onSnapshot(snap=>{
       S[name]=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
       S.loaded[name]=true;
