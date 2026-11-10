@@ -12,6 +12,8 @@ const TYPES = {
 const STATUTS = {a_faire:"À faire", en_cours:"En cours", fait:"Fait"};
 /* Données du club : une collection Firestore par rubrique. Les règles d'accès sont dans outils/qg/firestore.rules. */
 const COLLS=["membres","evenements","taches","annonces","presences","preparations"];
+const PUBLIC_COLLS=["membres","evenements","annonces","presences"];   /* visibles par les membres du club */
+const roleOf = a => (a&&a.role) || (a&&a.membreId ? "bureau" : "membre");
 const OWNER=((window.QG_FIREBASE||{}).proprietaire||"jblucas.denis@audencia.com").toLowerCase();
 const S = {
   membres:[], evenements:[], taches:[], annonces:[], presences:[], preparations:[], acces:[],
@@ -102,10 +104,11 @@ const lateTasks = () => S.taches.filter(t=>t.statut!=="fait" && (dueInfo(t)||{})
 
 /* ---------- Personnes : chaque compte est relié à une fiche du bureau ---------- */
 function wantProfiles(){}
-const pname = id => { const m=membre(id); return m? m.nom : (id===S.me?"Toi":"Un membre"); };
+const personName = id => { const p=S.presences.find(x=>x.uid===id&&x.nom); return p? p.nom : (id===S.me? S.myName : ""); };
+const pname = id => { const m=membre(id); return m? m.nom : (personName(id) || (id===S.me?"Toi":"Un membre")); };
 const HUES=["#1F3A7A","#8E6A12","#2F7F5F","#7A3E9D","#1F7A8A","#A2481F","#4A5A7A","#7A2E4A"];
 function initials(id){
-  const m=membre(id), n=(m&&m.nom)||"?", parts=n.split(/[\s-]+/).filter(Boolean);
+  const m=membre(id), n=(m&&m.nom)||personName(id)||"?", parts=n.split(/[\s-]+/).filter(Boolean);
   const txt=((parts[0]||"?")[0]+((parts[1]||"")[0]||"")).toUpperCase();
   let h=0; for(const c of String(id)) h=(h*31+c.charCodeAt(0))>>>0;
   return '<span class="ini" style="background:'+HUES[h%HUES.length]+'" title="'+esc(n)+'">'+esc(txt)+'</span>';
@@ -140,14 +143,14 @@ function renderNow(){
   const late=lateTasks().length;
   const enCours=S.taches.filter(t=>t.statut==="en_cours").length;
   const pinned=S.annonces.filter(a=>a.epingle).length;
-  $("#strip").innerHTML='<span>Aujourd\'hui : <b>'+(today.length||"aucun")+'</b> rendez-vous</span><span class="sep">·</span>'+
-    '<span><b>'+enCours+'</b> tâche'+(enCours>1?"s":"")+' en cours</span><span class="sep">·</span>'+
-    '<span><b'+(late?' style="color:#FFB08A"':"")+'>'+late+'</b> en retard</span>'+
+  $("#strip").innerHTML='<span>Aujourd\'hui : <b>'+(today.length||"aucun")+'</b> rendez-vous</span>'+
+    (S.bureau?'<span class="sep">·</span><span><b>'+enCours+'</b> tâche'+(enCours>1?"s":"")+' en cours</span><span class="sep">·</span>'+
+    '<span><b'+(late?' style="color:#FFB08A"':"")+'>'+late+'</b> en retard</span>':"")+
     (pinned?'<span class="sep">·</span><span><b>'+pinned+'</b> annonce'+(pinned>1?"s":"")+' épinglée'+(pinned>1?"s":"")+'</span>':"");
-  const b=$("#lateBadge"); b.hidden=!late; b.textContent=late;
+  const b=$("#lateBadge"); b.hidden=!late||!S.bureau; b.textContent=late;
 }
 function presBtn(o){
-  if(!S.me || !S.canWrite || o.annule || o.end<S.now) return "";
+  if(!S.me || !S.db || o.annule || o.end<S.now) return "";
   const on=amPresent(o.occ);
   return '<button class="btn small'+(on?" on":"")+'" data-act="pres" data-occ="'+esc(o.occ)+'">'+(on?"✓ J'y serai":"Je viens")+'</button>';
 }
@@ -302,18 +305,21 @@ function renderBureau(){
 
 /* ---------- Accès au QG (administrateurs) ---------- */
 function renderAcces(){
-  const list=[...S.acces].sort((a,b)=>((membre(a.membreId)||{}).ordre??99)-((membre(b.membreId)||{}).ordre??99)||a.id.localeCompare(b.id));
+  const list=[...S.acces].sort((a,b)=>(roleOf(a)===roleOf(b)?0:roleOf(a)==="bureau"?-1:1)||((membre(a.membreId)||{}).ordre??99)-((membre(b.membreId)||{}).ordre??99)||(a.nom||a.id).localeCompare(b.nom||b.id));
   let h='<div class="sechead" style="margin-top:8px"><h2>Accès au QG</h2></div>'+
-    '<p class="help">Seules les adresses e-mail de cette liste peuvent entrer, après avoir vérifié leur adresse. Chaque adresse est reliée à une fiche du bureau. Les administrateurs gèrent cette liste.</p>'+
+    '<p class="help">Seules les adresses e-mail de cette liste peuvent entrer, après avoir vérifié leur adresse. Le bureau voit tout le QG ; les membres du club voient l\'agenda, les annonces et la liste du bureau, et peuvent dire « Je viens ». Les administrateurs gèrent cette liste.</p>'+
     '<form class="addacc" id="accForm"><div class="grid2"><div class="field"><label for="acc-mail">Adresse e-mail</label><input id="acc-mail" type="email" required autocomplete="off" placeholder="prenom.nom@audencia.com"></div>'+
-    '<div class="field"><label for="acc-mem">Fiche du bureau</label><select id="acc-mem" required>'+memberOptions(null).replace("— Personne —","Choisir…")+'</select></div></div>'+
-    '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="check"><input type="checkbox" id="acc-admin"> Administrateur (gère les accès)</label><button class="btn gold small" type="submit" style="margin-left:auto">Ouvrir l\'accès</button></div></form>';
+    '<div class="field"><label for="acc-role">Type d\'accès</label><select id="acc-role"><option value="membre">Membre du club : agenda et annonces</option><option value="bureau">Bureau : tout le QG</option></select></div></div>'+
+    '<div class="field" id="acc-nom-w"><label for="acc-nom">Prénom et nom</label><input id="acc-nom" maxlength="80" autocomplete="off"></div>'+
+    '<div class="field" id="acc-mem-w" hidden><label for="acc-mem">Fiche du bureau</label><select id="acc-mem">'+memberOptions(null).replace("— Personne —","Choisir…")+'</select></div>'+
+    '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="check" id="acc-admin-w" hidden><input type="checkbox" id="acc-admin"> Administrateur (gère les accès)</label><button class="btn gold small" type="submit" style="margin-left:auto">Ouvrir l\'accès</button></div></form>';
   h+='<div class="acces">';
   if(!list.length) h+='<div class="empty"><b>Aucun accès</b></div>';
   for(const a of list){
-    const m=membre(a.membreId), self=a.id===S.email, owner=a.id===OWNER;
-    h+='<div class="arow"><div><div class="em">'+esc(a.id)+'</div><div class="sub2">'+esc(m?m.nom+" · "+(m.role||"Membre"):"Fiche introuvable")+(a.admin||owner?" · administrateur":"")+(self?" · toi":"")+'</div></div>'+
-      (owner?'<span class="chip gold">Président</span>':'<div class="acts"><button class="btn ghost small" data-act="accAdmin" data-id="'+esc(a.id)+'">'+(a.admin?"Retirer admin":"Rendre admin")+'</button>'+
+    const m=membre(a.membreId), self=a.id===S.email, owner=a.id===OWNER, bur=roleOf(a)==="bureau";
+    const who=bur?(m?m.nom+" · "+(m.role||"Bureau"):"Fiche du bureau introuvable"):(a.nom||"Membre")+" · membre du club";
+    h+='<div class="arow"><div><div class="em">'+esc(a.id)+'</div><div class="sub2">'+esc(who)+(a.admin||owner?" · administrateur":"")+(self?" · toi":"")+'</div></div>'+
+      (owner?'<span class="chip gold">Président</span>':'<div class="acts">'+(bur?'<button class="btn ghost small" data-act="accAdmin" data-id="'+esc(a.id)+'">'+(a.admin?"Retirer admin":"Rendre admin")+'</button>':"")+
         (self?"":'<button class="btn ghost small" data-act="accDel" data-id="'+esc(a.id)+'">Retirer</button>')+'</div>')+'</div>';
   }
   h+='</div>';
@@ -522,19 +528,24 @@ function render(){
     return;
   }
   S.lastGate="";
+  ["taches","coord"].forEach(t=>{ $("#tab-"+t).hidden=!S.bureau; });
+  $("nav.tabs .wrap").style.gridTemplateColumns="repeat("+(S.bureau?5:3)+",1fr)";
+  if(!S.bureau && (S.tab==="taches"||S.tab==="coord")) S.tab="agenda";
+  renderNotifBar();
   renderNow();
   const active=document.activeElement;
   const draft = $("#annTxt") ? $("#annTxt").value : null;
   const pinChk = $("#annPin") ? $("#annPin").checked : false;
   const keepFocus = active && active.id==="annTxt";
   const addFocus = active && active.id && active.id.startsWith("add-") ? {id:active.id,v:active.value} : null;
-  const keep={}; ["acc-mail","acc-mem","acc-admin"].forEach(id=>{ const el=document.getElementById(id); if(el) keep[id]=el.type==="checkbox"?el.checked:el.value; });
+  const keep={}; ["acc-mail","acc-role","acc-nom","acc-mem","acc-admin"].forEach(id=>{ const el=document.getElementById(id); if(el) keep[id]=el.type==="checkbox"?el.checked:el.value; });
   const fid=active&&active.id&&keep.hasOwnProperty(active.id)?active.id:null;
   view.innerHTML = S.tab==="agenda"?renderAgenda(): S.tab==="taches"?renderTaches(): S.tab==="annonces"?renderAnnonces(): S.tab==="coord"?renderCoord(): renderBureau();
   if(addFocus){ const el=document.getElementById(addFocus.id); if(el){ el.value=addFocus.v; el.focus(); } }
   Object.keys(keep).forEach(id=>{ const el=document.getElementById(id); if(el){ if(el.type==="checkbox") el.checked=keep[id]; else el.value=keep[id]; } });
   if(fid&&document.getElementById(fid)) document.getElementById(fid).focus();
-  if(loadedAll()){ const al=coordAlerts(), n=al.notReady+al.unassigned, cb=$("#coordBadge"); cb.hidden=!n; cb.textContent=n; }
+  syncAccForm();
+  if(loadedAll()&&S.bureau){ const al=coordAlerts(), n=al.notReady+al.unassigned, cb=$("#coordBadge"); cb.hidden=!n; cb.textContent=n; }
   if(draft!==null && $("#annTxt")){ $("#annTxt").value=draft; $("#annPin").checked=pinChk; if(keepFocus) $("#annTxt").focus(); }
   document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));
   const st=$("#status");
@@ -702,7 +713,7 @@ document.addEventListener("click",async e=>{
     if(!S.me) return; const occ=b.dataset.occ; const ref=col("presences").doc(occ+"__"+S.me);
     b.disabled=true;
     if(amPresent(occ)) await w(ref.delete(),"Présence retirée");
-    else await w(ref.set({occ,uid:S.me,at:Date.now()}),"Noté, tu es attendu·e");
+    else await w(ref.set({occ,uid:S.me,mail:S.email,nom:S.myName||(membre(S.me)||{}).nom||"",at:Date.now()}),"Noté, tu es attendu·e");
     return;
   }
   if(a==="cycle"){
@@ -753,8 +764,13 @@ document.addEventListener("click",async e=>{
     return;
   }
 });
+function syncAccForm(){
+  const r=$("#acc-role"); if(!r) return; const bur=r.value==="bureau";
+  $("#acc-nom-w").hidden=bur; $("#acc-mem-w").hidden=!bur; $("#acc-admin-w").hidden=!bur;
+}
 document.addEventListener("change",async e=>{
-  const el=e.target; if(!S.db) return;
+  const el=e.target; if(el.id==="acc-role"){ syncAccForm(); return; }
+  if(!S.db) return;
   if(el.id==="importFile"){
     const f=el.files&&el.files[0]; el.value=""; if(!f||!S.isAdmin) return;
     let data; try{ data=JSON.parse(await f.text()); }catch(_){ toast("Fichier illisible : choisis le fichier .json de sauvegarde."); return; }
@@ -782,11 +798,19 @@ document.addEventListener("submit",async e=>{
   if(["loginForm","signupForm","resetForm"].includes(e.target.id)){ e.preventDefault(); authSubmit(e.target); return; }
   if(e.target.id==="accForm"){
     e.preventDefault(); if(!S.db||!S.isAdmin) return;
-    const mail=$("#acc-mail").value.trim().toLowerCase(), mem=$("#acc-mem").value, adm=$("#acc-admin").checked;
+    const mail=$("#acc-mail").value.trim().toLowerCase(), role=$("#acc-role").value;
     if(!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(mail)){ toast("Adresse e-mail invalide."); return; }
-    if(!membre(mem)){ toast("Choisis la fiche du bureau de cette personne."); return; }
-    const ok=await w(col("acces").doc(mail).set({membreId:mem,admin:adm,ajoutePar:S.me||null,ajouteLe:Date.now()}),"Accès ouvert pour "+membre(mem).nom.split(" ")[0]);
-    if(ok&&$("#acc-mail")){ $("#acc-mail").value=""; $("#acc-admin").checked=false; }
+    let body, nom;
+    if(role==="bureau"){
+      const mem=$("#acc-mem").value; if(!membre(mem)){ toast("Choisis la fiche du bureau de cette personne."); return; }
+      body={role:"bureau",membreId:mem,admin:$("#acc-admin").checked}; nom=membre(mem).nom;
+    } else {
+      nom=$("#acc-nom").value.trim(); if(!nom){ toast("Indique le prénom et le nom du membre."); return; }
+      body={role:"membre",nom,admin:false};
+    }
+    Object.assign(body,{ajoutePar:S.me||null,ajouteLe:Date.now()});
+    const ok=await w(col("acces").doc(mail).set(body),"Accès ouvert pour "+nom.split(" ")[0]);
+    if(ok&&$("#acc-mail")){ $("#acc-mail").value=""; $("#acc-nom").value=""; $("#acc-admin").checked=false; }
     return;
   }
   if(e.target.classList.contains("prepForm")){
@@ -818,12 +842,13 @@ let unsubs=[], dataTimer=null;
 function stopData(){
   unsubs.forEach(u=>{ try{u();}catch(_){} }); unsubs=[]; clearTimeout(dataTimer);
   S.db=null; S.loaded={}; S.live=false; S.slow=false; COLLS.forEach(c=>S[c]=[]); S.acces=[];
-  S.me=null; S.email=null; S.isAdmin=false; S.isOwner=false; S.denied=false;
+  S.me=null; S.email=null; S.myName=""; S.bureau=false; S.isAdmin=false; S.isOwner=false; S.canWrite=false; S.denied=false;
 }
 function startData(fs){
   const fresh={};
   dataTimer=setTimeout(()=>{ if(!S.live){ S.slow=true; render(); } },10000);
-  COLLS.concat(S.isAdmin?["acces"]:[]).forEach(name=>{
+  if(!S.bureau) ["taches","preparations"].forEach(c=>{ S.loaded[c]=true; fresh[c]=true; });
+  COLLS.filter(c=>S.bureau||PUBLIC_COLLS.includes(c)).concat(S.isAdmin?["acces"]:[]).forEach(name=>{
     unsubs.push(fs.collection(name).onSnapshot(snap=>{
       S[name]=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
       S.loaded[name]=true;
@@ -846,11 +871,13 @@ async function enter(u){
     let acc=null;
     try{ const snap=await fs.collection("acces").doc(mail).get(); acc=snap.exists?snap.data():null; }
     catch(e){ if(e.code!=="permission-denied") throw e; }
-    if(!acc && mail===OWNER){ acc={membreId:"lucas",admin:true,ajouteLe:Date.now()}; await fs.collection("acces").doc(mail).set(acc); }
+    if(!acc && mail===OWNER){ acc={role:"bureau",membreId:"lucas",admin:true,ajouteLe:Date.now()}; await fs.collection("acces").doc(mail).set(acc); }
     if(S.authUser!==u) return;
     if(!acc){ S.denied=true; render(); return; }
-    S.email=mail; S.me=acc.membreId||null; S.isAdmin=!!acc.admin||mail===OWNER; S.isOwner=S.isAdmin; S.canWrite=true; S.db=fs;
-    render(); startData(fs);
+    S.email=mail; S.bureau=roleOf(acc)==="bureau"||mail===OWNER;
+    S.me=S.bureau?(acc.membreId||null):"e:"+mail; S.myName=S.bureau?"":(acc.nom||"");
+    S.isAdmin=S.bureau&&(!!acc.admin||mail===OWNER); S.isOwner=S.isAdmin; S.canWrite=S.bureau; S.db=fs;
+    render(); startData(fs); enableNotifs(false);
   }catch(e){
     S.authMsg={t:"Impossible de vérifier ton accès : vérifie ta connexion internet, puis reconnecte-toi."};
     try{ await S.auth.signOut(); }catch(_){}
@@ -892,6 +919,8 @@ document.addEventListener("click",async e=>{
   if(a==="logout"){ S.authView="login"; S.authMsg=null; try{ await S.auth.signOut(); }catch(_){} return; }
   if(a==="install"&&S.installEvt){ const ev=S.installEvt; S.installEvt=null; try{ await ev.prompt(); }catch(_){} render(); return; }
   if(!S.authUser) return;
+  if(a==="notifOn"){ b.disabled=true; await enableNotifs(true); return; }
+  if(a==="notifHide"){ lsSet(b.dataset.k,"1"); renderNotifBar(); return; }
   if(a==="resend"){ b.disabled=true;
     try{ await S.authUser.sendEmailVerification(backUrl()); S.authMsg={ok:true,t:"Lien renvoyé à "+S.authUser.email+"."}; }catch(err){ S.authMsg=authErr(err); }
     render(); return; }
@@ -904,6 +933,52 @@ document.addEventListener("click",async e=>{
 });
 $("#logoutBtn").addEventListener("click",async()=>{ S.authView="login"; S.authMsg=null; try{ await S.auth.signOut(); }catch(_){} });
 window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); S.installEvt=e; S.lastGate=""; render(); });
+
+/* ---------- Notifications (annonces, rendez-vous, rappels) ---------- */
+const NOTIF={supported:false,checked:false};
+const lsGet = k => { try{ return localStorage.getItem(k); }catch(_){ return null; } };
+const lsSet = (k,v) => { try{ localStorage.setItem(k,v); }catch(_){} };
+async function notifSupport(){
+  try{ return "serviceWorker" in navigator && "Notification" in window && !!(window.firebase&&firebase.messaging) && await firebase.messaging.isSupported(); }
+  catch(_){ return false; }
+}
+function renderNotifBar(){
+  const el=$("#notifBar"); if(!el) return;
+  let h="";
+  if(S.db && NOTIF.checked){
+    const ios=/iphone|ipad|ipod/i.test(navigator.userAgent), standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+    if(!NOTIF.supported){
+      if(ios && !standalone && !lsGet("qg-notif-ios")) h='<span><b>Notifications :</b> sur iPhone, installe d\'abord l\'appli (Partager, puis « Sur l\'écran d\'accueil ») et ouvre-la depuis son icône.</span><button class="linkbtn" data-auth="notifHide" data-k="qg-notif-ios">Plus tard</button>';
+    } else if(Notification.permission==="default" && !lsGet("qg-notif-plustard")){
+      h='<span><b>Notifications</b> : nouvelles annonces, rendez-vous ajoutés ou modifiés, et un rappel 2 h avant chaque rendez-vous.</span><span class="nb-acts"><button class="btn small gold" data-auth="notifOn">Activer</button><button class="linkbtn" data-auth="notifHide" data-k="qg-notif-plustard">Plus tard</button></span>';
+    }
+  }
+  el.innerHTML=h; $("#notifWrap").hidden=!h;
+}
+function waitActive(reg){
+  if(reg.active) return Promise.resolve(reg);
+  const sw=reg.installing||reg.waiting;
+  return new Promise(res=>{ if(!sw) return res(reg); sw.addEventListener("statechange",()=>{ if(sw.state==="activated") res(reg); }); });
+}
+async function enableNotifs(ask){
+  if(!NOTIF.checked){ NOTIF.supported=await notifSupport(); NOTIF.checked=true; }
+  if(!NOTIF.supported||!S.db||!S.email){ renderNotifBar(); return; }
+  try{
+    if(ask){
+      const p=await Notification.requestPermission();
+      if(p!=="granted"){ toast(p==="denied"?"Notifications refusées : tu peux les autoriser dans les réglages du navigateur.":"Notifications pas activées."); renderNotifBar(); return; }
+    }
+    if(Notification.permission!=="granted"){ renderNotifBar(); return; }
+    const reg=await waitActive(await navigator.serviceWorker.register("assets/qg/sw.js",{scope:"assets/qg/"}));
+    const tok=await firebase.messaging().getToken({vapidKey:window.QG_FIREBASE.vapidKey,serviceWorkerRegistration:reg});
+    if(tok){
+      const ua=navigator.userAgent, app=/iphone|ipad|ipod/i.test(ua)?"iPhone":/android/i.test(ua)?"Android":"Ordinateur";
+      await S.db.collection("jetons").doc(tok).set({mail:S.email,appareil:app,majLe:Date.now()});
+      if(ask) toast("Notifications activées sur cet appareil");
+    }
+  }catch(e){ if(ask) toast("Impossible d'activer les notifications sur cet appareil. Réessaie depuis l'appli installée."); }
+  renderNotifBar();
+}
 
 (function init(){
   const cfg=window.QG_FIREBASE;

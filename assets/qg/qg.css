@@ -289,3 +289,8 @@ nav.tabs button[aria-selected="true"] svg{color:var(--gold)}
 .install b{color:var(--gold)}
 
 @media (max-width:480px){.top .name span{display:none}.top .logout{min-height:32px;padding:5px 10px;font-size:13px}.status{font-size:11px}}
+
+main .wrap.notifwrap{padding-block:14px 0}
+#notifBar{background:var(--gold-soft);border-radius:14px;padding:12px 14px;font-size:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+#notifBar b{color:var(--gold)}
+#notifBar .nb-acts{display:flex;gap:10px;align-items:center}

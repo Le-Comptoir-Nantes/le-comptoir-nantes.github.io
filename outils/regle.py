@@ -39,12 +39,12 @@ CSP_QG = '; '.join([
     "style-src-attr 'unsafe-inline'",
     "img-src 'self'",
     "font-src 'self'",
-    "connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com",
+    "connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://fcmregistrations.googleapis.com",
     "media-src 'none'",
     "manifest-src 'self'",
     "frame-src 'none'",
     "child-src 'none'",
-    "worker-src 'none'",
+    "worker-src 'self'",                   # le petit service des notifications (assets/qg/sw.js)
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
@@ -55,4 +55,5 @@ VENDOR = {
     'assets/qg/vendor/firebase-app-compat.js': '24a1fd90a9424647636669f59013201ba385eff82a58f88c76a7d400d4d71139',
     'assets/qg/vendor/firebase-auth-compat.js': '277f6ef70525168247921e7a51fe995ecc66f9c3cf56c97f0d2bc262f74b5906',
     'assets/qg/vendor/firebase-firestore-compat.js': '25133ac64bef210c19384ed72eafdec440c27c02a6b48e9d2b6b48bf7b00ad04',
+    'assets/qg/vendor/firebase-messaging-compat.js': '3550a8481c2f8f379f7f511a05d02ff7a441d9795b9fe141eed52ca199e58e3c',
 }

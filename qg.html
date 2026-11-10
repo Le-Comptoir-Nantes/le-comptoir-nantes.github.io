@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; style-src-attr 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; media-src 'none'; manifest-src 'self'; frame-src 'none'; child-src 'none'; worker-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; style-src-attr 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://fcmregistrations.googleapis.com; media-src 'none'; manifest-src 'self'; frame-src 'none'; child-src 'none'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#14213D">
@@ -31,7 +31,7 @@
   </div>
 </header>
 
-<main><div class="wrap" id="view"></div></main>
+<main><div class="wrap notifwrap" id="notifWrap" hidden><div id="notifBar"></div></div><div class="wrap" id="view"></div></main>
 
 <nav class="tabs" aria-label="Sections">
   <div class="wrap" role="tablist">
@@ -48,6 +48,7 @@
 <script src="assets/qg/vendor/firebase-app-compat.js"></script>
 <script src="assets/qg/vendor/firebase-auth-compat.js"></script>
 <script src="assets/qg/vendor/firebase-firestore-compat.js"></script>
+<script src="assets/qg/vendor/firebase-messaging-compat.js"></script>
 <script src="assets/qg/config.js"></script>
 <script src="assets/qg/app.js"></script>
 </body>

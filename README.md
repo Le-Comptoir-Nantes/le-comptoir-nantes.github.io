@@ -76,3 +76,11 @@ Si une rubrique affiche « Ce contenu ne se charge pas » : une virgule ou un gu
 - **Branchement** : `assets/qg/config.js` contient l'identifiant du projet Firebase « QG Le Comptoir » (`qg-le-comptoir`, console : console.firebase.google.com, compte Google du président). Ces valeurs ne sont pas secrètes ; la protection vient des règles.
 - **Sécurité de la page** : `qg.html` a sa propre règle (`CSP_QG` dans `outils/regle.py`), qui n'autorise en plus que les adresses de Firebase. La bibliothèque Firebase est hébergée dans `assets/qg/vendor/` et reconnue par son empreinte (`VENDOR`) : `verifier.py` signale toute modification.
 - **Sauvegarde** : onglet Bureau > Sauvegarde, réservé aux administrateurs.
+
+### Membres du club et notifications
+
+- **Deux niveaux d'accès** (onglet Bureau > Accès au QG) : *Bureau* (tout le QG, relié à une fiche du bureau) et *Membre du club* (agenda, annonces, fiches du bureau, « Je viens »). Les tâches et la coordination sont réservées au bureau : les règles Firestore le bloquent côté serveur, pas seulement l'affichage.
+- **Notifications** : chaque appareil les active une fois (bandeau « Activer » dans l'appli ; sur iPhone, l'appli doit être installée sur l'écran d'accueil). Le service `assets/qg/sw.js` les affiche.
+- **Envoi** : `.github/workflows/qg-notifications.yml` lance `outils/qg/notifier.py` toutes les 5 minutes : nouvelle annonce, rendez-vous ajouté ou modifié, rappel 2 h avant chaque rendez-vous. Il lui faut le secret GitHub `QG_FIREBASE_SA` : la clé JSON du compte de service (console Firebase > Paramètres du projet > Comptes de service > Générer une nouvelle clé privée), collée dans GitHub > Settings > Secrets and variables > Actions. Cette clé donne tous les droits sur la base : ne jamais la publier ni l'envoyer par message.
+- **Tests** : `python3 outils/qg/test_notifier.py`.
+- GitHub met en pause les tâches planifiées d'un dépôt resté 60 jours sans modification : dans ce cas, le réactiver depuis l'onglet Actions.

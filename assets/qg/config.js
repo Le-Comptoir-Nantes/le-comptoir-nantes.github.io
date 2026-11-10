@@ -7,6 +7,9 @@ window.QG_FIREBASE = {
   authDomain: "qg-le-comptoir.firebaseapp.com",
   projectId: "qg-le-comptoir",
   appId: "1:139731513780:web:8c6f18441d4d2dfb3982e1",
+  messagingSenderId: "139731513780",
+  /* Clé publique Web Push (console Firebase > Paramètres > Cloud Messaging) : elle n'est pas secrète. */
+  vapidKey: "BOGVMo1JgsI3UsO_MKgcTyR_NT1bmGCUaf1DsJkz6naVAVnHw1Xji6QNC8vqpzznhk37ffgh3AcYh68v41h8oug",
   /* Le président : toujours administrateur, même s'il n'est pas dans la liste des accès. Doit être identique dans firestore.rules. */
   proprietaire: "jblucas.denis@audencia.com"
 };

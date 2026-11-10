@@ -1,7 +1,9 @@
 rules_version = '2';
 // QG du Comptoir : règles de la base Firestore.
 // À coller dans la console Firebase : Firestore Database > Règles > Publier.
-// Seules les adresses e-mail vérifiées présentes dans la collection « acces » (ou le président) lisent et modifient les données.
+// Deux niveaux d'accès, enregistrés dans la collection « acces » (une fiche par adresse e-mail vérifiée) :
+//  - bureau : tout le QG (agenda, tâches, coordination, annonces, liste des accès) ;
+//  - membre du club : agenda, annonces et fiches du bureau en lecture, et « Je viens » pour soi.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -11,28 +13,64 @@ service cloud.firestore {
     function adresse() {
       return request.auth.token.email.lower();
     }
-    // Le président : toujours administrateur (même adresse que « proprietaire » dans assets/qg/config.js)
+    function fiche() {
+      return get(/databases/$(database)/documents/acces/$(adresse())).data;
+    }
+    // Le président : toujours du bureau et administrateur (même adresse que « proprietaire » dans assets/qg/config.js)
     function president() {
       return connecte() && adresse() == 'jblucas.denis@audencia.com';
     }
-    function membre() {
+    function inscrit() {
       return president() || (connecte() && exists(/databases/$(database)/documents/acces/$(adresse())));
     }
+    function bureau() {
+      return president() || (inscrit() && fiche().get('role', 'bureau') == 'bureau');
+    }
     function admin() {
-      return president() || (membre() && get(/databases/$(database)/documents/acces/$(adresse())).data.admin == true);
+      return president() || (bureau() && fiche().get('admin', false) == true);
     }
 
-    // Liste des accès : lisible par le bureau, modifiable par les administrateurs
+    // Liste des accès : le bureau la lit, chacun lit sa propre fiche, les administrateurs la modifient
     match /acces/{mail} {
-      allow read: if membre();
-      allow create, update: if admin() && request.resource.data.membreId is string;
+      allow read: if bureau() || (inscrit() && mail == adresse());
+      allow create, update: if admin() && request.resource.data.get('role', 'bureau') in ['bureau', 'membre'];
       allow delete: if admin() && mail != 'jblucas.denis@audencia.com';
     }
 
-    // Données du club : réservées au bureau
-    match /{rubrique}/{id} {
-      allow read, write: if membre()
-        && rubrique in ['membres', 'evenements', 'taches', 'annonces', 'presences', 'preparations'];
+    // Agenda, annonces, fiches du bureau : lus par tous les inscrits, modifiés par le bureau
+    match /evenements/{id} {
+      allow read: if inscrit();
+      allow write: if bureau();
+    }
+    match /annonces/{id} {
+      allow read: if inscrit();
+      allow write: if bureau();
+    }
+    match /membres/{id} {
+      allow read: if inscrit();
+      allow write: if bureau();
+    }
+
+    // « Je viens » : chacun ajoute ou retire sa propre présence ; le bureau peut tout corriger
+    match /presences/{id} {
+      allow read: if inscrit();
+      allow create, update: if bureau() || (inscrit() && request.resource.data.mail == adresse());
+      allow delete: if bureau() || (inscrit() && resource.data.mail == adresse());
+    }
+
+    // Tâches et coordination : réservées au bureau
+    match /taches/{id} {
+      allow read, write: if bureau();
+    }
+    match /preparations/{id} {
+      allow read, write: if bureau();
+    }
+
+    // Appareils inscrits aux notifications : chacun enregistre les siens, personne ne les lit
+    // (seul l'envoyeur automatique, outils/qg/notifier.py, y accède avec sa clé de service)
+    match /jetons/{jeton} {
+      allow create, update: if inscrit() && request.resource.data.mail == adresse();
+      allow delete: if inscrit() && resource.data.mail == adresse();
     }
   }
 }
