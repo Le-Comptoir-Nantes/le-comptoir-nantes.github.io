@@ -541,7 +541,10 @@ function render(){
   const addFocus = active && active.id && active.id.startsWith("add-") ? {id:active.id,v:active.value} : null;
   const keep={}; ["acc-mail","acc-role","acc-nom","acc-mem","acc-admin"].forEach(id=>{ const el=document.getElementById(id); if(el) keep[id]=el.type==="checkbox"?el.checked:el.value; });
   const fid=active&&active.id&&keep.hasOwnProperty(active.id)?active.id:null;
-  view.innerHTML = S.tab==="agenda"?renderAgenda(): S.tab==="taches"?renderTaches(): S.tab==="annonces"?renderAnnonces(): S.tab==="coord"?renderCoord(): S.tab==="revisions"?renderRevisions(): renderBureau();
+  const vh = S.tab==="agenda"?renderAgenda(): S.tab==="taches"?renderTaches(): S.tab==="annonces"?renderAnnonces(): S.tab==="coord"?renderCoord(): S.tab==="revisions"?renderRevisions(): renderBureau();
+  // Une fiche longue n'est pas reconstruite toutes les 30 secondes si rien n'a changé (garde la lecture en place)
+  if(!(S.tab==="revisions" && S.lastView===vh && view.childElementCount)) view.innerHTML=vh;
+  S.lastView = S.tab==="revisions" ? vh : null;
   if(addFocus){ const el=document.getElementById(addFocus.id); if(el){ el.value=addFocus.v; el.focus(); } }
   Object.keys(keep).forEach(id=>{ const el=document.getElementById(id); if(el){ if(el.type==="checkbox") el.checked=keep[id]; else el.value=keep[id]; } });
   if(fid&&document.getElementById(fid)) document.getElementById(fid).focus();
@@ -699,6 +702,8 @@ function confirmSheet(title,sub,label,fn,cls){
 /* ---------- Actions ---------- */
 document.addEventListener("click",async e=>{
   const tabB=e.target.closest("nav.tabs button"); if(tabB){ S.tab=tabB.dataset.tab; try{localStorage.setItem("qg-tab",S.tab)}catch(_){} location.hash=S.tab; render(); window.scrollTo(0,0); return; }
+  const aller=e.target.closest(".fdoc [data-aller]");
+  if(aller){ const cible=document.querySelector('.fdoc [data-ancre="'+aller.dataset.aller+'"]'); if(cible) cible.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); return; }
   const b=e.target.closest("[data-act]"); if(!b) return;
   const a=b.dataset.act;
   if(a==="week"){ const d=+b.dataset.d; S.weekOffset = d===0?0:S.weekOffset+d; render(); return; }
@@ -844,9 +849,9 @@ const REV_KEY = id => "qg-erreurs-"+id;
 function revErrors(id){ try{ return JSON.parse(lsGet(REV_KEY(id))||"[]"); }catch(_){ return []; } }
 function setRevErrors(id,list){ lsSet(REV_KEY(id), JSON.stringify([...new Set(list)])); }
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-function filigrane(){
+function filigrane(fixe){
   const who=(S.email||"QG du Comptoir")+" · "+new Intl.DateTimeFormat("fr-FR",{day:"numeric",month:"short"}).format(new Date());
-  return '<div class="filigrane" aria-hidden="true">'+Array.from({length:60},()=>'<span>'+esc(who)+'</span>').join("")+'</div>';
+  return '<div class="filigrane'+(fixe?" fixe":"")+'" aria-hidden="true">'+Array.from({length:fixe?140:60},()=>'<span>'+esc(who)+'</span>').join("")+'</div>';
 }
 function renderRevisions(){
   const it=S.rev&&S.revisions.find(r=>r.id===S.rev.id);
@@ -860,9 +865,9 @@ function renderRevisions(){
   for(const [mat,list] of Object.entries(groups)){
     h+='<section class="revgroup"><h3>'+esc(mat)+'</h3>';
     for(const r of list){
-      const quiz=r.type==="quiz", n=quiz?(r.questions||[]).length:(r.sections||[]).length, err=quiz?revErrors(r.id).length:0;
+      const quiz=r.type==="quiz", n=quiz?(r.questions||[]).length:(r.pages||r.sections||[]).length, err=quiz?revErrors(r.id).length:0;
       h+='<div class="revcard"><div class="ico">'+(quiz?"QCM":"Fiche")+'</div><div><div class="ttl">'+esc(r.titre)+'</div><div class="sub2">'+
-        (quiz? n+' questions'+(err?' · '+err+' erreur'+(err>1?"s":"")+' à revoir':"") : n+' fiche'+(n>1?"s":""))+'</div></div>'+
+        (quiz? n+' questions'+(err?' · '+err+' erreur'+(err>1?"s":"")+' à revoir':"") : esc(r.resume||(n+' fiche'+(n>1?"s":""))))+'</div></div>'+
         '<button class="btn small gold" data-act="revOpen" data-id="'+esc(r.id)+'">'+(quiz?"Commencer":"Ouvrir")+'</button></div>';
     }
     h+='</section>';
@@ -914,7 +919,50 @@ function renderQuiz(it){
   }
   return h+'</div>';
 }
+/* Fiches au format riche : HTML stocké dans Firestore, nettoyé ici par liste blanche
+   (balises de mise en forme, classes f-*, quelques styles sans URL, aucun lien, aucun script). */
+const NET_TAGS=new Set("b strong i em u s small sup sub br p span div section nav h1 h2 h3 h4 h5 h6 ul ol li mark blockquote table thead tbody tfoot tr th td caption button hr".split(" "));
+const NET_STYLE=/^(--tc|width|background|color|font-size|margin-top)\s*:\s*[-a-z0-9#%.,() ]+$/i;
+const netCache=new Map();
+function nettoie(html){
+  const src=new DOMParser().parseFromString("<body>"+html+"</body>","text/html").body;
+  const out=document.implementation.createHTMLDocument("").body;
+  const copie=(from,to)=>{
+    for(const n of [...from.childNodes]){
+      if(n.nodeType===3){ to.appendChild(out.ownerDocument.createTextNode(n.nodeValue)); continue; }
+      if(n.nodeType!==1) continue;
+      const tag=n.tagName.toLowerCase(); if(!NET_TAGS.has(tag)) continue;
+      const el=out.ownerDocument.createElement(tag);
+      const cls=(n.getAttribute("class")||"").split(/\s+/).filter(c=>/^f-[a-z0-9-]+$/.test(c));
+      if(cls.length) el.setAttribute("class",cls.join(" "));
+      const st=(n.getAttribute("style")||"").split(";").map(d=>d.trim()).filter(d=>d && NET_STYLE.test(d) && !/url|expression|\\/i.test(d));
+      if(st.length) el.setAttribute("style",st.join(";"));
+      const al=n.getAttribute("data-aller"); if(al && /^[a-z0-9-]+$/.test(al)) el.setAttribute("data-aller",al);
+      if(tag==="button") el.setAttribute("type","button");
+      to.appendChild(el); copie(n,el);
+    }
+  };
+  copie(src,out);
+  return out.innerHTML;
+}
+function ficheRiche(it){
+  const key=it.id+"|"+(it.majLe||"")+"|"+(it.pages||[]).length;
+  if(!netCache.has(key)){
+    netCache.clear();
+    netCache.set(key,(it.pages||[]).map(p=>{
+      const c=String(p.c||"blue").split(/\s+/).filter(x=>/^[a-z]+$/.test(x)).map(x=>"f-"+x).join(" ");
+      const a=/^[a-z0-9-]+$/.test(p.a||"")?p.a:"";
+      return '<section class="f-sheet '+c+'" data-ancre="'+a+'">'+nettoie(p.h||"")+'</section>';
+    }).join(""));
+  }
+  return netCache.get(key);
+}
 function renderFiche(it){
+  if(it.format==="riche"){
+    return '<div class="sechead"><h2>'+esc(it.titre)+'</h2><button class="btn ghost small" data-act="revBack">← Révisions</button></div>'+
+      (it.source?'<p class="help">'+esc(it.source)+'</p>':"")+
+      filigrane(true)+'<div class="fdoc">'+ficheRiche(it)+'</div>';
+  }
   let h='<div class="sechead"><h2>'+esc(it.titre)+'</h2><button class="btn ghost small" data-act="revBack">← Révisions</button></div><div class="quiz fiche">'+filigrane();
   (it.sections||[]).forEach(s=>{
     h+='<section style="display:flex;flex-direction:column;gap:8px">'+(s.titre?'<h3 class="qq" style="font-size:20px">'+esc(s.titre)+'</h3>':"");
