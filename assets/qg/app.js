@@ -11,12 +11,22 @@ const TYPES = {
 };
 const STATUTS = {a_faire:"À faire", en_cours:"En cours", fait:"Fait"};
 /* Données du club : une collection Firestore par rubrique. Les règles d'accès sont dans outils/qg/firestore.rules. */
-const COLLS=["membres","evenements","taches","annonces","presences","preparations"];
-const PUBLIC_COLLS=["membres","evenements","annonces","presences","revisions"];   /* visibles par les membres du club */
+const COLLS=["membres","evenements","taches","annonces","presences","preparations","idees"];
+const PUBLIC_COLLS=["membres","evenements","annonces","presences","revisions","idees"];   /* visibles par les membres du club */
+/* Boîte à idées : catégories (couleur du post-it) et étapes de traitement par le bureau */
+const CATS = {
+  evenement:{lbl:"Événement", c:"--pi-jaune"},
+  meet:{lbl:"Meet and Talk", c:"--pi-rose"},
+  sortie:{lbl:"Sortie", c:"--pi-bleu"},
+  revision:{lbl:"Cours et révisions", c:"--pi-vert"},
+  club:{lbl:"Vie du club", c:"--pi-orange"},
+  autre:{lbl:"Autre", c:"--pi-gris"}
+};
+const ETATS = {nouvelle:"Nouvelle", etude:"À l'étude", retenue:"Retenue", programmee:"Programmée", ecartee:"Écartée"};
 const roleOf = a => (a&&a.role) || (a&&a.membreId ? "bureau" : "membre");
 const OWNER=((window.QG_FIREBASE||{}).proprietaire||"jblucas.denis@audencia.com").toLowerCase();
 const S = {
-  membres:[], evenements:[], taches:[], annonces:[], presences:[], preparations:[], acces:[], revisions:[], rev:null,
+  membres:[], evenements:[], taches:[], annonces:[], presences:[], preparations:[], idees:[], ideesKo:false, ifiltre:"ouvertes", acces:[], revisions:[], rev:null, uid:null,
   authUser:null, authView:"login", authMsg:null, authEmail:"", installEvt:null, isAdmin:false, denied:false,
   me:null, user:null, db:null, canWrite:true, live:false, offline:false,
   loaded:{}, tab:"agenda", weekOffset:0, filtre:"actives", names:{}, now:new Date()
@@ -307,9 +317,9 @@ function renderBureau(){
 function renderAcces(){
   const list=[...S.acces].sort((a,b)=>(roleOf(a)===roleOf(b)?0:roleOf(a)==="bureau"?-1:1)||((membre(a.membreId)||{}).ordre??99)-((membre(b.membreId)||{}).ordre??99)||(a.nom||a.id).localeCompare(b.nom||b.id));
   let h='<div class="sechead" style="margin-top:8px"><h2>Accès au QG</h2></div>'+
-    '<p class="help">Seules les adresses e-mail de cette liste peuvent entrer, après avoir vérifié leur adresse. Le bureau voit tout le QG ; les membres du club voient l\'agenda, les annonces et la liste du bureau, et peuvent dire « Je viens ». Les administrateurs gèrent cette liste.</p>'+
+    '<p class="help">Seules les adresses e-mail de cette liste peuvent entrer, après avoir vérifié leur adresse. Le bureau voit tout le QG ; les membres du club voient l\'agenda, les annonces, les révisions et la liste du bureau, disent « Je viens » et proposent des idées. Les administrateurs gèrent cette liste.</p>'+
     '<form class="addacc" id="accForm"><div class="grid2"><div class="field"><label for="acc-mail">Adresse e-mail</label><input id="acc-mail" type="email" required autocomplete="off" placeholder="prenom.nom@audencia.com"></div>'+
-    '<div class="field"><label for="acc-role">Type d\'accès</label><select id="acc-role"><option value="membre">Membre du club : agenda et annonces</option><option value="bureau">Bureau : tout le QG</option></select></div></div>'+
+    '<div class="field"><label for="acc-role">Type d\'accès</label><select id="acc-role"><option value="membre">Membre du club : agenda, annonces, idées</option><option value="bureau">Bureau : tout le QG</option></select></div></div>'+
     '<div class="field" id="acc-nom-w"><label for="acc-nom">Prénom et nom</label><input id="acc-nom" maxlength="80" autocomplete="off"></div>'+
     '<div class="field" id="acc-mem-w" hidden><label for="acc-mem">Fiche du bureau</label><select id="acc-mem">'+memberOptions(null).replace("— Personne —","Choisir…")+'</select></div>'+
     '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="check" id="acc-admin-w" hidden><input type="checkbox" id="acc-admin"> Administrateur (gère les accès)</label><button class="btn gold small" type="submit" style="margin-left:auto">Ouvrir l\'accès</button></div></form>';
@@ -378,7 +388,85 @@ function installHint(){
 }
 
 /* ---------- Rendu global ---------- */
-function loadedAll(){ return S.offline || ["membres","evenements","taches","annonces","presences","preparations","revisions"].every(k=>S.loaded[k]); }
+function loadedAll(){ return S.offline || ["membres","evenements","taches","annonces","presences","preparations","revisions","idees"].every(k=>S.loaded[k]); }
+
+/* ---------- Boîte à idées ---------- */
+const myName = () => S.bureau ? ((myMember()||{}).nom||"") : (S.myName||"");
+const canEditIdee = i => S.bureau || (!!S.uid && i.auteurUid===S.uid);
+function renderIdees(){
+  const nb={ouvertes:0,nouvelle:0,retenues:0,ecartee:0,miennes:0};
+  S.idees.forEach(i=>{ const e=i.statut||"nouvelle";
+    if(e!=="ecartee") nb.ouvertes++; if(e==="nouvelle") nb.nouvelle++; if(e==="retenue"||e==="programmee") nb.retenues++; if(e==="ecartee") nb.ecartee++;
+    if(S.uid&&i.auteurUid===S.uid) nb.miennes++; });
+  const F=[["ouvertes","En cours"],["nouvelle","Nouvelles"],["retenues","Retenues"],["miennes","Les miennes"],["ecartee","Écartées"]];
+  let h='<div class="sechead"><h2>Boîte à idées</h2>'+(S.ideesKo?"":'<button class="btn gold small" data-act="newIdee">+ Idée</button>')+'</div>'+
+    '<p class="help">Un événement, un intervenant, une sortie, une idée pour le club ? Colle un post-it. Tout le club le voit et peut le soutenir ; le bureau le traite et répond ici.</p>';
+  if(S.ideesKo) return h+'<div class="empty"><b>Boîte à idées bientôt ouverte</b><span>Elle sera disponible dès que Lucas aura activé son accès.</span></div>';
+  if(!loadedAll()) return h+'<div class="empty"><b>Chargement…</b></div>';
+  h+='<div class="filters" role="group" aria-label="Filtrer les idées">'+F.map(([k,l])=>'<button class="fchip" data-act="ifiltre" data-f="'+k+'" aria-pressed="'+(S.ifiltre===k)+'">'+l+'<span class="n">'+nb[k]+'</span></button>').join("")+'</div>';
+  const list=S.idees.filter(i=>{ const e=i.statut||"nouvelle";
+    switch(S.ifiltre){ case "nouvelle": return e==="nouvelle"; case "retenues": return e==="retenue"||e==="programmee";
+      case "ecartee": return e==="ecartee"; case "miennes": return !!S.uid&&i.auteurUid===S.uid; default: return e!=="ecartee"; } })
+    .sort((a,b)=>((b.soutiens||[]).length-(a.soutiens||[]).length)||(b.creeLe||0)-(a.creeLe||0));
+  h+='<div class="board">';
+  if(S.ifiltre==="ouvertes"||S.ifiltre==="miennes") h+='<button class="postit vide" data-act="newIdee"><span class="pi-plus-ico" aria-hidden="true">+</span><span class="pi-ttl">Coller une idée</span><span class="pi-txt">Titre, deux lignes d\'explication : ça suffit.</span></button>';
+  for(const i of list){
+    const c=CATS[i.categorie]||CATS.autre, e=i.statut||"nouvelle", sout=i.soutiens||[], moi=!!S.uid&&sout.includes(S.uid), mine=!!S.uid&&i.auteurUid===S.uid;
+    h+='<article class="postit'+(e==="ecartee"?" off":"")+'" style="--pc:var('+c.c+')">'+
+      '<div class="pi-top"><span class="pi-cat">'+esc(c.lbl)+'</span><span class="pi-etat e-'+e+'">'+esc(ETATS[e]||ETATS.nouvelle)+'</span></div>'+
+      '<h3 class="pi-ttl">'+esc(i.titre)+'</h3>'+
+      (i.detail?'<p class="pi-txt">'+esc(i.detail)+'</p>':"")+
+      (i.noteBureau?'<div class="pi-rep"><b>Le bureau :</b> '+esc(i.noteBureau)+'</div>':"")+
+      '<div class="pi-foot"><span class="pi-who">'+esc(mine?"Toi":(i.nom||"Un membre"))+' · '+esc(ago(i.creeLe))+'</span>'+
+      '<button class="pi-sout'+(moi?" on":"")+'" data-act="ideeSout" data-id="'+esc(i.id)+'" aria-pressed="'+moi+'" aria-label="'+(moi?"Retirer mon soutien":"Soutenir cette idée")+' ('+sout.length+')">'+(moi?"✓ Soutenue":"+1")+'<span class="n">'+sout.length+'</span></button></div>'+
+      (canEditIdee(i)?'<div class="pi-acts">'+(S.bureau?'<button class="btn small" data-act="ideeTraiter" data-id="'+esc(i.id)+'">Traiter</button>':"")+
+        '<button class="btn ghost small" data-act="ideeEdit" data-id="'+esc(i.id)+'">Modifier</button></div>':"")+
+      '</article>';
+  }
+  h+='</div>';
+  if(!list.length && S.ifiltre!=="ouvertes" && S.ifiltre!=="miennes") h+='<div class="empty"><b>Rien ici</b><span>Aucune idée dans cette catégorie.</span></div>';
+  return h+'<p class="help">« +1 » : tu soutiens l\'idée (un seul par personne, tu peux le retirer). Les idées les plus soutenues remontent en haut.</p>';
+}
+function ideeSheet(i){
+  const e=i||{categorie:"evenement"};
+  openSheet('<h3>'+(i?"Modifier l'idée":"Nouvelle idée")+'</h3><form id="iForm">'+
+    '<div class="field"><label for="i-titre">Ton idée</label><input id="i-titre" required maxlength="120" value="'+esc(e.titre||"")+'" placeholder="Une soirée jeux de société au Comptoir"></div>'+
+    '<div class="field"><label for="i-cat">Catégorie</label><select id="i-cat">'+Object.entries(CATS).map(([k,v])=>'<option value="'+k+'"'+(k===e.categorie?" selected":"")+'>'+v.lbl+'</option>').join("")+'</select></div>'+
+    '<div class="field"><label for="i-det">En deux mots (facultatif)</label><textarea id="i-det" maxlength="800" placeholder="Pourquoi c\'est une bonne idée, qui pourrait venir, quand…">'+esc(e.detail||"")+'</textarea></div>'+
+    '<div class="bar">'+(i?'<button type="button" class="btn danger small left" id="delI">Retirer le post-it</button>':"")+
+    '<button type="button" class="btn ghost" data-close>Fermer</button><button class="btn gold" type="submit">'+(i?"Enregistrer":"Coller le post-it")+'</button></div></form>',
+  root=>{
+    root.querySelector("[data-close]").onclick=closeSheet;
+    if(i) $("#delI",root).onclick=()=>confirmSheet("Retirer cette idée ?","« "+i.titre+" » disparaîtra de la boîte à idées pour tout le club.","Retirer",async()=>{ await w(col("idees").doc(i.id).delete(),"Idée retirée"); });
+    $("#iForm",root).onsubmit=async ev=>{
+      ev.preventDefault();
+      const body={titre:$("#i-titre").value.trim(), categorie:$("#i-cat").value, detail:$("#i-det").value.trim(), majLe:Date.now()};
+      if(!body.titre) return; closeSheet();
+      if(i) await w(col("idees").doc(i.id).update(body),"Idée mise à jour");
+      else await w(col("idees").add(Object.assign(body,{statut:"nouvelle",auteurUid:S.uid,nom:myName(),soutiens:[],creeLe:Date.now()})),"Post-it collé : merci pour l'idée !");
+    };
+  });
+}
+function ideeTraiterSheet(i){
+  const e=i.statut||"nouvelle";
+  openSheet('<h3>Traiter l\'idée</h3><p class="sub"><b>'+esc(i.titre)+'</b>'+(i.nom?' · proposée par '+esc(i.nom):"")+' · '+(i.soutiens||[]).length+' soutien'+((i.soutiens||[]).length>1?"s":"")+'</p>'+
+    '<form id="itForm"><div class="field"><label for="it-etat">Où en est l\'idée ?</label><select id="it-etat">'+Object.entries(ETATS).map(([k,v])=>'<option value="'+k+'"'+(k===e?" selected":"")+'>'+v+'</option>').join("")+'</select></div>'+
+    '<div class="field"><label for="it-rep">Réponse du bureau (visible par tout le club)</label><textarea id="it-rep" maxlength="600" placeholder="Retenue pour mars : Félice s\'en occupe.">'+esc(i.noteBureau||"")+'</textarea></div>'+
+    '<div class="choice"><button type="button" id="itTask"><b>Créer une tâche</b><span>Confier à un membre du bureau l\'étude ou la préparation de l\'idée.</span></button>'+
+    '<button type="button" id="itEv"><b>Mettre à l\'agenda</b><span>Créer le rendez-vous à partir de l\'idée.</span></button></div>'+
+    '<div class="bar"><button type="button" class="btn ghost" data-close>Fermer</button><button class="btn gold" type="submit">Enregistrer</button></div></form>',
+  root=>{
+    root.querySelector("[data-close]").onclick=closeSheet;
+    const save=async(msg,force)=>{ const statut=force||$("#it-etat",root).value, noteBureau=$("#it-rep",root).value.trim();
+      closeSheet(); const body={statut,majLe:Date.now()}; if(noteBureau) body.noteBureau=noteBureau; else body.noteBureau=firebase.firestore.FieldValue.delete();
+      return w(col("idees").doc(i.id).update(body),msg); };
+    $("#itForm",root).onsubmit=async ev=>{ ev.preventDefault(); await save("Idée mise à jour"); };
+    $("#itTask",root).onclick=async()=>{ const cur=$("#it-etat",root).value; await save(null, cur==="nouvelle"?"etude":cur);
+      taskSheet(null,{titre:"Idée : "+i.titre,note:(i.detail||"")+(i.nom?"\nProposée par "+i.nom+" dans la boîte à idées.":"")}); };
+    $("#itEv",root).onclick=async()=>{ const cur=$("#it-etat",root).value; await save(null, ["nouvelle","etude","retenue"].includes(cur)?"programmee":cur);
+      eventSheet(null,{titre:i.titre,type:i.categorie==="meet"?"meet":i.categorie==="sortie"?"sortie":i.categorie==="revision"?"soutien":"autre",note:i.detail||""}); };
+  });
+}
 
 /* ---------- Coordination ---------- */
 const SUGG = {
@@ -529,7 +617,7 @@ function render(){
   }
   S.lastGate="";
   ["taches","coord"].forEach(t=>{ $("#tab-"+t).hidden=!S.bureau; });
-  $("nav.tabs .wrap").style.gridTemplateColumns="repeat("+(S.bureau?6:4)+",1fr)";
+  $("nav.tabs .wrap").style.gridTemplateColumns="repeat("+(S.bureau?7:5)+",1fr)";
   document.body.classList.toggle("protege", protege());
   if(!S.bureau && (S.tab==="taches"||S.tab==="coord")) S.tab="agenda";
   renderNotifBar();
@@ -541,7 +629,7 @@ function render(){
   const addFocus = active && active.id && active.id.startsWith("add-") ? {id:active.id,v:active.value} : null;
   const keep={}; ["acc-mail","acc-role","acc-nom","acc-mem","acc-admin"].forEach(id=>{ const el=document.getElementById(id); if(el) keep[id]=el.type==="checkbox"?el.checked:el.value; });
   const fid=active&&active.id&&keep.hasOwnProperty(active.id)?active.id:null;
-  const vh = S.tab==="agenda"?renderAgenda(): S.tab==="taches"?renderTaches(): S.tab==="annonces"?renderAnnonces(): S.tab==="coord"?renderCoord(): S.tab==="revisions"?renderRevisions(): renderBureau();
+  const vh = S.tab==="agenda"?renderAgenda(): S.tab==="taches"?renderTaches(): S.tab==="annonces"?renderAnnonces(): S.tab==="coord"?renderCoord(): S.tab==="revisions"?renderRevisions(): S.tab==="idees"?renderIdees(): renderBureau();
   // Une fiche longue n'est pas reconstruite toutes les 30 secondes si rien n'a changé (garde la lecture en place)
   if(!(S.tab==="revisions" && S.lastView===vh && view.childElementCount)) view.innerHTML=vh;
   S.lastView = S.tab==="revisions" ? vh : null;
@@ -550,6 +638,7 @@ function render(){
   if(fid&&document.getElementById(fid)) document.getElementById(fid).focus();
   syncAccForm();
   if(loadedAll()&&S.bureau){ const al=coordAlerts(), n=al.notReady+al.unassigned, cb=$("#coordBadge"); cb.hidden=!n; cb.textContent=n; }
+  { const ni=S.bureau?S.idees.filter(i=>(i.statut||"nouvelle")==="nouvelle").length:0, ib=$("#ideeBadge"); if(ib){ ib.hidden=!ni; ib.textContent=ni; } }
   if(draft!==null && $("#annTxt")){ $("#annTxt").value=draft; $("#annPin").checked=pinChk; if(keepFocus) $("#annTxt").focus(); }
   document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));
   const st=$("#status");
@@ -585,8 +674,8 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape" && $("#scrim")) clo
 const memberOptions = sel => '<option value="">— Personne —</option>'+[...S.membres].sort((a,b)=>(a.ordre??99)-(b.ordre??99)).map(m=>'<option value="'+esc(m.id)+'"'+(m.id===sel?" selected":"")+'>'+esc(m.nom)+(m.role?" · "+esc(m.role):"")+'</option>').join("");
 const typeOptions = sel => Object.entries(TYPES).map(([k,v])=>'<option value="'+k+'"'+(k===sel?" selected":"")+'>'+v.lbl+'</option>').join("");
 
-function eventSheet(ev){
-  const e=ev||{type:"comptoir",date:ymd(S.now),debut:"18:00",fin:"20:00",repetition:"aucune"};
+function eventSheet(ev,pre){
+  const e=ev||Object.assign({type:"comptoir",date:ymd(S.now),debut:"18:00",fin:"20:00",repetition:"aucune"},pre||{});
   openSheet('<h3>'+(ev?"Modifier la série":"Nouveau rendez-vous")+'</h3><form id="evForm">'+
     '<div class="field"><label for="f-titre">Titre</label><input id="f-titre" required maxlength="120" value="'+esc(e.titre||"")+'" placeholder="Comptoir du mercredi"></div>'+
     '<div class="grid2"><div class="field"><label for="f-type">Type</label><select id="f-type">'+typeOptions(e.type)+'</select></div>'+
@@ -646,8 +735,8 @@ function occSheet(ev,key){
     };
   });
 }
-function taskSheet(t){
-  const e=t||{statut:"a_faire"};
+function taskSheet(t,pre){
+  const e=t||Object.assign({statut:"a_faire"},pre||{});
   openSheet('<h3>'+(t?"Modifier la tâche":"Nouvelle tâche")+'</h3><form id="tForm">'+
     '<div class="field"><label for="t-titre">Tâche</label><input id="t-titre" required maxlength="160" value="'+esc(e.titre||"")+'" placeholder="Réserver le bar de mercredi"></div>'+
     '<div class="grid2"><div class="field"><label for="t-resp">Pour qui ?</label><select id="t-resp">'+memberOptions(t?e.responsable:((myMember()||{}).id))+'</select></div>'+
@@ -708,6 +797,7 @@ document.addEventListener("click",async e=>{
   const a=b.dataset.act;
   if(a==="week"){ const d=+b.dataset.d; S.weekOffset = d===0?0:S.weekOffset+d; render(); return; }
   if(a==="filtre"){ S.filtre=b.dataset.f; render(); return; }
+  if(a==="ifiltre"){ S.ifiltre=b.dataset.f; render(); return; }
   if(a.startsWith("rev") && revAction(a,b)) return;
   if(!S.db) return;
   if(a==="newEvent") return eventSheet();
@@ -730,6 +820,12 @@ document.addEventListener("click",async e=>{
     await w(col("taches").doc(t.id).update({statut:next,majLe:Date.now()}), next==="fait"?"Tâche terminée":null);
     return;
   }
+  if(a==="newIdee"){ if(S.ideesKo) return; return ideeSheet(); }
+  if(a==="ideeEdit"){ const i=S.idees.find(x=>x.id===b.dataset.id); if(i&&canEditIdee(i)) ideeSheet(i); return; }
+  if(a==="ideeTraiter"){ const i=S.idees.find(x=>x.id===b.dataset.id); if(i&&S.bureau) ideeTraiterSheet(i); return; }
+  if(a==="ideeSout"){ const i=S.idees.find(x=>x.id===b.dataset.id); if(!i||!S.uid) return; b.disabled=true;
+    const on=(i.soutiens||[]).includes(S.uid), FV=firebase.firestore.FieldValue;
+    await w(col("idees").doc(i.id).update({soutiens:on?FV.arrayRemove(S.uid):FV.arrayUnion(S.uid)}), on?"Soutien retiré":"Tu soutiens cette idée"); return; }
   if(a==="pinAnn"){ const x=S.annonces.find(y=>y.id===b.dataset.id); if(x) await w(col("annonces").doc(x.id).update({epingle:!x.epingle})); return; }
   if(a==="delAnn"){ const x=S.annonces.find(y=>y.id===b.dataset.id); if(x) confirmSheet("Supprimer cette annonce ?","Elle disparaîtra pour tout le club.","Supprimer",async()=>{ await w(col("annonces").doc(x.id).delete(),"Annonce supprimée"); }); return; }
   if(a==="prepToggle"||a==="prepDel"){
@@ -836,7 +932,7 @@ document.addEventListener("submit",async e=>{
 });
 
 /* ---------- Démarrage ---------- */
-const VALID=["agenda","taches","annonces","revisions","coord","bureau"];
+const VALID=["agenda","taches","annonces","idees","revisions","coord","bureau"];
 function readHash(){ const h=(location.hash||"").slice(1); if(VALID.includes(h)) S.tab=h; }
 try{ const t=localStorage.getItem("qg-tab"); if(VALID.includes(t)) S.tab=t; }catch(_){}
 readHash();
@@ -1030,7 +1126,7 @@ window.addEventListener("beforeprint",()=>voile(true,3000));
 let unsubs=[], dataTimer=null;
 function stopData(){
   unsubs.forEach(u=>{ try{u();}catch(_){} }); unsubs=[]; clearTimeout(dataTimer);
-  S.db=null; S.loaded={}; S.live=false; S.slow=false; COLLS.forEach(c=>S[c]=[]); S.acces=[]; S.revisions=[]; S.rev=null;
+  S.db=null; S.loaded={}; S.live=false; S.slow=false; COLLS.forEach(c=>S[c]=[]); S.acces=[]; S.revisions=[]; S.rev=null; S.ideesKo=false; S.uid=null;
   S.me=null; S.email=null; S.myName=""; S.bureau=false; S.isAdmin=false; S.isOwner=false; S.canWrite=false; S.denied=false;
 }
 function startData(fs){
@@ -1046,7 +1142,8 @@ function startData(fs){
       render();
     },err=>{
       S.loaded[name]=true; S.live=false;
-      if(err&&err.code==="permission-denied" && name!=="acces"){ stopData(); S.denied=true; }
+      if(name==="idees"){ S.ideesKo=true; fresh.idees=true; if(COLLS.every(k=>fresh[k])){ S.live=true; S.slow=false; clearTimeout(dataTimer); } }   /* boîte à idées pas encore autorisée : le reste du QG marche */
+      else if(err&&err.code==="permission-denied" && name!=="acces"){ stopData(); S.denied=true; }
       render();
     }));
   });
@@ -1063,7 +1160,7 @@ async function enter(u){
     if(!acc && mail===OWNER){ acc={role:"bureau",membreId:"lucas",admin:true,ajouteLe:Date.now()}; await fs.collection("acces").doc(mail).set(acc); }
     if(S.authUser!==u) return;
     if(!acc){ S.denied=true; render(); return; }
-    S.email=mail; S.bureau=roleOf(acc)==="bureau"||mail===OWNER;
+    S.email=mail; S.uid=u.uid; S.bureau=roleOf(acc)==="bureau"||mail===OWNER;
     S.me=S.bureau?(acc.membreId||null):"e:"+mail; S.myName=S.bureau?"":(acc.nom||"");
     S.isAdmin=S.bureau&&(!!acc.admin||mail===OWNER); S.isOwner=S.isAdmin; S.canWrite=S.bureau; S.db=fs;
     render(); startData(fs); enableNotifs(false);

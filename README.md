@@ -68,7 +68,7 @@ Si une rubrique affiche « Ce contenu ne se charge pas » : une virgule ou un gu
 
 ## QG du Comptoir (espace du bureau)
 
-`qg.html` est l'appli de coordination du bureau : agenda, tâches, annonces, coordination. Elle s'installe sur téléphone et ordinateur (« Sur l'écran d'accueil » / « Installer l'application »).
+`qg.html` est l'appli de coordination du bureau : agenda, tâches, annonces, boîte à idées, révisions, coordination. Elle s'installe sur téléphone et ordinateur (« Sur l'écran d'accueil » / « Installer l'application »).
 
 - **Connexion** : adresse e-mail et mot de passe, à chaque ouverture. L'adresse doit être confirmée par le lien reçu par e-mail.
 - **Qui entre** : seules les adresses de la liste « Accès au QG » (onglet Bureau de l'appli), reliées chacune à une fiche du bureau. Le président (`proprietaire` dans `assets/qg/config.js`) est toujours administrateur et gère la liste.
@@ -79,9 +79,10 @@ Si une rubrique affiche « Ce contenu ne se charge pas » : une virgule ou un gu
 
 ### Membres du club et notifications
 
-- **Deux niveaux d'accès** (onglet Bureau > Accès au QG) : *Bureau* (tout le QG, relié à une fiche du bureau) et *Membre du club* (agenda, annonces, fiches du bureau, « Je viens »). Les tâches et la coordination sont réservées au bureau : les règles Firestore le bloquent côté serveur, pas seulement l'affichage.
+- **Deux niveaux d'accès** (onglet Bureau > Accès au QG) : *Bureau* (tout le QG, relié à une fiche du bureau) et *Membre du club* (agenda, annonces, fiches du bureau, « Je viens », révisions, boîte à idées). Les tâches et la coordination sont réservées au bureau : les règles Firestore le bloquent côté serveur, pas seulement l'affichage.
 - **Notifications** : chaque appareil les active une fois (bandeau « Activer » dans l'appli ; sur iPhone, l'appli doit être installée sur l'écran d'accueil). Le service `assets/qg/sw.js` les affiche.
 - **Envoi** : `.github/workflows/qg-notifications.yml` lance `outils/qg/notifier.py` toutes les 5 minutes : nouvelle annonce, rendez-vous ajouté ou modifié, rappel 2 h avant chaque rendez-vous. **Aucune clé** : le workflow se connecte à Google par la fédération d'identité (pool `github`, fournisseur `depot`, limité au dépôt du club et à la branche `main`), qui lui donne quelques minutes d'accès au compte de service `qg-notifications` (rôles : utilisateur Firestore, envoi Firebase Cloud Messaging).
 - **Révisions** : fiches et quiz (collection `revisions`), lisibles par tous les inscrits, publiés par le bureau. Pas de téléchargement : ils ne s'affichent que dans l'appli, avec filigrane au nom de la personne connectée, écran noir quand on quitte l'appli, sélection, copie et impression bloquées. Une page web ne peut pas empêcher une capture d'écran du téléphone : le filigrane permet d'en retrouver l'auteur.
+- **Boîte à idées** (onglet Idées, collection `idees`) : chaque inscrit, bureau ou membre du club, colle une idée sous forme de post-it (titre, catégorie, explication), peut la modifier ou la retirer, et soutient les idées des autres avec « +1 ». Le bureau traite chaque idée : étape (Nouvelle, À l'étude, Retenue, Programmée, Écartée), réponse visible par tout le club, et en un geste une tâche ou un rendez-vous créés à partir de l'idée. Le badge de l'onglet compte les nouvelles idées pour le bureau. Tant que les règles Firestore n'ont pas été republiées, l'onglet affiche « bientôt ouverte » et le reste du QG fonctionne normalement.
 - **Tests** : `python3 outils/qg/test_notifier.py`.
 - GitHub met en pause les tâches planifiées d'un dépôt resté 60 jours sans modification : dans ce cas, le réactiver depuis l'onglet Actions.

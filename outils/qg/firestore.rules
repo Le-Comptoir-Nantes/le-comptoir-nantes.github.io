@@ -3,7 +3,7 @@ rules_version = '2';
 // À coller dans la console Firebase : Firestore Database > Règles > Publier.
 // Deux niveaux d'accès, enregistrés dans la collection « acces » (une fiche par adresse e-mail vérifiée) :
 //  - bureau : tout le QG (agenda, tâches, coordination, annonces, liste des accès) ;
-//  - membre du club : agenda, annonces et fiches du bureau en lecture, et « Je viens » pour soi.
+//  - membre du club : agenda, annonces et fiches du bureau en lecture, « Je viens » pour soi, révisions, boîte à idées.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -62,6 +62,46 @@ service cloud.firestore {
     match /revisions/{id} {
       allow read: if inscrit();
       allow write: if bureau();
+    }
+
+    // Boîte à idées : chaque inscrit colle ses idées (post-its), les modifie ou les retire, et soutient celles des autres (+1) ;
+    // le bureau les traite (étape, réponse) et peut tout corriger. L'auteur est repéré par son identifiant de connexion, pas par son adresse.
+    function ideeValide(d) {
+      return d.keys().hasOnly(['titre', 'detail', 'categorie', 'statut', 'auteurUid', 'nom', 'soutiens', 'noteBureau', 'creeLe', 'majLe'])
+        && d.titre is string && d.titre.size() > 0 && d.titre.size() <= 120
+        && d.get('detail', '') is string && d.get('detail', '').size() <= 800
+        && d.get('nom', '') is string && d.get('nom', '').size() <= 80
+        && d.get('noteBureau', '') is string && d.get('noteBureau', '').size() <= 600
+        && d.categorie in ['evenement', 'meet', 'sortie', 'revision', 'club', 'autre']
+        && d.statut in ['nouvelle', 'etude', 'retenue', 'programmee', 'ecartee']
+        && d.soutiens is list && d.soutiens.size() <= 500
+        && d.auteurUid is string;
+    }
+    function seulement(champs) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(champs);
+    }
+    // Un « +1 » : la personne ajoute ou retire uniquement son propre identifiant
+    function unSoutien() {
+      let avant = resource.data.get('soutiens', []).toSet();
+      let apres = request.resource.data.soutiens.toSet();
+      let moi = [request.auth.uid].toSet();
+      return (apres.difference(avant) == moi && avant.difference(apres).size() == 0)
+        || (avant.difference(apres) == moi && apres.difference(avant).size() == 0);
+    }
+    match /idees/{id} {
+      allow read: if inscrit();
+      allow create: if (admin() && ideeValide(request.resource.data))
+        || (inscrit() && ideeValide(request.resource.data)
+          && request.resource.data.auteurUid == request.auth.uid
+          && request.resource.data.statut == 'nouvelle'
+          && request.resource.data.soutiens.size() == 0
+          && !('noteBureau' in request.resource.data));
+      allow update: if inscrit() && ideeValide(request.resource.data)
+        && request.resource.data.auteurUid == resource.data.auteurUid
+        && (bureau()
+          || (resource.data.auteurUid == request.auth.uid && seulement(['titre', 'detail', 'categorie', 'majLe']))
+          || (seulement(['soutiens']) && unSoutien()));
+      allow delete: if bureau() || (inscrit() && resource.data.auteurUid == request.auth.uid);
     }
 
     // Tâches et coordination : réservées au bureau
