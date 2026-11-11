@@ -29,7 +29,7 @@ assets/site.css, site.js                                  mise en page et foncti
 assets/motion.css, motion.js                              animations (coupées si le visiteur le demande)
 assets/jeu.css, jeu.js                                    mise en page et fonctionnement des pages du jeu
 assets/fonts/, assets/bureau/                             polices et portraits, hébergés sur le site
-outils/                                                   scripts de fabrication et de contrôle (pas utiles aux visiteurs)
+outils/                                                   scripts de fabrication et de contrôle (pas utiles aux visiteurs), dont outils/revisions/ pour les fiches et quiz du QG
 SECURITY.md, .well-known/security.txt                     sécurité : protections, signalement
 .github/workflows/verifier.yml                            contrôle automatique à chaque publication
 sitemap.xml, robots.txt                                   pour les moteurs de recherche
