@@ -22,9 +22,12 @@
   <div class="wrap">
     <div class="top">
       <img src="assets/favicon.svg" width="40" height="40" alt="">
-      <div class="name"><b>Le Comptoir</b><span>Club étudiant · Audencia</span></div>
-      <div class="status" id="status" hidden><i class="dot"></i><span id="statusTxt">Connexion…</span></div>
-      <button class="btn small logout" id="logoutBtn" type="button" hidden>Déconnexion</button>
+      <div class="name"><b>Le Comptoir</b><span data-en="Student club · Audencia">Club étudiant · Audencia</span></div>
+      <div class="topr">
+        <div class="status" id="status" hidden><i class="dot"></i><span id="statusTxt">Connexion…</span></div>
+        <button class="btn small lang" id="langBtn" type="button" lang="en" aria-label="EN, switch to English">EN</button>
+        <button class="btn small logout" id="logoutBtn" type="button" hidden data-en="Sign out">Déconnexion</button>
+      </div>
     </div>
     <section class="now" id="now" aria-live="polite"></section>
     <div class="strip" id="strip"></div>
@@ -35,18 +38,18 @@
 
 <nav class="tabs" aria-label="Sections">
   <div class="wrap" role="tablist">
-    <button role="tab" data-tab="agenda" id="tab-agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Agenda</button>
-    <button role="tab" data-tab="taches" id="tab-taches"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5l2 2 3.5-3.5M4 13.5l2 2 3.5-3.5M13 7h7M13 14h7M4 20h16"/></svg>Tâches<span class="badge" id="lateBadge" hidden></span></button>
-    <button role="tab" data-tab="annonces" id="tab-annonces"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h3l7 4V6L7 10z"/><path d="M17.5 9a4 4 0 0 1 0 6"/></svg>Annonces</button>
-    <button role="tab" data-tab="idees" id="tab-idees"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 4.5h15v10l-5 5h-10z"/><path d="M14.5 19.5v-5h5"/><path d="M8 9h8M8 12.5h4"/></svg>Idées<span class="badge" id="ideeBadge" hidden></span></button>
-    <button role="tab" data-tab="revisions" id="tab-revisions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M9 8h7M9 11.5h5"/></svg>Révisions</button>
+    <button role="tab" data-tab="agenda" id="tab-agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span data-en="Calendar">Agenda</span></button>
+    <button role="tab" data-tab="taches" id="tab-taches"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5l2 2 3.5-3.5M4 13.5l2 2 3.5-3.5M13 7h7M13 14h7M4 20h16"/></svg><span data-en="Tasks">Tâches</span><span class="badge" id="lateBadge" hidden></span></button>
+    <button role="tab" data-tab="annonces" id="tab-annonces"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h3l7 4V6L7 10z"/><path d="M17.5 9a4 4 0 0 1 0 6"/></svg><span class="lg" data-en="Announcements">Annonces</span><span class="sm" data-en="News">Annonces</span></button>
+    <button role="tab" data-tab="idees" id="tab-idees"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 4.5h15v10l-5 5h-10z"/><path d="M14.5 19.5v-5h5"/><path d="M8 9h8M8 12.5h4"/></svg><span data-en="Ideas">Idées</span><span class="badge" id="ideeBadge" hidden></span></button>
+    <button role="tab" data-tab="revisions" id="tab-revisions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M9 8h7M9 11.5h5"/></svg><span data-en="Revision">Révisions</span></button>
     <button role="tab" data-tab="coord" id="tab-coord"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/><path d="M12 3.5v1.5M20.5 12H19M12 20.5V19M3.5 12H5"/></svg><span class="lg">Coordination</span><span class="sm">Coord.</span><span class="badge" id="coordBadge" hidden></span></button>
-    <button role="tab" data-tab="bureau" id="tab-bureau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.8-3.2 3-5 5.5-5s4.7 1.8 5.5 5"/><circle cx="17" cy="9.5" r="2.4"/><path d="M15.5 14.4c2.3-.4 4.3 1 5 4"/></svg>Bureau</button>
+    <button role="tab" data-tab="bureau" id="tab-bureau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.8-3.2 3-5 5.5-5s4.7 1.8 5.5 5"/><circle cx="17" cy="9.5" r="2.4"/><path d="M15.5 14.4c2.3-.4 4.3 1 5 4"/></svg><span data-en="Board">Bureau</span></button>
   </div>
 </nav>
 
 <div id="sheetRoot"></div>
-<div class="voile" id="voile" hidden><div><b>Le Comptoir</b><span>Contenu protégé</span></div></div>
+<div class="voile" id="voile" hidden><div><b>Le Comptoir</b><span data-en="Protected content">Contenu protégé</span></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 <script src="assets/qg/vendor/firebase-app-compat.js"></script>
 <script src="assets/qg/vendor/firebase-auth-compat.js"></script>

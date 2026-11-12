@@ -5,7 +5,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from notifier import PARIS, notifications  # noqa: E402
+from notifier import PARIS, message, notifications  # noqa: E402
 
 maintenant = dt.datetime(2026, 11, 11, 16, 5, tzinfo=PARIS)          # mercredi 16h05
 ms = lambda d: int(d.timestamp() * 1000)
@@ -28,6 +28,14 @@ assert titres[1] == 'Rendez-vous modifié : Comptoir du mercredi', titres
 assert envois[1]['corps'] == 'Mercredi 11 novembre · 18h00 · Le Lieu Unique', envois[1]['corps']
 assert titres[2] == 'Dans 1 h 55 : Comptoir du mercredi' and envois[2]['corps'] == '18h00 · Le Lieu Unique', envois[2]
 assert len(envois) == 3
+# Version anglaise, pour les appareils réglés en anglais
+assert envois[0]['en']['titre'] == 'New announcement · Le Comptoir'
+assert envois[1]['en'] == {'titre': 'Event changed: Comptoir du mercredi', 'corps': 'Wednesday 11 November · 18:00 · Le Lieu Unique'}, envois[1]['en']
+assert envois[2]['en'] == {'titre': 'In 1 h 55 min: Comptoir du mercredi', 'corps': '18:00 · Le Lieu Unique'}, envois[2]['en']
+m_fr, m_en = message(envois[2], None), message(envois[2], 'en')
+assert m_fr['titre'] == 'Dans 1 h 55 : Comptoir du mercredi' and m_fr['lang'] == 'fr' and 'en' not in m_fr, m_fr
+assert m_en['titre'] == 'In 1 h 55 min: Comptoir du mercredi' and m_en['corps'] == '18:00 · Le Lieu Unique' and m_en['lang'] == 'en', m_en
+assert m_en['tag'] == m_fr['tag'] and m_en['url'] == m_fr['url']
 
 # Rien ne repart au passage d'après
 envois2, _ = notifications(ann, ev, etat, maintenant + dt.timedelta(minutes=5))
@@ -39,4 +47,10 @@ ev['sortie'] = {'titre': 'Visite du tribunal de commerce', 'date': '2026-11-20',
 envois3, _ = notifications({}, ev, dict(etat, evenementsDepuis=ms(avant), rappels=[]), maintenant)
 assert [e['titre'] for e in envois3] == ['Nouveau rendez-vous : Visite du tribunal de commerce'], envois3
 assert envois3[0]['corps'] == 'Vendredi 20 novembre · 09h30 · Tribunal de commerce'
+assert envois3[0]['en']['titre'] == 'New event: Visite du tribunal de commerce'
+assert envois3[0]['en']['corps'] == 'Friday 20 November · 09:30 · Tribunal de commerce'
+# Lieu non renseigné
+ev['sans'] = {'titre': 'Réunion', 'date': '2026-11-20', 'debut': '12:00', 'majLe': ms(maintenant)}
+e4, _ = notifications({}, {'sans': ev['sans']}, dict(etat, evenementsDepuis=ms(avant), connus=[], rappels=[]), maintenant)
+assert e4[0]['corps'].endswith('lieu à annoncer') and e4[0]['en']['corps'].endswith('venue TBA'), e4
 print('notifier : tous les tests passent')

@@ -5,7 +5,8 @@ Lancé toutes les 5 minutes par .github/workflows/qg-notifications.yml. À chaqu
   - nouvelle annonce publiée            -> « Nouvelle annonce »
   - rendez-vous ajouté ou modifié       -> « Nouveau rendez-vous » / « Rendez-vous modifié »
   - rendez-vous qui commence dans 2 h   -> rappel (une seule fois par date)
-Les notifications partent vers les appareils (collection « jetons ») dont l'adresse a encore un accès.
+Les notifications partent vers les appareils (collection « jetons ») dont l'adresse a encore un accès,
+en français ou en anglais selon la langue choisie dans l'appli sur l'appareil (champ « langue » du jeton).
 
 Connexion à Google sans clé : GitHub fournit au workflow un jeton d'identité (OIDC) prouvant qu'il s'agit
 du dépôt du club ; Google l'échange contre un accès de quelques minutes au compte de service
@@ -32,6 +33,9 @@ BASE = 'https://firestore.googleapis.com/v1/projects/%s/databases/(default)/docu
 JOURS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche']
 MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août',
         'septembre', 'octobre', 'novembre', 'décembre']
+DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+          'September', 'October', 'November', 'December']
 
 
 # ---------- Lecture des valeurs Firestore ----------
@@ -60,8 +64,22 @@ def heure(h):
         return None
 
 
-def joli_jour(d):
+def joli_jour(d, en=False):
+    if en:
+        return '%s %d %s' % (DAYS[d.weekday()], d.day, MONTHS[d.month - 1])
     return '%s %d %s' % (JOURS[d.weekday()], d.day, MOIS[d.month - 1])
+
+
+def majuscule(t):
+    return t[:1].upper() + t[1:]
+
+
+def lieu(o, en=False):
+    return o['lieu'] or ('venue TBA' if en else 'lieu à annoncer')
+
+
+def hh(o, en=False):
+    return o['heure'].strftime('%H:%M' if en else '%Hh%M')
 
 
 def occurrences(ev, debut, fin):
@@ -92,7 +110,7 @@ def occurrences(ev, debut, fin):
         quand = dt.datetime.combine(d, h, tzinfo=PARIS)
         if debut <= quand <= fin:
             out.append({'cle': d.isoformat(), 'quand': quand, 'heure': h,
-                        'lieu': ex.get('lieu') or ev.get('lieu') or 'lieu à annoncer'})
+                        'lieu': ex.get('lieu') or ev.get('lieu') or ''})
     return out
 
 
@@ -101,10 +119,10 @@ def prochaine(ev, maintenant):
     return o[0] if o else None
 
 
-def resume(ev, o):
+def resume(ev, o, en=False):
     if not o:
-        return 'Voir le détail dans l\'agenda du QG.'
-    return '%s · %s · %s' % (joli_jour(o['quand'].date()).capitalize(), o['heure'].strftime('%Hh%M'), o['lieu'])
+        return 'See the details in the HQ calendar.' if en else 'Voir le détail dans l\'agenda du QG.'
+    return '%s · %s · %s' % (majuscule(joli_jour(o['quand'].date(), en)), hh(o, en), lieu(o, en))
 
 
 def notifications(annonces, evenements, etat, maintenant):
@@ -119,8 +137,9 @@ def notifications(annonces, evenements, etat, maintenant):
     for aid, a in sorted(annonces.items(), key=lambda x: x[1].get('creeLe') or 0):
         if (a.get('creeLe') or 0) > depuis:
             texte = ' '.join((a.get('texte') or '').split())
-            envois.append({'titre': 'Nouvelle annonce · Le Comptoir',
-                           'corps': texte[:180] + ('…' if len(texte) > 180 else ''),
+            corps = texte[:180] + ('…' if len(texte) > 180 else '')
+            envois.append({'titre': 'Nouvelle annonce · Le Comptoir', 'corps': corps,
+                           'en': {'titre': 'New announcement · Le Comptoir', 'corps': corps},
                            'tag': 'annonce-' + aid, 'url': APPLI + '#annonces'})
             nouvel['annoncesDepuis'] = max(nouvel.get('annoncesDepuis', 0), a.get('creeLe') or 0)
     # Rendez-vous ajoutés ou modifiés
@@ -129,8 +148,11 @@ def notifications(annonces, evenements, etat, maintenant):
     for eid, ev in evenements.items():
         if (ev.get('majLe') or 0) > depuis:
             nouveau = eid not in connus
-            envois.append({'titre': ('Nouveau rendez-vous : ' if nouveau else 'Rendez-vous modifié : ') + (ev.get('titre') or 'Le Comptoir'),
-                           'corps': resume(ev, prochaine(ev, maintenant)),
+            o = prochaine(ev, maintenant)
+            nom = ev.get('titre') or 'Le Comptoir'
+            envois.append({'titre': ('Nouveau rendez-vous : ' if nouveau else 'Rendez-vous modifié : ') + nom,
+                           'corps': resume(ev, o),
+                           'en': {'titre': ('New event: ' if nouveau else 'Event changed: ') + nom, 'corps': resume(ev, o, True)},
                            'tag': 'rdv-' + eid, 'url': APPLI + '#agenda'})
             nouvel['evenementsDepuis'] = max(nouvel.get('evenementsDepuis', 0), ev.get('majLe') or 0)
     nouvel['connus'] = sorted(connus | set(evenements))
@@ -143,8 +165,11 @@ def notifications(annonces, evenements, etat, maintenant):
                 continue
             minutes = max(1, round((o['quand'] - maintenant).total_seconds() / 60))
             dans = ('%d h %02d' % divmod(minutes, 60)) if minutes >= 60 else '%d min' % minutes
-            envois.append({'titre': 'Dans %s : %s' % (dans.replace(' 00', ''), ev.get('titre') or 'rendez-vous'),
-                           'corps': '%s · %s' % (o['heure'].strftime('%Hh%M'), o['lieu']),
+            dans = dans.replace(' 00', '')
+            envois.append({'titre': 'Dans %s : %s' % (dans, ev.get('titre') or 'rendez-vous'),
+                           'corps': '%s · %s' % (hh(o), lieu(o)),
+                           'en': {'titre': 'In %s%s: %s' % (dans, ' min' if ' h ' in dans else '', ev.get('titre') or 'event'),
+                                  'corps': '%s · %s' % (hh(o, True), lieu(o, True))},
                            'tag': 'rappel-' + cle, 'url': APPLI + '#agenda'})
             faits.add(cle)
     limite = (maintenant - dt.timedelta(days=3)).date().isoformat()
@@ -219,6 +244,16 @@ def session():
     return Session(r.json()['accessToken'])
 
 
+def message(n, langue):
+    """Données envoyées à un appareil : le texte dans sa langue (anglais si l'appareil l'a choisi, sinon français)."""
+    en = langue == 'en' and n.get('en')
+    d = {k: str(v) for k, v in n.items() if k != 'en'}
+    if en:
+        d.update({k: str(v) for k, v in n['en'].items()})
+    d['lang'] = 'en' if en else 'fr'
+    return d
+
+
 def lire(s, collection):
     docs, page = {}, None
     while True:
@@ -253,7 +288,7 @@ def main():
             for jeton in jetons:
                 if jeton in perimes:
                     continue
-                corps = {'message': {'token': jeton, 'data': {k: str(v) for k, v in n.items()},
+                corps = {'message': {'token': jeton, 'data': message(n, jetons[jeton].get('langue')),
                                      'webpush': {'headers': {'Urgency': 'high', 'TTL': '86400'}}}}
                 r = s.post('https://fcm.googleapis.com/v1/projects/%s/messages:send' % PROJET, json=corps, timeout=20)
                 if r.status_code in (400, 404) and ('UNREGISTERED' in r.text or 'NOT_FOUND' in r.text or 'INVALID_ARGUMENT' in r.text):

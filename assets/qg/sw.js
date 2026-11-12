@@ -8,12 +8,12 @@ self.addEventListener("push", e => {
   let p = {};
   try { p = e.data ? e.data.json() : {}; } catch (_) { p = {}; }
   const d = p.data || {}, n = p.notification || {};
-  const titre = d.titre || n.title || "QG du Comptoir";
+  const titre = d.titre || n.title || (d.lang === "en" ? "Le Comptoir HQ" : "QG du Comptoir");
   const options = {
     body: d.corps || n.body || "",
     icon: "icone-192.png",
     badge: "icone-192.png",
-    lang: "fr",
+    lang: d.lang === "en" ? "en" : "fr",
     data: { url: d.url || "../../qg.html" }
   };
   if (d.tag) options.tag = d.tag;
