@@ -329,7 +329,7 @@
     }).join('');
     if (fc) {
       var people = rows.filter(function (r) { return !open(r.title); });
-      var pics = people.filter(function (r) { return r.autorisationPhoto === true && img(r.photo); }).slice(0, 6);
+      var pics = people.filter(function (r) { return r.autorisationPhoto === true && img(r.photo); }).slice(0, 10);
       fc.innerHTML = '<span class="stack">' + pics.map(function (r) { return '<img src="' + esc(img(r.photo)) + '" alt="" loading="lazy">'; }).join('') + '</span>' +
         '<span><b>' + t(people.length + ' étudiants tiennent le comptoir', people.length + ' students run the club') + '</b><small>' + t('Rencontrer le bureau', 'Meet the board') + '</small></span>';
     }

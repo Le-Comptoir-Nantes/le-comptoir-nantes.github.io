@@ -196,6 +196,10 @@ html.m .faces .stack>:nth-child(3){--fi:2}
 html.m .faces .stack>:nth-child(4){--fi:3}
 html.m .faces .stack>:nth-child(5){--fi:4}
 html.m .faces .stack>:nth-child(6){--fi:5}
+html.m .faces .stack>:nth-child(7){--fi:6}
+html.m .faces .stack>:nth-child(8){--fi:7}
+html.m .faces .stack>:nth-child(9){--fi:8}
+html.m .faces .stack>:nth-child(10){--fi:9}
 @media (hover:hover) and (pointer:fine){
   html.m .member:hover .face{transform:translateY(-4px);box-shadow:0 24px 34px -24px rgba(7,22,58,.65)}
   html.m .good:hover .pic img{transform:scale(1.05)}
